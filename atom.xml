@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Kstheme</title>
   
-  <subtitle>test</subtitle>
+  <subtitle>Kstheme</subtitle>
   <link href="http://kstheme.github.io/atom.xml" rel="self"/>
   
   <link href="http://kstheme.github.io/"/>
