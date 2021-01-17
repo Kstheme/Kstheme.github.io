@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>第一篇blog</title>
+      <link href="2021/01/17/di-yi-pian-blog/"/>
+      <url>2021/01/17/di-yi-pian-blog/</url>
+      
+        <content type="html"><![CDATA[<p>这是高亮<code>234</code><br>werwerwer<br>werwerwer<br>不断行的空格1&nbsp;&nbsp;2<br> 半方大的空白<br> 全方大的空白</p><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><h3 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h3><h5 id="1-1-test"><a href="#1-1-test" class="headerlink" title="1.1 test"></a>1.1 test</h5><p>公式  </p><script type="math/tex; mode=display">\left\{    \begin{aligned}    x &= r\cos \theta \\    y &= r\sin \theta \\    \end{aligned}\right.</script><p>\n\n</p><script type="math/tex; mode=display">F(x)=\left\{       \begin{array}{rcl}        0,       & {x<a}\\        \frac{x-a}{b-a},     & {a<x<b}\\        1,    & {x>b}\\       \end{array} \right.</script><p>麦克斯韦方程组</p><script type="math/tex; mode=display">\begin{cases}{}\oint_l{Hdl}=\int_s{jds}+\int_s{\frac{\partial D}{\partial t}ds} \\ \oint_l{Edl}=-\int_s{\frac{\partial B}{\partial t}}\\\oint_s{ds}=0\\\oint_s{Dds}=\int_v{\rho dv}\end{cases}</script><p>矩阵表示</p><script type="math/tex; mode=display">A_{m,n} = \begin{pmatrix}a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\     a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\     \vdots & \vdots & \vdots & \vdots    \\a_{m,1} & a_{m,2} & \cdots & a_{m,n} \end{pmatrix}</script><p>行内公式$x=y$</p><h3 id="Related-work"><a href="#Related-work" class="headerlink" title="Related work"></a>Related work</h3><h3 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h3><h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><h3 id="Ackonwledegments"><a href="#Ackonwledegments" class="headerlink" title="Ackonwledegments"></a>Ackonwledegments</h3>]]></content>
+      
+      
+      <categories>
+          
+          <category> Markdown写作教程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Markdown教程 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Hello World</title>
       <link href="2021/01/16/hello-world/"/>
       <url>2021/01/16/hello-world/</url>
