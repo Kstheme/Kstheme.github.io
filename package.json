@@ -1,0 +1,39 @@
+{
+  "name": "vuepress-theme-hope-template",
+  "description": "A project of vuepress-theme-hope",
+  "version": "2.0.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "docs:build": "vuepress-vite build src",
+    "docs:clean-dev": "vuepress-vite dev src --clean-cache",
+    "docs:dev": "vuepress-vite dev src",
+    "docs:update-package": "npx vp-update"
+  },
+  "devDependencies": {
+    "@mathjax/src": "^4.0.0",
+    "@vuepress/bundler-vite": "2.0.0-rc.26",
+    "@vuepress/plugin-catalog": "^2.0.0-rc.118",
+    "@vuepress/plugin-docsearch": "^2.0.0-rc.118",
+    "@vuepress/plugin-markdown-chart": "^2.0.0-rc.118",
+    "@vuepress/plugin-markdown-ext": "^2.0.0-rc.118",
+    "@vuepress/plugin-markdown-include": "^2.0.0-rc.118",
+    "@vuepress/plugin-prismjs": "^2.0.0-rc.118",
+    "@vuepress/plugin-revealjs": "^2.0.0-rc.118",
+    "@vuepress/plugin-search": "^2.0.0-rc.118",
+    "@vuepress/plugin-slimsearch": "^2.0.0-rc.118",
+    "@vuepress/plugin-watermark": "^2.0.0-rc.118",
+    "chart.js": "^4.5.1",
+    "echarts": "^6.0.0",
+    "flowchart.ts": "^3.0.1",
+    "katex": "^0.16.25",
+    "markmap-lib": "^0.18.12",
+    "markmap-toolbar": "^0.18.12",
+    "markmap-view": "^0.18.12",
+    "mermaid": "^11.12.1",
+    "sass-embedded": "^1.93.2",
+    "vue": "^3.5.22",
+    "vuepress": "2.0.0-rc.26",
+    "vuepress-theme-hope": "2.0.0-rc.98"
+  }
+}
