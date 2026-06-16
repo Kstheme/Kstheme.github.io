@@ -7,19 +7,21 @@ on:
   # 手动触发部署
   workflow_dispatch:
 
-# 授予 GITHUB_TOKEN 必要的权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 确保只有一个部署任务在运行
 concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  # 消除 Node.js 20 弃用警告，提前使用 Node.js 24
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,21 +43,7 @@ jobs:
       - name: Build VuePress site
         run: pnpm docs:build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vuepress/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        run: gh pages deploy --dist docs/.vuepress/dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
