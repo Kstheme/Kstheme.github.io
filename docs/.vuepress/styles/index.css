@@ -1,0 +1,709 @@
+/* ============================================
+   Aesop Style — VuePress Theme-Plume
+   ============================================
+   Inspired by Aesop Skincare's design language:
+   warm chamois, sage ink, serif body, square edges.
+   ============================================ */
+
+/* ---- Google Fonts — Aesop transitional serif ---- */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@400;600&display=swap');
+
+/* ============================================
+   LIGHT MODE
+   ============================================ */
+:root {
+  /* --- Background --- */
+  --vp-c-bg: #F0EDE4;            /* cream surface */
+  --vp-c-bg-alt: #E8E4D9;        /* warm chamois — sidebar, code */
+  --vp-c-bg-elv: #F0EDE4;        /* elevated — dialog, dropdown */
+  --vp-c-bg-soft: #E8E4D9;       /* soft — table, ads */
+  --vp-c-bg-safe: #E8E4D9;      /* safe — code block bg */
+
+  /* --- Brand (sage muted) --- */
+  --vp-c-brand-1: #7A8470;       /* sage — primary link, button */
+  --vp-c-brand-2: #8D9A82;       /* lighter sage — hover */
+  --vp-c-brand-3: #6A7560;       /* darker sage — active */
+  --vp-c-brand-soft: rgba(122, 132, 112, 0.15);
+
+  /* --- Grey / neutral palette --- */
+  --vp-c-gray-1: #D5CFC0;
+  --vp-c-gray-2: #E0DCD0;
+  --vp-c-gray-3: #E8E4D9;
+  --vp-c-gray-soft: rgba(122, 132, 112, 0.10);
+
+  /* --- Text (ink) --- */
+  --vp-c-text-1: #1B1B1B;                /* near-black */
+  --vp-c-text-2: rgba(27, 27, 27, 0.72);
+  --vp-c-text-3: rgba(27, 27, 27, 0.48);
+
+  /* --- Border / divider --- */
+  --vp-c-border: #D5CFC0;
+  --vp-c-divider: #E0DCD0;
+  --vp-c-gutter: #E0DCD0;
+
+  /* --- Shadow: none (Aesop signature) --- */
+  --vp-shadow-1: none;
+  --vp-shadow-2: none;
+  --vp-shadow-3: none;
+  --vp-shadow-4: none;
+  --vp-shadow-5: none;
+
+  /* --- Typography --- */
+  --vp-font-family-base: "Inter", -apple-system, BlinkMacSystemFont,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --vp-font-family-mono: ui-monospace, "Menlo", "Monaco", "Consolas",
+    "Liberation Mono", "Courier New", monospace;
+
+  /* --- Nav --- */
+  --vp-nav-bg-color: var(--vp-c-bg);
+  --vp-nav-screen-bg-color: var(--vp-c-bg);
+
+  /* --- Sidebar --- */
+  --vp-sidebar-bg-color: var(--vp-c-bg-alt);
+
+  /* --- Home --- */
+  --vp-home-hero-name-color: var(--vp-c-text-1);
+
+  /* --- Code --- */
+  --vp-code-color: #5A5A5A;
+  --vp-code-bg: rgba(0, 0, 0, 0.04);
+  --vp-code-block-bg: var(--vp-c-bg-alt);
+  --vp-code-block-color: var(--vp-c-text-1);
+
+  /* --- Input --- */
+  --vp-input-border-color: var(--vp-c-border);
+  --vp-input-bg-color: var(--vp-c-bg);
+
+  /* --- Button brand --- */
+  --vp-button-brand-bg: var(--vp-c-brand-1);
+  --vp-button-brand-text: #fff;
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-active-bg: var(--vp-c-brand-3);
+
+  /* --- Button alt --- */
+  --vp-button-alt-bg: var(--vp-c-gray-3);
+  --vp-button-alt-text: var(--vp-c-text-1);
+  --vp-button-alt-hover-bg: var(--vp-c-gray-2);
+
+  /* --- Badge --- */
+  --vp-badge-tip-bg: var(--vp-c-brand-soft);
+  --vp-badge-tip-text: var(--vp-c-brand-1);
+
+  /* --- Hint container override (square) --- */
+  --vp-custom-block-info-bg: rgba(122, 132, 112, 0.08);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
+  --vp-custom-block-warning-bg: rgba(145, 89, 48, 0.10);
+  --vp-custom-block-danger-bg: rgba(184, 39, 44, 0.10);
+}
+
+/* ============================================
+   DARK MODE (warm dark tones)
+   ============================================ */
+[data-theme="dark"] {
+  /* --- Background --- */
+  --vp-c-bg: #2A2824;            /* warm dark brown */
+  --vp-c-bg-alt: #1F1D1A;        /* deeper warm */
+  --vp-c-bg-elv: #33302B;        /* elevated */
+  --vp-c-bg-soft: #33302B;
+  --vp-c-bg-safe: #33302B;
+
+  /* --- Brand (lighter sage on dark) --- */
+  --vp-c-brand-1: #9AAB8E;
+  --vp-c-brand-2: #B0C0A4;
+  --vp-c-brand-3: #7A8470;
+  --vp-c-brand-soft: rgba(154, 171, 142, 0.20);
+
+  /* --- Grey --- */
+  --vp-c-gray-1: #444038;
+  --vp-c-gray-2: #37342E;
+  --vp-c-gray-3: #33302B;
+  --vp-c-gray-soft: rgba(154, 171, 142, 0.10);
+
+  /* --- Text (warm cream) --- */
+  --vp-c-text-1: rgba(240, 237, 228, 0.92);
+  --vp-c-text-2: rgba(240, 237, 228, 0.62);
+  --vp-c-text-3: rgba(240, 237, 228, 0.36);
+
+  /* --- Border --- */
+  --vp-c-border: #444038;
+  --vp-c-divider: #37342E;
+  --vp-c-gutter: #000;
+
+  /* --- Nav --- */
+  --vp-nav-bg-color: var(--vp-c-bg);
+  --vp-nav-screen-bg-color: var(--vp-c-bg);
+
+  /* --- Sidebar --- */
+  --vp-sidebar-bg-color: var(--vp-c-bg-alt);
+
+  /* --- Code --- */
+  --vp-code-color: #C0B8A8;
+  --vp-code-bg: rgba(255, 255, 255, 0.06);
+  --vp-code-block-bg: var(--vp-c-bg-alt);
+
+  /* --- Button --- */
+  --vp-button-brand-bg: var(--vp-c-brand-2);
+  --vp-button-brand-text: #1F1D1A;
+  --vp-button-brand-hover-bg: var(--vp-c-brand-1);
+  --vp-button-brand-hover-text: #fff;
+  --vp-button-brand-active-bg: var(--vp-c-brand-3);
+
+  /* --- Button alt --- */
+  --vp-button-alt-bg: var(--vp-c-gray-3);
+  --vp-button-alt-text: var(--vp-c-text-1);
+  --vp-button-alt-hover-bg: var(--vp-c-gray-1);
+
+  /* --- Input --- */
+  --vp-input-bg-color: var(--vp-c-bg-alt);
+
+  /* --- Dropdown / elevated surfaces pick up bg-elv automatically --- */
+}
+
+/* ============================================
+   FONT: Chinese UI (keep sans-serif for nav etc.)
+   ============================================ */
+:root:where(:lang(zh)),
+:root:where(:lang(zh-CN)) {
+  --vp-font-family-base:
+    "Inter4CJK",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji";
+}
+
+/* ============================================
+   CONTENT: Serif body for Aesop editorial feel
+   ============================================ */
+.vp-doc {
+  font-family: "Lora", "Noto Serif SC", "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--vp-c-text-1);
+}
+
+/* Headings keep sans-serif for Aesop's "headings = UI labels" feel */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6 {
+  font-family: var(--vp-font-family-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--vp-c-text-1);
+}
+
+/* Body paragraphs — Aesop justified copy */
+.vp-doc p {
+  font-family: "Lora", "Noto Serif SC", "Georgia", "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 1.2em 0;
+}
+
+/* === Aesop Signature: small-caps labels === */
+.vp-doc h2 {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--vp-c-text-2);
+  padding-top: 0;
+  margin: 48px 0 20px;
+  border-top: none;
+}
+
+.vp-doc h2:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.vp-doc h3 {
+  font-size: 15px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--vp-c-text-2);
+  margin: 32px 0 16px;
+}
+
+.vp-doc a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  font-weight: 400;
+  background-image: linear-gradient(transparent calc(100% - 1px), var(--vp-c-brand-1) 1px);
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 400ms ease, color 300ms ease;
+}
+
+.vp-doc :not(h1, h2, h3, h4, h5, h6) a:hover {
+  color: var(--vp-c-brand-2);
+  background-size: 100% 100%;
+}
+
+/* Headings with links — keep underline always visible */
+.vp-doc h1 a,
+.vp-doc h2 a,
+.vp-doc h3 a,
+.vp-doc h4 a {
+  background-size: 100% 100%;
+  background-image: linear-gradient(transparent calc(100% - 1px), var(--vp-c-text-2) 1px);
+}
+
+/* Blockquote — Aesop quiet refinement */
+.vp-doc blockquote {
+  padding: 16px 24px;
+  margin: 24px 0;
+  color: var(--vp-c-text-2);
+  background-color: var(--vp-c-bg-soft);
+  border-left: 2px solid var(--vp-c-brand-1);
+  border-radius: 0;
+  font-style: italic;
+}
+
+.vp-doc blockquote::before {
+  display: none;
+}
+
+.vp-doc blockquote > p {
+  font-size: 15px;
+  color: inherit;
+}
+
+/* Lists */
+.vp-doc ul,
+.vp-doc ol {
+  padding-left: 1.5em;
+}
+
+/* ============================================
+   ARCHITECTURAL SQUARE EDGES (selective)
+   ============================================ */
+/* Keep Aesop-square on structural / hard-edged elements */
+.vp-navbar,
+.vp-sidebar,
+.vp-sidebar *,
+.vp-home-hero,
+.vp-home-hero *,
+.vp-nav-screen,
+.search-box,
+.search-box *,
+.tag,
+.tag *,
+.vp-doc pre,
+.vp-doc :not(pre) > code,
+.vp-doc blockquote,
+.vp-doc th,
+.vp-doc td,
+.vp-doc table,
+.vp-doc hr {
+  border-radius: 0 !important;
+}
+
+/* ============================================
+   NO SHADOWS (selective — keep clean on structure)
+   ============================================ */
+.vp-home-hero,
+.vp-home-hero *,
+.vp-doc pre,
+.vp-doc blockquote,
+.tag,
+.search-box {
+  box-shadow: none !important;
+}
+
+/* ============================================
+   FROSTED GLASS — navigation bar (毛玻璃)
+   ============================================ */
+.vp-navbar {
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+
+/* Light mode: warm cream glass */
+.vp-navbar:not(.home),
+.vp-navbar.home:not(.top) {
+  background-color: rgba(240, 237, 228, 0.72) !important;
+}
+
+/* Dark mode: warm dark glass */
+[data-theme="dark"] .vp-navbar:not(.home),
+[data-theme="dark"] .vp-navbar.home:not(.top) {
+  background-color: rgba(42, 40, 36, 0.78) !important;
+}
+
+/* ============================================
+   FROSTED GLASS — sidebar (毛玻璃)
+   ============================================ */
+.vp-sidebar {
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background-color: rgba(232, 228, 217, 0.85) !important;
+}
+
+[data-theme="dark"] .vp-sidebar {
+  background-color: rgba(31, 29, 26, 0.90) !important;
+}
+
+/* ============================================
+   FROSTED GLASS — mobile nav screen
+   ============================================ */
+.vp-nav-screen {
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background-color: rgba(240, 237, 228, 0.88) !important;
+}
+
+[data-theme="dark"] .vp-nav-screen {
+  background-color: rgba(42, 40, 36, 0.90) !important;
+}
+
+/* ============================================
+   CREAM BRICK — cards, feature blocks, containers
+   ============================================ */
+.vp-card-wrapper {
+  background: linear-gradient(145deg, #F5F0E6 0%, #EBE6DA 100%) !important;
+  border: 1px solid rgba(122, 132, 112, 0.12) !important;
+  box-shadow:
+    0 2px 4px rgba(122, 132, 112, 0.06),
+    0 1px 2px rgba(122, 132, 112, 0.04) !important;
+  border-radius: 4px !important;
+  transition: box-shadow 400ms ease, border-color 400ms ease, transform 400ms ease !important;
+}
+
+.vp-card-wrapper:hover {
+  box-shadow:
+    0 6px 12px rgba(122, 132, 112, 0.08),
+    0 2px 4px rgba(122, 132, 112, 0.04) !important;
+  border-color: rgba(122, 132, 112, 0.22) !important;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .vp-card-wrapper {
+  background: linear-gradient(145deg, #37342E 0%, #2E2B26 100%) !important;
+  border: 1px solid rgba(154, 171, 142, 0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.20) !important;
+}
+
+[data-theme="dark"] .vp-card-wrapper:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.30) !important;
+  border-color: rgba(154, 171, 142, 0.18) !important;
+}
+
+/* Card grid — warm gap glow */
+.vp-card-grid {
+  gap: 24px;
+}
+
+/* ============================================
+   CREAM BRICK — custom blocks / hint containers
+   ============================================ */
+.vp-doc blockquote {
+  background: linear-gradient(135deg, #F0EDE4, #E8E4D9) !important;
+  border-left: 3px solid var(--vp-c-brand-1);
+  padding: 20px 28px;
+}
+
+[data-theme="dark"] .vp-doc blockquote {
+  background: linear-gradient(135deg, #33302B, #2A2824) !important;
+}
+
+/* ============================================
+   CREAM BRICK — table
+   ============================================ */
+.vp-doc tr {
+  background-color: rgba(240, 237, 228, 0.60);
+}
+
+[data-theme="dark"] .vp-doc tr {
+  background-color: rgba(42, 40, 36, 0.60);
+}
+
+/* ============================================
+   CREAM BRICK — content background subtle texture
+   ============================================ */
+.vp-content {
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(122, 132, 112, 0.015) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(122, 132, 112, 0.015) 0%, transparent 50%);
+}
+
+[data-theme="dark"] .vp-content {
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(154, 171, 142, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(154, 171, 142, 0.02) 0%, transparent 50%);
+}
+/* ============================================
+   NAVIGATION — letter-spaced (Aesop)
+   ============================================ */
+.vp-navbar a,
+.vp-navbar button {
+  letter-spacing: 0.04em;
+  font-weight: 400;
+}
+
+.vp-nav .vp-nav-item > a {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+
+/* ============================================
+   CODE BLOCKS — minimal, no rounded corners
+   ============================================ */
+.vp-doc :not(pre) > code {
+  padding: 2px 6px;
+  background-color: var(--vp-code-bg);
+  border-radius: 0;
+  font-size: 0.85em;
+}
+
+.vp-doc pre {
+  border-radius: 0;
+  background-color: var(--vp-code-block-bg);
+}
+
+/* ============================================
+   HOME PAGE HERO — Aesop editorial calm
+   ============================================ */
+
+/* Light mode hero vars: Aesop warm ink on cream */
+:root {
+  --vp-home-hero-name-color: #1B1B1B;
+  --vp-home-hero-name-background: transparent;
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
+  --vp-c-text-hero-name: #1B1B1B;
+  --vp-c-text-hero-tagline: rgba(27, 27, 27, 0.60);
+  --vp-c-text-hero-text: rgba(27, 27, 27, 0.80);
+}
+
+[data-theme="dark"] {
+  --vp-c-text-hero-name: rgba(240, 237, 228, 0.92);
+  --vp-c-text-hero-tagline: rgba(240, 237, 228, 0.55);
+  --vp-c-text-hero-text: rgba(240, 237, 228, 0.75);
+}
+
+/* Hero full-width background — warm chamois field */
+.vp-home-hero {
+  background-color: #E8E4D9 !important;
+  position: relative;
+}
+
+/* Subtle warm texture overlay for Aesop apothecary feel */
+.vp-home-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(122, 132, 112, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 80%, rgba(122, 132, 112, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .vp-home-hero {
+  background-color: #2A2824 !important;
+}
+
+[data-theme="dark"] .vp-home-hero::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(154, 171, 142, 0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 80%, rgba(154, 171, 142, 0.03) 0%, transparent 60%);
+}
+
+/* Hero inner content — keep on top of the background layer */
+.vp-home-hero .vp-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero name — clean sans-serif, editorial */
+.vp-home-hero .vp-hero-name {
+  font-family: var(--vp-font-family-base);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--vp-c-text-hero-name);
+  margin-bottom: 0.5em;
+}
+
+/* Hero tagline — serif, warm, quiet */
+.vp-home-hero .vp-hero-tagline {
+  font-family: "Lora", "Noto Serif SC", "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-hero-tagline);
+  margin-bottom: 0.75em;
+}
+
+/* Hero description — serif, editorial body copy */
+.vp-home-hero .vp-hero-description {
+  font-family: "Lora", "Noto Serif SC", "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--vp-c-text-hero-text);
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Hero action buttons — enhanced cream brick */
+.vp-home-hero .vp-hero-actions {
+  margin-top: 2.5rem;
+}
+
+.vp-home-hero .vp-hero-actions .vp-button {
+  font-family: var(--vp-font-family-base);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+}
+
+/* ============================================
+   SEARCH
+   ============================================ */
+.search-box {
+  border-radius: 0 !important;
+}
+
+.search-box .search-input-wrapper .search-input {
+  border-radius: 0 !important;
+}
+
+/* ============================================
+   TAGS
+   ============================================ */
+.tag {
+  border-radius: 0 !important;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   TABLE
+   ============================================ */
+.vp-doc table {
+  border-radius: 0;
+}
+
+.vp-doc th,
+.vp-doc td {
+  border-radius: 0;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.vp-sidebar {
+  background-color: var(--vp-sidebar-bg-color);
+}
+
+.vp-sidebar .vp-sidebar-item {
+  border-radius: 0;
+}
+
+/* ============================================
+   ENHANCED BUTTONS — cream brick tactile
+   ============================================ */
+.vp-button {
+  border-radius: 4px !important;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 0.65rem 1.8rem;
+  position: relative;
+  transition: all 400ms ease !important;
+}
+
+/* Brand button — sage gradient with warm inner light */
+.vp-button.brand {
+  background: linear-gradient(145deg, #7A8470 0%, #6A7560 100%) !important;
+  box-shadow:
+    0 2px 4px rgba(122, 132, 112, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+  color: #fff;
+}
+
+.vp-button.brand:hover {
+  background: linear-gradient(145deg, #8D9A82 0%, #7A8470 100%) !important;
+  box-shadow:
+    0 4px 10px rgba(122, 132, 112, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.vp-button.brand:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(122, 132, 112, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Alt button — cream brick surface */
+.vp-button.alt {
+  background: linear-gradient(145deg, #F5F0E6 0%, #EBE6DA 100%) !important;
+  border: 1px solid rgba(122, 132, 112, 0.18) !important;
+  box-shadow:
+    0 1px 2px rgba(122, 132, 112, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.60) !important;
+}
+
+.vp-button.alt:hover {
+  background: linear-gradient(145deg, #F0EDE4 0%, #E8E4D9 100%) !important;
+  border-color: rgba(122, 132, 112, 0.30) !important;
+  box-shadow:
+    0 3px 8px rgba(122, 132, 112, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.60) !important;
+  transform: translateY(-2px);
+}
+
+.vp-button.alt:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(122, 132, 112, 0.04) !important;
+}
+
+/* Dark mode buttons */
+[data-theme="dark"] .vp-button.brand {
+  background: linear-gradient(145deg, #9AAB8E 0%, #7A8470 100%) !important;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .vp-button.brand:hover {
+  background: linear-gradient(145deg, #B0C0A4 0%, #9AAB8E 100%) !important;
+}
+
+[data-theme="dark"] .vp-button.alt {
+  background: linear-gradient(145deg, #37342E 0%, #2E2B26 100%) !important;
+  border: 1px solid rgba(154, 171, 142, 0.15) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .vp-button.alt:hover {
+  background: linear-gradient(145deg, #3D3A34 0%, #33302B 100%) !important;
+  border-color: rgba(154, 171, 142, 0.25) !important;
+}
+
+/* ============================================
+   TRANSITION DURATION — slow, luxurious ease
+   ============================================ */
+:root {
+  --vp-t-color: 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --vp-t-transform: 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
