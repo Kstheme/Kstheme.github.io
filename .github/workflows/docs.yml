@@ -7,43 +7,42 @@ on:
   # 手动触发部署
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-env:
-  # 消除 Node.js 20 弃用警告，提前使用 Node.js 24
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          # "最近更新时间" 等 git 日志相关信息，需要拉取全部提交记录
           fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
+          # 选择要使用的 pnpm 版本
           version: 10
+          # 使用 pnpm 安装依赖
           run_install: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 选择要使用的 node 版本
+          node-version: 22
+          # 缓存 pnpm 依赖
           cache: pnpm
 
+      # 运行构建脚本
       - name: Build VuePress site
         run: pnpm docs:build
 
+      # @see https://github.com/crazy-max/ghaction-github-pages
       - name: Deploy to GitHub Pages
-        run: gh pages deploy --dist docs/.vuepress/dist
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          # 部署到 gh-pages 分支
+          target_branch: gh-pages
+          # 部署目录为 VuePress 的默认输出目录
+          build_dir: docs/.vuepress/dist
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
