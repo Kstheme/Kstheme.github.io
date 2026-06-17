@@ -39,7 +39,7 @@ export default defineThemeConfig({
     },
   ],
 
-  logo: "https://theme-plume.vuejs.press/plume.png",
+  logo: "/kstheme_logo.svg",
 
   appearance: true, // 配置 深色模式
 
@@ -87,7 +87,7 @@ export default defineThemeConfig({
        * @see https://theme-plume.vuejs.press/config/theme/#profile
        */
       profile: {
-        avatar: "https://theme-plume.vuejs.press/plume.png",
+        avatar: "/avatar.png",
         name: "Kstheme",
         description: "Algorithm Engineer",
         circle: true,
@@ -114,7 +114,7 @@ export default defineThemeConfig({
        * @see https://theme-plume.vuejs.press/config/theme/#profile
        */
       profile: {
-        avatar: "https://theme-plume.vuejs.press/plume.png",
+        avatar: "/avatar.png",
         name: "余弦",
         description: "算法工程师",
         circle: true,
