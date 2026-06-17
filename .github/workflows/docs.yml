@@ -6,36 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  # 先配置环境，允许 main 分支部署
-  setup-env:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      administration: write
-    steps:
-      - name: Configure github-pages environment
-        run: |
-          gh api --method PUT \
-            /repos/${{ github.repository }}/environments/github-pages \
-            -f deployment_branch_policy[protected_branches]=false \
-            -f deployment_branch_policy[custom_branch_policies]=true || true
-          gh api --method POST \
-            /repos/${{ github.repository }}/environments/github-pages/deployment-branch-policies \
-            -f name='${{ github.ref_name }}' || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # 然后构建并部署
   build-and-deploy:
-    needs: setup-env
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,11 +28,10 @@ jobs:
       - name: Build VuePress site
         run: pnpm docs:build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vuepress/dist
-
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: gh-pages
+          build_dir: docs/.vuepress/dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
