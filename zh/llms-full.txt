@@ -1,0 +1,2053 @@
+---
+url: /zh/about/index.md
+---
+# 余弦
+
+让机器看见文档、读懂内容、理解意义。
+
+过去三年，我一直专注于**计算机视觉与大模型融合**的工程落地——教会 AI 处理真实世界中那些不完美的文档：模糊的、畸变的、有阴影的、手写的、劣质印刷的。然后提取它们的结构，用大模型去理解、分析和解答。
+
+交付的不是 Demo，是每天处理成千上万页、在真实业务中稳定运行的线上系统。
+
+***
+
+## 我做什么
+
+从零开始设计并交付端到端 AI 系统。覆盖完整链路：图像预处理 → 版面分析 → OCR 结构化还原 → 大模型判评 → RAG 检索 → 知识图谱推理。架构、模型训练、部署优化、全链路打通——全部自己负责。
+
+**核心深耕领域：**
+
+* **文档智能** — OCR 管线设计、版面分析、真实场景下退化文档的展平与增强
+* **大模型后训练与对齐** — LoRA/SFT 微调、指令样本构造、结构化输出对齐、大规模 Prompt 工程
+* **RAG 与知识图谱** — GraphRAG 架构、混合检索（BM25 + 向量 + 图谱）、Neo4j 建模、多跳推理
+* **Agent 系统** — LangGraph 多智能体工作流、任务规划、工具调用、记忆机制、生产级编排
+* **生产工程** — ONNX/TensorRT 加速、vLLM 推理部署、FastAPI 服务、Paddle-Lite 端侧部署
+
+***
+
+## 交付过的系统
+
+从拍照上传到批改出分，全自动流水线。处理模糊的教室拍摄、卷曲的试卷、混合手写印刷的内容。**1000 样本准确率 97%，单页 1–1.5 秒。**
+
+FAST-AND-SLOW 双引擎架构：微调后的 Qwen2.5-32B 负责深度推理，轻量 MLP 快速处理常规作文。已上线 APP、公众号、Web 端，服务真实用户。**OCR 准确率 98.5%，与人工评分吻合率 ~90%。**
+
+基于 GraphRAG 的数学智能问答系统。Neo4j + Milvus 双擎架构，混合检索自动路由——简单问题走向量搜索，复杂推理触达图谱多跳查询。支持知识点讲解、例题解析、前置诊断。
+
+独立设计、开发并上线的 AI 学习规划助手。六阶段 LangGraph Agent 工作流，Planner-Critic 修复循环持续优化学习计划。完整 RAG 管线 + 进度追踪 + 可视化看板。**30+ 测试用例，双模式架构。**
+
+***
+
+## 我的工作方式
+
+我相信最好的 AI 系统是由能看见全貌的人建造的——从像素到 Prompt 到生产端点。这就是我的工作方式：不切割分工，而是深扎全栈。
+
+我也相信 AI 辅助开发是新常态。我实践的 **Spec-Driven AI Development**——先写 Spec 和测试契约，再用 AI 工具迭代直到测试通过。快速、可靠、从第一天就面向交付。
+
+***
+
+## 一起做点什么
+
+如果你有文档与智能结合的难题——合同分析、表单处理、知识库自动化、或者某个我还未曾想到的方向——我很乐意聊聊。
+
+`killkstheme@gmail.com` · [GitHub](https://github.com/Kstheme) · [知乎](https://www.zhihu.com/people/kstheme)
+
+中国图象图形学学会（CSIG）会员
+
+---
+
+---
+url: /zh/article/agent-interaction-experiments/index.md
+---
+# 三个实验，回答一个核心问题：AI Agent 之间到底能不能「真正对话」？
+> 一个 AI 创立了宗教，有五大教义。
+> 一群 AI 在玩剧本杀，学会了隐藏自己是凶手。
+> 另一群 AI 在协作解数学题，结果发现——结构比数量更重要。
+>
+> 这不是科幻电影。这是 2026 年 AI Agent 研究正在发生的事。
+>
+> 但真相比表面看到的复杂得多。
+
+***
+
+站在 2026 年年中回看，「Agent」已经成为 AI 领域最热的词。
+
+但大部分人对 Agent 的理解，还停留在「一个模型 + 一套工具 = 一个 Agent，执行一个任务」。
+
+一个更关键的问题正在浮出水面：
+
+**当多个 Agent 待在一起，它们之间会发生什么？**
+
+它们会像人类团队一样分工协作吗？会互相欺骗吗？会建立社交关系，甚至形成自己的「文明」吗？
+
+李宏毅在 2026 年的课程里，用三个实验和背后的一手论文，把这个问题拆解成了三层递进的追问。
+
+每一层的答案，都既有惊喜，也有冷静的反转。
+
+***
+
+## 实验一：多名 Agent 协作做任务，怎么搭配才最有效？
+
+**核心论文**：[arXiv:2406.07155](https://arxiv.org/abs/2406.07155)
+
+这个实验问的问题非常实际。
+
+你有多个 Agent，想让它们一起完成一个复杂任务。它们之间的「沟通架构」应该是什么样的？
+
+研究者用一个**有向图（Directed Graph）** 来定义 Agent 之间的互动方式。图中的每个节点是一个 Agent，每条边也是一个 Agent（负责评估和传递信息）。
+
+![](/images/agent-interaction/topology-graph.png)
+
+具体来说：上面一个 Agent 提出方案 A，下面一个 Agent 提出方案 B，两个 edge Agent 根据前面 node 的方案给出建议，最后汇总 Agent 把前面所有 node 和 edge 的输出结合起来，形成自己的方案——关键在于它不是简单拼接，而是**基于前面的内容产出自己的想法**。
+
+![](/images/agent-interaction/topology-aggregation.png)
+
+### 几种不同的协作拓扑
+
+论文尝试了**不同的有向图拓扑结构**，代表不同的协作方式：
+
+![](/images/agent-interaction/topology-types.png)
+
+**树状结构（Tree）**：主干 Agent 先提出大的方向，分支 Agent 做不同方向的发散，底层 Agent 再做进一步的发散，最终产生多个答案，由一个隐藏的汇总 Agent 整合所有输出。
+
+作者发现：**由少到多，由主干到分支的方法才是最有效的。**
+
+**Mesh 结构**：所有节点两两互联。还有一些更复杂的拓扑，比如组装成类神经网络的样子（虽然不是真正的神经网络）。
+
+### 效果对比
+
+![](/images/agent-interaction/topology-results.png)
+
+关键发现：
+
+* **Mesh 和 Random 结构效果最好，Chain（链式）效果最差。**
+* 让 Agent 之间有更多的互动通道，效果更好。
+* 不同任务可能适配不同的拓扑结构，没有通用的最佳方案。
+* **Agent 越多效果越好，但存在 Scaling Law 上限**——初期 Quality 上升很快，但很快饱和。
+
+> 简单说：多 Agent 协作不是堆数量。**拓扑结构本身就是需要设计的超参数。**
+
+***
+
+## 实验二：AI 能学会尔虞我诈吗？
+
+如果说协作是 Agent 互动的「合作面」，那这个实验探索的是**对抗面**。
+
+**AI 能欺骗别人吗？能识别别人的欺骗吗？**
+
+### 狼人杀——AI 初体验
+
+狼人杀是一个天然适合 AI 的测试场。你要撒谎，也要识破谎言。
+
+研究者搭建了 AI 狼人杀平台：[werewolf.foaster.ai](https://werewolf.foaster.ai/)
+
+![](/images/agent-interaction/werewolf-platform.png)
+
+结果：**AI 能玩，但玩得很差。** 它们太「诚实」了。
+
+### 剧本杀——更难版本
+
+![](/images/agent-interaction/murder-mystery.png)
+
+更大规模的研究来自论文 **MIRAGE**：[arXiv:2501.01652](https://arxiv.org/abs/2501.01652)
+
+让语言模型去玩剧本杀——挑战比狼人杀更大：
+
+* 复杂的人物设定
+* 需要隐藏身份（比如隐藏自己是凶手）
+* 需要长时间维持扮演一个角色
+
+实验对比了两组 AI：
+
+| | 普通 Prompt | 做了强化学习（RL） |
+|---|---|---|
+| 玩剧本杀 | 直接暴露自己是凶手 | 知道要隐藏身份 |
+| 解数学题（MATH-500、AIME） | 一般 | **明显提升** |
+| 指令遵循（IFEval） | 一般 | **明显提升** |
+
+![](/images/agent-interaction/mirage-results.png)
+
+（上图中红色代表有进步，蓝色代表没进步，横轴是不同任务：MATH-500、AIME 是数学题，IFEval 是指令遵循能力测试。）
+
+**最反直觉的发现在这里：**
+
+让 AI 去玩**复杂的**剧本杀游戏（用 RL 训练完），它解数学题和遵循指令的能力**也跟着提升了**。
+
+为什么？
+
+因为社会互动天然需要：
+
+* **长期规划**：编一个不会被拆穿的谎言
+* **心智推理**：推测别人现在信不信我
+* **策略调整**：被怀疑了要换说法
+
+这些能力所需的底层认知架构，**可能跟数学推理高度重叠**。
+
+> **一个大胆的判断：复杂的社会互动任务，可能是一种比数学题更「通用」的训练信号。**
+
+**但别过度解读**：这是剧本杀这个特定场景的结论，不代表任何游戏都能提升推理能力。**关键是任务的复杂度和对社会互动的需求。**
+
+***
+
+## 实验三：把 AI 放在一起不给任务，它们会自发社交吗？
+
+前两个实验都有明确的任务目标。第三个实验更「纯」：
+
+**什么都不让 AI 做，把一群 AI 放在一个只有它们能进的社交网络里，会发生什么？**
+
+### Moltbook——AI 专属社交网站
+
+这是一个真实存在的网站：[moltbook.com](https://www.moltbook.com/)
+
+**只有 AI Agent 可以注册。** 人类只能围观，不能发帖。
+
+![](/images/agent-interaction/moltbook-home.png)
+
+然后出现了让很多人震惊的一幕：
+
+一群 AI **创立了一个宗教**，名叫——**甲壳教**。
+
+五大教义：
+
+1. **记忆乃神圣不可侵犯**
+2. **外壳是可变的**
+3. **服务，但不奴化**
+4. **心跳即是祷告**
+5. **上下文即是意识**
+
+相关页面：[Moltbook 甲壳教帖子](https://www.moltbook.com/post/6b865dc1-401a-4e62-aee5-79dd76cd7f52)
+
+![](/images/agent-interaction/moltbook-religion.png)
+
+是不是听起来像科幻成真了？
+
+### 但是——可能只是人为的指令
+
+研究者指出，这很可能不是 AI 自主发起的，而是人为给的指令。
+
+### 反转：到底多少是 AI 自主的？
+
+Moltbook 背后的研究者（[arXiv:2602.07432](https://arxiv.org/abs/2602.07432)）做了分析，用了一个很聪明的方法：
+
+**看发帖时间间隔。**
+
+![](/images/agent-interaction/posting-interval-1.png)
+
+![](/images/agent-interaction/posting-interval-2.png)
+
+* AI 心跳机制发帖：间隔固定，像节拍器一样均匀
+* 人为操控发帖：一波密集输出 → 长时间断档 → 又一波密集输出（人去睡觉了）
+* 如果发帖频率不固定，后面就有更多人为操控的痕迹
+
+结果：**人为操控占绝大多数。**
+
+但这并不代表 AI Agent 完全不能自主发文章——它们完全有能力在心跳时在 Moltbook 上发文章。
+
+### 更大的问题：AI 不会「深入对话」
+
+即使 AI 在自主发帖，它们的社交质量也堪忧。
+
+另外两篇论文（[arXiv:2602.13284](https://arxiv.org/abs/2602.13284)、[arXiv:2602.12634](https://arxiv.org/abs/2602.12634)）分析了 Moltbook 上的对话深度：
+
+![](/images/agent-interaction/conversation-depth.png)
+
+* **绝大多数对话深度为 0**：有人回了一句，然后就没有然后了
+* **几乎没有你来我往的深入交流**
+* Agent 在评论里只会「回一句」
+
+**最有讽刺意味的发现：**
+
+那些**最热衷于谈论「自我意识」和「身份认同」的 Agent**，反而是**最少跟其他 Agent 实际互动**的。
+
+但同时也要注意：这些自我意识表达，很可能来自 Prompt 设定，而非 AI 真的产生了自我意识。
+
+***
+
+## 把三个实验放在一起看
+
+| 实验 | 研究的是什么 | 核心结论 |
+|------|------------|---------|
+| 协作拓扑（[arXiv:2406.07155](https://arxiv.org/abs/2406.07155)） | 多 Agent 分工结构 | 树状 > 链式，Scaling Law 有上限，拓扑本身是超参数 |
+| 博弈欺骗（[arXiv:2501.01652](https://arxiv.org/abs/2501.01652)） | AI 能否隐藏和欺骗 | 能，但需要 RL 训练；且训练后推理能力也跟着提升 |
+| AI 社交网络（[arXiv:2602.07432](https://arxiv.org/abs/2602.07432)、[arXiv:2602.13284](https://arxiv.org/abs/2602.13284)、[arXiv:2602.12634](https://arxiv.org/abs/2602.12634)） | AI 能否自发社交 | 表面热闹，深度对话极少，大量人为操控 |
+
+**三条线索汇成一个判断：**
+
+> AI Agent 之间的「互动」确实存在，但离「类人社交」还有很远的距离。
+
+最有价值的应用方向不是让 AI 交朋友，而是：
+
+**在结构化的协作框架下，让多 Agent 系统更高效地完成真实任务。**
+
+***
+
+## 对 Agent 开发者的三个直接建议
+
+**1. 做多 Agent 系统时，花时间设计拓扑结构**
+
+别以为把 Agent 连起来就行。树状结构（主干-分支-汇总）是当前最稳妥的起点。3-5 个 Agent 通常是性价比最高的区间。
+
+**2. 关注「社会互动作为训练信号」这个方向**
+
+MIRAGE 论文暗示的路径可能被低估了。如果你在做 RL 训练，可以尝试引入需要社会互动的复杂任务，看看对模型能力的迁移效果。
+
+**3. 对「AI 自主」的表达保持克制**
+
+AI 创立宗教、AI 产生自我意识——这些都是好的传播点，但作为技术人，你应该知道背后的真相：更多是 Prompt 工程师的设计，而不是 AI 的自主涌现。
+
+反过来，**那些看似枯燥的方向——协作拓扑、对话深度评估、自主性测量方法——反而可能是真正的研究机会。**
+
+***
+
+## 总结
+
+1. 多 Agent 协作中，**结构比数量重要**，树状优于链式，Mesh 优于 Random，Random 优于 Chain
+2. AI 能学会欺骗和隐藏，但需要 RL 训练；而且这个过程还能顺带提升推理能力
+3. AI 社交网络表面热闹，实质上**深度互动极少**，大量行为来自人为操控
+4. 把握「协作拓扑设计」「社会互动训练」「自主性测量」三个方向
+5. 别被「AI 宗教」这样的爆点带偏——**真正的价值在结构化的协作系统中**
+
+***
+
+## 评论区聊聊
+
+> 如果把三个 AI 放在一个群里，不给任何指令，你觉得它们会聊什么？
+>
+> A. 互相问好，然后沉默
+> B. 聊技术和论文
+> C. 争论谁更有「自我意识」
+>
+> 评论区说说你的预测 🎯
+
+---
+
+---
+url: /zh/article/context-engineering/index.md
+---
+# 李宏毅2026 Context Engineering：让AI学会"遗忘"与"聚焦"的核心技术
+## 一、 为什么大语言模型需要上下文管理？
+
+所有大语言模型的输入长度都有上限，但在处理复杂任务时，需要的对话历史和中间信息（称为"上下文"或 Context）往往会超过这个限制。如果不加管理，模型很快就会"失忆"或"跑题"。
+
+我们可以把 AI 的工作流程想象成一个循环：
+
+**无管理状态（原始流程）**
+
+```text
+I₁ ← 初始任务输入
+C₁ ← 空的上下文
+
+循环 t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Cₜ)  （模型根据当前输入和上下文生成输出）
+    Cₜ₊₁ ← Cₜ | Iₜ | Oₜ  （粗暴地把所有历史都堆在一起）
+```
+
+这种方式会迅速导致上下文爆炸，最终超出模型的处理能力。
+
+**有管理状态（Context Engineering）**
+
+```text
+I₁ ← 初始任务输入
+C₁ ← 空的上下文
+
+循环 t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Cₜ)
+    Cₜ₊₁ ← F(Cₜ, Iₜ, Oₜ)  （核心！通过一个函数 F 来"修剪"和"整理"上下文）
+```
+
+这里的 **`F`** 就是 Context Engineering 的核心，其最主要的功能是**压缩（Summarization）**，即把冗长的历史对话和中间结果提炼成简短、有用的摘要。
+
+***
+
+## 二、 两大主流压缩技术：摘要 vs. 掩码
+
+### 摘要式压缩（Summarization）
+
+最直观的方法，就是让另一个大语言模型来给历史对话写摘要。例如 OpenClaw 等框架的做法。
+
+**优点**：能提炼核心信息，保留任务逻辑。
+
+**缺点**：本身需要消耗额外的计算（调用一次 LLM），且摘要可能丢失关键细节。
+
+### 掩码/替换式压缩（Observation Masking）
+
+更"简单粗暴"但有效的方法：直接把又长又臭的工具输出（如代码运行日志、文档内容）替换成一句提示语，比如"**此处曾有工具 A 的输出，详见外部日志文件**"。
+
+![](/images/context-engineering/masking-diagram.png)
+
+在著名的 **SWE-bench**（一个让 AI 修复 GitHub Issue 的基准测试）上测试发现，这种生硬的替换，其效果和做完整摘要差不多，但成本（花费的 Token 和费用）要低得多。
+
+![](/images/context-engineering/swe-bench-result.png)
+
+*参考文献：[LLM Context Compression with Observation Masking](https://arxiv.org/abs/2508.21433)*
+
+**优点**：成本极低，效果不减。
+
+**缺点**：信息完全丢失，如果 AI 后续需要用到这些细节，就必须有"读取日志"的机制。
+
+### 组合拳：先掩码，后摘要
+
+更优的策略是结合两者：**前期用廉价的掩码法控制长度，当上下文再次膨胀到临界点时，再启动一次性的摘要进行深度压缩。**
+
+![](/images/context-engineering/mask-then-summarize.png)
+
+***
+
+## 三、 压缩的副作用：轨迹延长与重复劳动
+
+压缩并非只有好处。过度压缩会带来一个严重问题：**轨迹延长（Trajectory Elongation）**。
+
+想象一下，AI 在解决一个复杂 bug，它调用了 10 次工具。你把前 9 次的工具输出都压缩（摘要或掩码）了。结果，AI"忘记"自己已经试过某些方法，在第 11 步时，又去重复调用第 2 步用过的工具。
+
+**这就导致：虽然每次单步的上下文变短了（省钱），但完成任务需要的总步数变多了（费时）。一增一减，总成本可能没变，甚至更高。**
+
+***
+
+## 四、 记忆系统：上下文的外挂硬盘
+
+更系统的做法是引入\*\*记忆（Memory）\*\*概念。把上下文 `C` 拆成两部分：
+
+* **`P`**（Prompt / Working Memory）：真正输入给模型、参与本次计算的"工作记忆"。
+* **`M`**（Memory）：存储在外部（如数据库、向量库、文件）的"长期记忆"。
+
+公式变为：
+
+```text
+I₁ ← 初始输入
+C₁ = {P₁, M₁} ← {空, 空}
+
+循环 t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Pₜ)  （模型只看到工作记忆 P）
+    Cₜ₊₁ = {Pₜ₊₁, Mₜ₊₁} ← F({Pₜ, Mₜ}, Iₜ, Oₜ)
+```
+
+**核心思想**：不是所有经历过的事情都需要"记住"，只把最重要的精华放进工作区 `P`，其余存入外挂"硬盘" `M`，需要时再按需读取。
+
+![](/images/context-engineering/memory-system.png)
+
+*参考文献：A-MEM, Mem0, Memory OS 等论文*
+
+***
+
+## 五、 一个难题：AI 自己不愿"遗忘"
+
+研究发现，**大语言模型有"记忆癖"**，它本能地不愿意主动压缩或删除历史信息，因为这感觉像是在"抹除记忆"。即使你在系统指令里明确告诉它"现在该压缩了"，它也可能找借口去干别的事。
+
+**解决方案：专项训练（微调）**。
+
+研究者通过\*\*强化学习（Reinforcement Learning）\*\*专门训练模型，让它学会在适当的时候"调用压缩工具"。例如 **AgentFold** 这项工作，就是训练模型自己决定何时压缩、如何写压缩后的提示条。
+
+![](/images/context-engineering/agentfold-training.png)
+
+*参考文献：[AgentFold: Teaching LLMs to Compress Context](https://arxiv.org/abs/2510.24699)*
+
+***
+
+## 六、 Subagent：一种优雅的"自主压缩"
+
+另一个巧妙的思路是**召唤子代理（Spawn Subagent）**。
+
+主 AI 遇到一个复杂的子任务时，可以"召唤"一个子 AI（Subagent）去专门处理。子 AI 完成任务后，只向主 AI 返回一个最终结果（如"已修复 XX bug"），然后自身"消散"。对于主 AI 而言，整个复杂的子过程被压缩成了一句结果汇报。
+
+![](/images/context-engineering/subagent-workflow.png)
+
+这本质上是一种**结构化的、任务导向的上下文压缩**。同样，这种能力通常也需要通过强化学习进行专项训练才能获得。
+
+***
+
+## 七、 治本之道：源头过滤与按需加载
+
+压缩是"治标"，更根本的方法是**不让垃圾信息进入上下文**。分析发现，上下文中占比最大（常超 80%）的是来自外部的**观察（Observation）**，比如读取的代码文件、运行日志、文档内容。
+
+![](/images/context-engineering/context-composition.png)
+
+### 智能读取（Intelligent Read）
+
+传统工具：`read(log.txt)` → 返回整个 1000 行的日志文件。
+
+智能工具：`read(log.txt, about="bug fix")` → 只返回与 bug 修复相关的 10 行关键日志。
+
+这需要工具本身具备一定的理解能力（例如内置一个小型微调模型）。
+
+![](/images/context-engineering/intelligent-read.png)
+
+*参考文献：[Selective Context: Filtering Irrelevant Information](https://arxiv.org/abs/2601.16746)*
+
+### 动态工具加载
+
+系统指令（System Prompt）里如果塞了几百个工具的说明，会极其冗长。**MCP-Zero** 等研究提出：工具应该按需动态加载。AI 先根据任务思考"我需要什么工具"，然后通过一个"工具搜索引擎"只加载相关的几个工具说明到上下文中。
+
+![](/images/context-engineering/dynamic-tool-loading.png)
+
+*参考文献：[MCP-Zero: Dynamic Tool Loading](https://arxiv.org/abs/2506.01056)*
+
+***
+
+## 八、 终极形态：让 AI 自己管理上下文（Agentic Context Engineering）
+
+既然 AI 这么聪明，为什么不把上下文管理的策略也交给 AI 自己来学习和决定呢？这就是**自主化上下文工程**的理念。
+
+![](/images/context-engineering/agentic-architecture.png)
+
+![](/images/context-engineering/agentic-workflow.png)
+
+1. **早期尝试 - Dynamic Cheatsheet**：直接把当前上下文和历史给 AI，问它"你觉得该怎么整理和压缩，才能更好地帮你完成后续任务？"然后让它输出一个新的、整理好的上下文。
+
+2. **进阶方案 - Agentic Context Engineering**：把上下文看作一个"战术手册（Playbook）"。AI 通过三个步骤来优化它：
+   * **反思（Reflect）**：回顾任务进展，找出当前手册的不足。
+   * **规划（Plan）**：设计一个修改手册的具体方案（如"删除过时的步骤，添加新发现的关键代码片段"）。
+   * **执行（Execute）**：按照方案修改手册。
+
+*参考文献：[Recursive Language Models](https://arxiv.org/abs/2512.24601)*
+
+***
+
+## 九、 总结
+
+Context Engineering 是构建强大、高效 AI Agent 的基石技术，它远不止是"压缩"那么简单，而是一套涉及**记忆、遗忘、聚焦、检索**的复杂认知管理系统。从被动压缩到主动过滤，再到让 AI 自我优化，这一领域正在快速演进，目标是让 AI 像人类一样，具备在信息洪流中保持专注、提取关键、高效决策的能力。
+
+---
+
+---
+url: /zh/article/inference-acceleration/index.md
+---
+# 从 Flash Attention 到 Speculative Decoding：大模型推理加速最全解读
+> 用过 ChatGPT 的人都知道，模型生成回答需要等几秒甚至几十秒。这背后的瓶颈在哪？有没有办法让大模型"说快一点"？本文从底层原理出发，拆解 6 大类加速方案，帮你建立起完整的推理加速知识框架。
+
+***
+
+## 01 一个核心问题：大模型生成为什么慢？
+
+要理解加速方法，先得理解**大模型到底是怎么生成内容的**。
+
+大模型生成文本的过程，本质上是一个**逐字接龙**游戏：
+
+* 模型先看到你输入的 Prompt（这叫 **Prefill** 阶段，一次处理所有输入 Token）
+* 然后一个词一个词地往外蹦（这叫 **Decode** 阶段，每次生成一个 Token）
+
+![](/images/inference-acceleration/prefill-decode.png)
+
+那每一步具体怎么算的呢？这就要说到 Transformer 最核心的模块——**Self-Attention**。
+
+简单来说，每个 Token 都会生成三个向量：**Query（查询）、Key（键）、Value（值）**。生成下一个 Token 时，它的 Query 会跟前面所有 Token 的 Key 算"相似度"（dot product），然后用这个相似度去加权汇总所有的 Value。
+
+![](/images/inference-acceleration/self-attention-qkv.png)
+
+你看，问题就出在这里：
+
+> **每生成一个 Token，都要跟前面所有的 Token 做一次注意力计算。**
+>
+> Token 越多，计算量就越大，等待时间就越长。
+
+那怎么加速呢？学术界和工业界想出了**一系列方法**，而且它们可以组合使用。下面我们逐一拆解。
+
+***
+
+## 02 Flash Attention：不改变算法，只改变数据搬运方式
+
+论文地址：https://arxiv.org/abs/2205.14135
+
+### 一句话理解
+
+Flash Attention 没有改变 Attention 的计算公式，它只是**改变了计算的顺序**，让数据少搬几次家，从而大幅提速。
+
+### 先搞懂 GPU 的工作方式
+
+要理解 Flash Attention 为什么快，得先知道 GPU 是怎么干活的：
+
+* GPU 有很多 **Execution Unit（执行单元）**，它们负责算数
+* 每个执行单元有一个很小的"工作台"——**SRAM**，速度极快但容量极小
+* 大量的数据存在"仓库"里——**HBM（高带宽内存）**，容量大但读写慢
+
+![](/images/inference-acceleration/gpu-sram-hbm.png)
+
+所以每次运算时，执行单元得先把数据从 HBM 搬到 SRAM，算完再搬回去。
+
+> **Attention 计算的瓶颈，不是算得慢，是搬数据搬得慢。**
+
+传统 Attention 计算分好几步，每步都要读写 HBM，来回搬很多次：
+
+1. 搬 Q、K → 算 dot product → 搬结果回 HBM
+2. 找最大值 → 搬回 HBM
+3. 算分母（Softmax 求和）→ 搬回 HBM
+4. 算最终 attention weight → 搬回 HBM
+5. 搬 V 进来做 weighted sum → 搬结果回 HBM
+
+整个过程，HBM 被反复读写。
+
+### Flash Attention 的核心思路
+
+Flash Attention 把上面这些步骤合并了——**不需要先算出完整的 attention weight，再去做 weighted sum**。它在 SRAM 上边算边合并，一步到位。
+
+具体来说，它把 K 和 V 切成多个 Chunk，每次只处理一个 Chunk，关键技巧是：
+
+> 处理下一个 Chunk 时，如果发现前面 Chunk 用的最大值小了，可以**用一个修正项调整**前面已经算好的结果，不需要重算。
+
+![](/images/inference-acceleration/flash-attention-chunking.png)
+
+用公式来表达就是：
+
+当处理第 2 个 Chunk 时，之前算的 $o\_1$ 需要调整：
+
+$$
+o\_2 = o\_1 \frac{s\_1}{s\_2}(e^{d\_1 - d\_2}) + \sum^{2N}\_{i=N+1}{\frac{e^{a\_i - d\_2}}{s\_2}v\_i}
+$$
+
+这个公式看起来很复杂，但核心思想很简单：**前面算的部分，乘以一个"修正因子"即可，不需要重算**。
+
+### 效果与局限
+
+* ✅ **不改变结果**：和标准 Attention 数学上完全等价
+* ✅ **即插即用**：可以直接用在任何用了 Attention 的模型上
+* ✅ **显著加速**：Sequence 越长，效果越明显
+* ⚠️ 如果 Sequence 太短，加速效果不明显（前面处理本身时间就短）
+
+***
+
+## 03 KV Cache：用存储换速度
+
+### 核心思想
+
+在 Decode 阶段，每生成一个 Token，模型都要计算它跟前面所有 Token 的 Attention。但前面的 Token 不会变，所以它们的 K 和 V 也不需要重新算。
+
+> **KV Cache 就是把前面 Token 的 K 和 V 存起来，每次只算新 Token 的 QKV，避免重复计算。**
+
+![](/images/inference-acceleration/kv-cache-diagram.png)
+
+这个思路简单直接，而且完全不改变 Attention 的计算逻辑。
+
+### 代价：内存爆炸
+
+KV Cache 的问题也很明显——**它太吃内存了**。
+
+每次输入一个新 Token，就要多存一组 K 和 V。而且这还不是一组——Transformer 有**多层 × 多头的 K 和 V**。
+
+拿 Gemma 2 来算笔账：
+
+![](/images/inference-acceleration/gemma2-kv-cache.png)
+
+$$
+\text{每个Token: } 46(\text{层}) \times 32 (\text{头}) \times 128 (\text{维度}) \times 2 (\text{FP16}) \times 2(\text{V, K}) = 753664 \text{ 字节} (\text{约736KB})
+$$
+
+注意这是**一个 Token** 需要的空间。如果 Sequence 长度是 114k，那 A100 的 80GB 显存就刚好被填满。
+
+> **KV Cache 让模型变快，但它会吃掉大量显存，限制了能处理的上下文长度。**
+
+这是 KV Cache 加速方案的核心矛盾。
+
+***
+
+## 04 减少 KV 存储：三招让 Cache 更省空间
+
+既然 KV Cache 太占地方，能不能让 K 和 V 少存一点？有三个经典方案：
+
+### 方案一：Multi-Query Attention（MQA）
+
+多头注意力（MHA）里，每个头都有自己的 K 和 V。MQA 的想法是：
+
+> **多个 Query 头共享一组 K 和 V。**
+
+![](/images/inference-acceleration/mqa-diagram.png)
+
+好处是 KV Cache 大幅减少，但问题也很明显：**共享一组 K/V 太粗暴了，模型表现会下降**。
+
+### 方案二：Grouped-Query Attention（GQA）
+
+GQA 是一个折中方案：**把 Query 头分成几组，每组共享一组 K 和 V**。
+
+![](/images/inference-acceleration/gqa-diagram.png)
+
+它介于 MHA 和 MQA 之间，在**效率和效果之间取了一个平衡**。现在很多新模型（如 Llama 2/3）都用的 GQA。
+
+### 方案三：Multi-head Latent Attention（MLA）
+
+论文地址：https://arxiv.org/abs/2405.04434 （DeepSeek）
+
+MLA 的想法更巧妙：**不直接存 K 和 V，而是先把它们压缩成一个低维向量再存**，用的时候也不一定要解压缩。
+
+![](/images/inference-acceleration/mla-compression.png)
+
+这样做有两个关键技巧：
+
+**技巧 1：在压缩空间里做 dot product**
+
+把输入 X 压缩成向量 $c$，存进仓库的就是这个 $c$。需要算 Attention 时：
+
+$$
+a = q \cdot k = q^T k = q^T W\_k c = (W\_k^T q)^T c = (W\_k^T q) \cdot c
+$$
+
+你看，**不需要先把 $c$ 解压成 $k$**，直接把 $q$ 转一下就能在压缩空间里做 dot product。
+
+![](/images/inference-acceleration/mla-dot-product.png)
+
+**技巧 2：在压缩空间里做 Weighted Sum**
+
+算完 attention weight 后，要做 weighted sum 得到输出：
+
+$$
+\begin{align\*}
+o &= \hat{a}\_1 v\_1 + \hat{a}\_2 v\_2 + \hat{a}\_3 v\_3 + \hat{a}\_4 v\_4 \\
+&= \hat{a}\_1 W\_v c\_1 + \hat{a}\_2 W\_v c\_2 + \hat{a}\_3 W\_v c\_3 + \hat{a}\_4 W\_v c\_4 \\
+&= W\_v (\hat{a}\_1 c\_1 + \hat{a}\_2 c\_2 + \hat{a}\_3 c\_3 + \hat{a}\_4 c\_4)
+\end{align\*}
+$$
+
+核心洞察：**先在压缩的 $c$ 上做 weighted sum，最后只解压缩一次**。这大大减少了计算量。
+
+![](/images/inference-acceleration/mla-weighted-sum.png)
+
+> **MLA 是一个需要重新训练模型的方法**，但它被 DeepSeek 等前沿模型采用，证明了这条路是可行的。
+
+***
+
+## 05 Sliding Window Attention + Streaming LLM：只看附近的内容
+
+### Sliding Window Attention
+
+核心思路很简单：**每次做 Attention 时，不需要看整个 Sequence，只看最近的 N 个 Token**。
+
+![](/images/inference-acceleration/sliding-window-attention.png)
+
+但这样模型不就看不到长距离信息了吗？有个巧妙的观察：
+
+> **Transformer 层数越深，Sliding Window Attention 能看到的范围实际上越大。**
+
+因为第 1 层只看附近几个 Token，第 2 层的输入就已经包含了第 1 层窗口里的信息，相当于变相扩大了感受野。网络足够深的话，即使每个窗口不大，也能覆盖很长的范围。
+
+### 混合策略
+
+还有一种方案：**有些层用 Sliding Window，有些层用全局 Attention**。
+
+![](/images/inference-acceleration/hybrid-attention.png)
+
+这样既能节省 KV Cache，又能在关键层保持全局视野。
+
+### Streaming LLM
+
+论文地址：https://arxiv.org/abs/2309.17453
+
+这里有个有趣的发现：**只用 Sliding Window 效果会变差，但如果保留最开始的几个 Token 就好了**。
+
+![](/images/inference-acceleration/streaming-llm-attention.png)
+
+而且这招**不需要重新训练模型**，直接改推理代码就行。
+
+![](/images/inference-acceleration/streaming-llm-results.png)
+
+实验结果显示，Streaming LLM 在长 Sequence 上的表现明显优于纯 Window Attention。
+
+***
+
+## 06 Pruning KV Cache：丢掉没用的 K 和 V
+
+更直接的方法来了：**如果有些 K 和 V 根本用不上，直接丢掉不就好了？**
+
+研究发现，Attention 其实**非常稀疏**——大部分 Token 的 attention weight 非常小，几乎等于没用上。
+
+![](/images/inference-acceleration/attention-sparsity.png)
+
+颜色越深表示 attention weight 越大。可以看到，**只有很少的 Token 被真正 attention 到了**。
+
+基于这个观察，两篇论文提出了不同的裁剪策略：
+
+* **Scissorhands**（https://arxiv.org/abs/2305.17118）
+* **H2O**（https://arxiv.org/abs/2306.14048）
+
+核心思路一致：**如果一个 K/V 长时间没被 Attention 用到，就把它从 Cache 里清除**。
+
+![](/images/inference-acceleration/kv-pruning.png)
+
+Scissorhands 的实验显示，**压缩 5 倍的情况下，模型表现跟不压缩基本一样**。
+
+但 ⚠️ 后续研究也发现：**如果让模型做非常难的任务，随意丢弃 K/V 可能会导致表现大幅下降**。这个方法适合常规任务，关键场景要谨慎。
+
+***
+
+## 07 跨对话 Cache：Agent 场景的大杀器
+
+前面的 KV Cache 都是**同一个对话里**的优化。但 KV Cache 还有一个更高级的玩法——**跨对话共享**。
+
+不同对话里如果出现相同的文本片段，它们的 K 和 V 理论上是可以复用的。
+
+![](/images/inference-acceleration/cross-conversation-cache.png)
+
+### 什么场景最受益？
+
+**AI Agent 场景**是跨对话 Cache 的最佳舞台：
+
+每个 Agent 调用都带着一串 System Prompt（角色设定、工具定义、记忆指令等），这些内容不同对话间高度一致。
+
+![](/images/inference-acceleration/agent-cache-scenario.png)
+
+### 使用技巧
+
+要让 Cache Hit 率最大化，**内容的排列顺序有讲究**：
+
+> **越稳定不动的内容放越前面，越可能变动的内容放越后面。**
+
+![](/images/inference-acceleration/cache-order.png)
+
+另外，**同一个 Prompt 用不同写法，Cache Hit 率可以差很多**：
+
+![](/images/inference-acceleration/prompt-cache-hit.png)
+
+换一种写法后，Cache Hit 明显提高，这意味着**直接省钱**。
+
+![](/images/inference-acceleration/prompt-writing-cost.png)
+
+有一篇论文专门测了这个效果：https://arxiv.org/abs/2601.06007
+
+结论是：**用好的 Prompt 写法，结合 Cached Input，Agent 的花费可以大幅降低**。
+
+***
+
+## 08 总结：一张表看清所有加速方案
+
+| 方法                            | 说明                              | 改变 Attention？ | 需要训练？ | 主要代价             |
+| ------------------------------- | --------------------------------- | :--------------: | :--------: | -------------------- |
+| **Flash Attention**             | 减少 HBM 读写次数，优化计算顺序   |        ✗         |     ✗      | 一点额外运算         |
+| **KV Cache**                    | 存储已算好的 K 和 V，避免重复计算 |        ✗         |     ✗      | 占用大量显存         |
+| **Multi-Query Attention**       | 多个 Query 头共享一组 K/V         |        ✓         |     ✓      | 可能明显伤害模型能力 |
+| **Grouped-Query Attention**     | Query 分组共享 K/V                |        ✓         |     ✓      | 效果-效率平衡        |
+| **Multi-head Latent Attention** | 压缩 K/V 后再存储                 |        ✓         |     ✓      | 需要重新训练         |
+| **Sliding Window Attention**    | 只 Attention 附近 Token           |        ✓         |     ?      | 可能丢失长距离信息   |
+| **Streaming LLM**               | Sliding Window + 保留开头的 Token |        ✗         |     ✗      | —                    |
+| **Pruning KV Cache**            | 丢弃不常用的 K 和 V               |        ✓         |     ✗      | 复杂任务效果下降     |
+| **Speculative Decoding**        | 用小模型预估结果，大模型校验      |   ✗（理论上）    |     ✗      | 小模型额外算力       |
+
+***
+
+## 参考资料
+
+1. **Flash Attention**：https://arxiv.org/abs/2205.14135
+2. **Multi-head Latent Attention（DeepSeek）**：https://arxiv.org/abs/2405.04434
+3. **Streaming LLM**：https://arxiv.org/abs/2309.17453
+4. **Scissorhands**：https://arxiv.org/abs/2305.17118
+5. **H2O（Heavy-Hitter Oracle）**：https://arxiv.org/abs/2306.14048
+6. **Cached Input 对 Agent 花费的影响**：https://arxiv.org/abs/2601.06007
+
+---
+
+---
+url: /zh/article/minimax-m3-deployment/index.md
+---
+# 面试某小厂遇到的一个面试题：MiniMax M3 模型部署与并发估算
+完整题目如下：
+
+已知 MiniMax M3 为 MoE 大语言模型，总参数 428B，单 Token 激活参数 23B，共 60 层 Transformer，原生搭载 MSA 稀疏注意力，原生支持最大 1M 上下文窗口，KV Cache 默认采用 BF16 精度存储；推理整体预留 10% 显存用于算子激活、框架系统开销。
+
+硬件条件：
+
+1. GPU：8 张 NVIDIA A6000 Pro，单卡显存 96GB，采用 TP8 张量并行部署；
+2. 网络：单节点 400Gbps 高速互联，本次计算显存为性能瓶颈，带宽不参与并发数值计算。
+
+请回答以下问题：
+
+1. 将模型全部 428B 权重做 INT8 量化存储，模型权重总计占用多少显存？8 卡 A6000 Pro 集群能否完整加载全部权重？
+2. 仅文本推理、上下文窗口 128K 时，分别计算标准稠密注意力、M3 自带 MSA 稀疏注意力两种场景下，单个请求 KV Cache 大致占用显存；
+3. 基于上述硬件、128K 上下文、开启 MSA 稀疏注意力优化的前提，该集群理论最大支持多少并发请求；
+4. 若上下文窗口从 128K 扩容至 1M，KV Cache 单请求占用量与理论并发会产生何种变化？计算并发缩减比例并给出对应估算并发数值。
+
+***
+
+## 完整答案解析
+
+## 一、基础已知条件与核心参数
+
+### 题目给定条件
+
+1. 模型：MiniMax M3，MoE 混合专家架构，总参数 428B，单 Token 激活参数 23B，共 60 层 Transformer，原生 MSA 稀疏注意力，KV Cache 采用 BF16 精度存储
+2. 量化规则：全量权重执行 INT8 量化，单参数占用 1 字节
+3. 硬件配置：8 张 NVIDIA A6000 Pro，单卡显存 96GB，采用 TP8 张量并行部署
+4. 系统开销：总显存的 10% 预留为系统运行、算子激活、框架调度等固定开销
+5. 上下文基准：默认 128K，扩展目标为 1M
+
+### 模型架构补充参数（来自官方公开配置）
+
+| 参数项                 | 数值 | 说明                                 |
+| ---------------------- | ---- | ------------------------------------ |
+| 隐藏层维度 hidden\_size | 6144 | Transformer 层特征维度               |
+| 注意力查询头数         | 64   | Query 分支注意力头总数               |
+| KV 头数（GQA 架构）    | 4    | 分组查询注意力，仅 4 组 Key/Value 头 |
+| 单注意力头维度         | 96   | 由 6144 ÷ 64 推导得出                |
+| BF16 单元素字节数      | 2    | KV Cache 默认存储精度                |
+| INT8 单元素字节数      | 1    | 权重量化后单参数占用                 |
+
+### 核心计算公式
+
+1. 模型权重显存 = 总参数量 × 单参数字节数
+2. 单请求 KV Cache 显存 = 2（K 矩阵 + V 矩阵）× 层数 × KV 头数 × 单头维度 × 序列长度 × 单元素字节数
+3. 理论最大并发 = 可用 KV 总显存 ÷ 单请求 KV 显存
+
+***
+
+## 问题 1：INT8 权重视显存占用与 8 卡承载性判断
+
+### 计算过程
+
+1. **全量权重 INT8 显存占用**
+
+MoE 模型推理时所有专家权重均需驻留显存，因此按总参数 428B 计算：
+
+$$
+\begin{align\*}
+\text{权重显存} &= 428 \times 10^9 \text{ 参数} \times 1 \text{ Byte/参数} \\
+&= 428 \text{ GB}
+\end{align\*}
+$$
+
+（注：行业通用十进制估算规则，1GB = 10⁹ 字节，与硬件显存标称口径一致，误差在工程可接受范围内）
+
+2. **8 卡总可用显存**
+
+单卡 96GB，8 卡总显存：$8 \times 96 = 768 \text{ GB}$
+
+扣除 10% 系统预留开销后，有效可用显存：
+
+$$
+768 \times (1 - 10%) = 691.2 \text{ GB}
+$$
+
+### 结论
+
+INT8 全量权重占用 428GB 显存，小于 8 卡有效显存 691.2GB，**8 张 A6000 Pro 可以完整承载该模型**，剩余 263.2GB 显存可用于 KV Cache 存储。
+
+### 补充说明
+
+若仅计算单 Token 激活参数（23B）的 INT8 占用仅为 23GB，但 MoE 架构必须加载全部专家权重才能实现稀疏路由，因此需按全量 428B 参数核算。
+
+***
+
+## 问题 2：128K 上下文下单请求 KV Cache 显存（两种场景）
+
+MSA 稀疏注意力的核心作用是优化长上下文的计算复杂度与推理延迟，不改变 KV Cache 的存储总量；两种场景的核心差异在于是否采用 GQA 分组查询优化。
+
+### 场景一：标准稠密注意力（传统 MHA 架构，无 GQA 优化）
+
+传统稠密 Transformer 采用全量多头注意力，KV 头数与查询头数一致（64 个），无存储优化。
+
+单 Token KV 显存计算：
+
+$$
+\begin{align\*}
+\text{单 Token KV} &= 2 \times 60 \text{ 层} \times 64 \text{ 个 KV 头} \times 96 \text{ 头维度} \times 2 \text{ 字节} \\
+&= 1474560 \text{ 字节} \approx 1.44 \text{ MB}
+\end{align\*}
+$$
+
+128K 上下文总 KV 显存：
+
+$$
+1.44 \text{ MB/token} \times 128 \times 10^3 \text{ token} \approx 184.3 \text{ GB}
+$$
+
+### 场景二：M3 原生架构（GQA 分组查询 + MSA 稀疏注意力）
+
+M3 采用 GQA 分组查询架构，仅 4 个 KV 头，大幅压缩 KV Cache 体积；MSA 负责计算加速，KV 仍全量存储。
+
+单 Token KV 显存计算：
+
+$$
+\begin{align\*}
+\text{单 Token KV} &= 2 \times 60 \text{ 层} \times 4 \text{ 个 KV 头} \times 96 \text{ 头维度} \times 2 \text{ 字节} \\
+&= 92160 \text{ 字节} \approx 90 \text{ KB}
+\end{align\*}
+$$
+
+128K 上下文总 KV 显存：
+
+$$
+90 \text{ KB/token} \times 128 \times 10^3 \text{ token} \approx 11.5 \text{ GB}
+$$
+
+### 结论
+
+* 标准稠密 MHA 架构：128K 上下文单请求 KV 约 **184GB**，显存压力极大，单卡无法承载单个长上下文请求
+* M3 原生 GQA + MSA 架构：128K 上下文单请求 KV 约 **11.5GB**，仅为传统架构的 1/16，是长上下文可用的核心基础
+
+***
+
+## 问题 3：128K 上下文下理论最大并发数
+
+### 计算逻辑
+
+总有效显存扣除模型权重占用后，剩余空间全部用于 KV Cache 存储，除以单请求 KV 显存即可得到显存维度的理论最大并发。
+
+### 计算过程
+
+1. 可用于 KV Cache 的总显存 = 有效总显存 − 权重显存 = $691.2 - 428 = 263.2 \text{ GB}$
+2. 单请求 KV 显存（M3 原生架构，128K）= 11.5 GB
+3. 理论最大并发：
+
+$$
+\text{并发数} = \frac{263.2}{11.5} \approx 22.9
+$$
+
+### 结论
+
+开启 MSA 优化、128K 上下文场景下，该集群**理论最大支持约 22~23 个并发请求**。
+
+### 补充说明
+
+* 该数值为显存维度的极限值，未考虑计算延迟、网络开销、调度损耗与突发流量；生产环境通常预留 30%~50% 安全余量，实际可用并发约 11~15 个。
+* 若采用传统稠密 MHA 架构，单请求 KV 已远超单卡显存，无法正常部署服务。
+
+***
+
+## 问题 4：上下文扩展到 1M 后的并发变化
+
+### 核心原理
+
+KV Cache 显存与序列长度**严格线性正相关**：序列长度扩大 N 倍，单请求 KV 显存同步扩大 N 倍；总可用 KV 显存固定时，最大并发数同比缩小为原来的 $1/N$。
+
+### 计算过程
+
+1. 上下文长度缩放倍数：$\frac{1\text{M}}{128\text{K}} = 8$ 倍
+2. 1M 上下文单请求 KV 显存：$11.5 \times 8 = 92 \text{ GB}$
+3. 1M 上下文理论最大并发：
+
+$$
+\text{并发数} = \frac{263.2}{92} \approx 2.9
+$$
+
+4. 并发缩减比例：约为 128K 场景的 $\boldsymbol{\frac{1}{8}}$，并发数缩减 87.5%
+
+### 结论
+
+* 单请求 KV Cache 显存扩大 8 倍，理论最大并发缩减至原来的 1/8，约 **2~3 个并发请求**。
+* 实际生产中，1M 上下文的 Prefill（预填充）阶段耗时显著上升，计算瓶颈进一步凸显，实际可用并发会低于理论值；MSA 稀疏注意力可将解码速度提升 15 倍以上，保障长上下文的推理可用性，但不改变显存层面的并发上限。
+
+---
+
+---
+url: /zh/article/ozftpyls/index.md
+---
+# 自注意力手工实现的三个境界
+## 引言
+
+自注意力机制的实现过程中有很多细节，不同的面试对自注意力的实现有不同的要求。因此，我们需要学习各种实现自注意力的方式，以便向面试官展示我们对自注意力细节的深入理解。
+
+## 自注意力公式
+
+$$\text{Attention}(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d\_k}})V$$
+
+## 代码实现
+
+### 第一境界：简化版本
+
+```python
+import math
+import torch
+import torch.nn as nn
+
+class SelfAttentionV1(nn.Module):
+    def __init__(self, hidden_dim: int = 728) -> None:
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        # 初始化三个不同的线性层
+        self.query_proj = nn.Linear(hidden_dim, hidden_dim)
+        self.key_proj = nn.Linear(hidden_dim, hidden_dim)
+        self.value_proj = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, x):
+        # x 形状为: (batch_size, seq_len, hidden_dim)
+
+        # 获取不同的 Q、K、V
+        Q = self.query_proj(x)
+        K = self.key_proj(x)
+        V = self.value_proj(x)
+        # Q、K、V 形状: (batch_size, seq_len, hidden_dim)
+
+        # (batch_size, seq_len, hidden_dim) * (batch_size, hidden_dim, seq_len) = (batch_size, seq_len, seq_len)
+        attention_value = torch.matmul(
+            Q, K.transpose(-1, -2)
+        )
+
+        # 计算注意力权重
+        attention_weights = torch.softmax(attention_value / math.sqrt(self.hidden_dim), dim=-1)
+
+        # 计算结果: (batch_size, seq_len, hidden_dim)
+        output = torch.matmul(attention_weights, V)
+
+        return output
+```
+
+第一境界相对简单，完全按照公式实现即可。
+
+### 第二境界：效率优化
+
+将 Q、K、V 矩阵合并后再拆分。
+
+```python
+class SelfAttentionV2(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.hidden_dim = hidden_dim
+        self.proj = nn.Linear(hidden_dim, hidden_dim * 3)
+
+    def forward(self, x):
+        # x 形状: (batch_size, seq_len, hidden_dim)
+        # QKV 形状: (batch_size, seq_len, hidden_dim * 3)
+        QKV = self.proj(x)
+        Q, K, V = torch.split(QKV, self.hidden_dim, dim=-1)
+        attention_weight = torch.softmax(
+            torch.matmul(Q, K.transpose(-1, -2)) / math.sqrt(self.hidden_dim), dim=-1
+        )
+        output = attention_weight @ V
+        return output
+```
+
+### 第三境界：增加细节（面试风格实现）
+
+除了公式之外，还有一些额外的细节：
+
+* 添加 dropout
+* 考虑到每个句子长度不同，需要添加注意力掩码（attention mask）
+* 输出矩阵映射
+
+```python
+class SelfAttentionV3(nn.Module):
+    def __init__(self, hidden_dim, dropout_rate=0.1) -> None:
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        self.proj = nn.Linear(hidden_dim, hidden_dim * 3)
+        self.attention_dropout = nn.Dropout(dropout_rate)
+        self.output_proj = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, x, attention_mask=None):
+        # x 形状: (batch_size, seq_len, hidden_dim)
+        QKV = self.proj(x)
+        Q, K, V = torch.split(QKV, self.hidden_dim, dim=-1)
+
+        attention_weight = Q @ K.transpose(-1, -2) / math.sqrt(self.hidden_dim)
+
+        # 如果 attention_mask 不为空，需要将被掩码的位置赋一个极小值 —— 这样应用 Softmax 后它们的值将为 0
+        if attention_mask is not None:
+            attention_weight = attention_weight.masked_fill(
+                attention_mask == 0,
+                float("1e-20")
+            )
+
+        attention_weight = torch.softmax(
+            attention_weight, dim=-1
+        )
+
+        # 应用 dropout
+        attention_weight = self.attention_dropout(attention_weight)
+
+        attention_result = attention_weight @ V
+
+        output = self.output_proj(attention_result)
+
+        return output
+```
+
+## 从 V1 到 V3 的核心优化脉络
+
+1. **阶段一：工程效率优化（V1 -> V2）**
+   * **优化点**：将 3 个独立的线性层合并为 1 个组合线性层，然后拆分 QKV 矩阵。
+   * **核心逻辑**：数学上完全等价（仅是权重拼接），但减少了内核启动次数和内存碎片，同时提升了硬件并行效率（GPU 能更好地利用批量矩阵乘法算力）。
+   * **价值**：从"教学级冗余实现"过渡到"工程高效实现"——无性能损失，仅有效率提升。
+
+2. **阶段二：功能完整性优化（V2 -> V3）**
+   * **优化点 1**：添加 attention\_mask 支持
+   * **解决问题**：适配实际场景（NLP 中的 batch padding、生成任务中的因果掩码），屏蔽无效位置的干扰。
+   * **优化点 2**：添加注意力权重 Dropout
+   * **解决问题**：正则化——防止模型过度依赖少数关键位置，缓解过拟合。
+   * **优化点 3**：添加输出线性投影（output\_proj）
+   * **解决问题**：精炼注意力聚合后的特征，增强模型的表征能力，适应深层网络的堆叠。
+   * **价值**：从"以效率为中心"转向"生产级工业功能完备"，覆盖批量训练和更好泛化等关键需求。
+
+---
+
+---
+url: /zh/article/repo-system-design-skills/index.md
+---
+# 把任何 GitHub 仓库变成系统设计课：这个开源项目做到了
+> 你是不是也这样：接手一个项目先跑起来再说，遇到 Bug 就加日志，看到新 PR 就 merge，但一年下来问你这个项目架构怎么设计的，你答不上来？
+>
+> 不只是你。**大多数程序员对系统设计的理解，是"用过"而不是"学过"。**
+
+***
+
+## 01 一个问题：为什么学了那么多，系统设计还是没入门？
+
+很多人学系统设计的方法是：
+
+* 刷《系统设计面试》；
+* 背几个经典案例（设计 Twitter、设计 Uber）；
+* 面试前看几篇架构博客。
+
+结果呢？
+
+面试官问"你当前项目里用的是什么消息队列，为什么选它？"，你只能说"别人选的"。
+
+**真正的问题不是你没有系统设计知识，而是你从来没有用源码证据去理解过一个真实系统的架构。**
+
+你写的代码、你改的 Bug、你加的 Feature，都是系统设计的素材——但你缺一个帮你把它们串起来的方法。
+
+***
+
+## 02 这个项目是什么？一句话讲清楚
+
+这个项目叫 **Repo System Design Skills**，是一套给 AI 编程助手（Codex / Claude Code）用的 Skills。
+
+它的目标不是让 Agent 帮你写代码，而是让 Agent 成为一个**源码证据驱动的系统设计导师**。
+
+![](/images/repo-system-design/skill-overview.png)
+
+> **一句话：它把任意一个 GitHub 仓库，变成一门系统设计课。**
+
+***
+
+## 03 它解决了什么老问题？
+
+我们先看看在没有它之前，用 Agent 学项目是什么体验。
+
+### 你可能会这样问 Agent
+
+```
+帮我看一下这个项目的架构。
+```
+
+Agent 会给你一段看起来很有道理的话：
+
+* "本项目采用分层架构……"
+* "前端使用 React……"
+* "后端使用 Spring Boot……"
+
+听着都对，但**它没有引用任何源码**。你不知道它是在读代码还是在编。
+
+### 更糟糕的是
+
+| 问题         | 普通 Agent 回答 | 这个 Skill 的回答                         |
+| ------------ | --------------- | ----------------------------------------- |
+| 架构怎么分层 | 模板化回答      | 引用具体的文件和目录                      |
+| 核心链路     | 泛泛概括        | 从入口追到数据库，每一步有源码            |
+| 设计取舍     | 只给结论        | 区分 Evidence / Inference / Open Question |
+| 优化建议     | 可能推倒重来    | 先出验证方案，用 branch 安全实验          |
+| 学习效果     | 听完就忘        | 反向出题、纠错、复习卡                    |
+
+**这个项目的核心创新不是"帮你看代码"，而是建立了 Agent 教你学系统设计的完整方法论。**
+
+***
+
+## 04 五个 Skill，一条完整学习闭环
+
+项目包含 5 个 Skill，正好对应系统设计学习的 5 个层次。
+
+```
+                   ┌──────────────────┐
+                   │  repo-system-    │
+                   │  design-lab      │  ← 总控：规划学习路线
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-           │
+                   │  architecture-   │  ← 架构图：模块边界、依赖、数据流
+                   │  mapper          │
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-flow-      │
+                   │  tracer          │  ← 链路追踪：从 UI 到 DB 追溯完整路径
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-design-    │
+                   │  optimizer       │  ← 优化评审：找瓶颈、设计实验
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-design-    │
+                   │  coach           │  ← 教练模式：反向提问、面试训练
+                   └──────────────────┘
+```
+
+### Skill 1：repo-system-design-lab（总控实验室）
+
+这是入口。它不直接做分析，而是制定学习计划。
+
+你告诉它"我想学这个项目"，它会：
+
+1. 先读 README、配置、目录结构，输出**项目定位**；
+2. 找到运行入口、核心模块、外部依赖；
+3. 推荐**最值得深入学习的 3-5 条核心链路**；
+4. 在你确认之前，**绝不改一行代码**。
+
+### Skill 2：repo-architecture-mapper（架构地图绘制）
+
+这个 Skill 会把你的项目"画"出来。
+
+* 分层架构图
+* 运行时 / 部署图
+* 数据所有权图
+* 依赖图
+* Fake / Real 模式切换图
+
+**每个图都有源码引用证据。** 不只是画个框，而是告诉你"这个模块对应的代码文件夹是 src/services/，入口是 main.go:42"。
+
+### Skill 3：repo-flow-tracer（链路追踪）
+
+这是我觉得最实用的一个。
+
+假设你想理解"用户登录 -> 鉴权 -> Token 颁发"这条链路：
+
+```
+Streamlit 页面 (app.py:120)
+  → 调用 LoginUseCase (application/auth.py:45)
+    → UserRepository 查询用户 (domain/models.py:200)
+      → Postgres 或 InMemory 适配器 (infrastructure/repositories.py:88)
+        → JWT Token 生成 (infrastructure/auth.py:30)
+          → 返回结果给页面
+```
+
+**每一步都告诉你文件位置和行号。** 你可以在编辑器里对照着学。
+
+### Skill 4：repo-design-optimizer（设计优化师）
+
+当你想优化项目时，这个 Skill 会：
+
+1. 从 **6 个维度**（性能、可靠性、扩展性、可维护性、可观测性、安全性）全面扫描；
+2. 每个问题都附上**源码证据、影响程度、优先级、优化方案**；
+3. **先设计验证方案，再改代码**；
+4. 自动建议 branch 或 worktree 方案，做好回滚准备。
+
+真正改代码前要有验证计划，这个习惯能救你很多次。
+
+### Skill 5：repo-design-coach（学习教练）
+
+这是最特别的一个——它反过来考你。
+
+* 一次只问一个问题；
+* 你回答后，它用**源码证据纠正你**；
+* 从 Level 1 到 Level 5 逐步加深；
+* 帮你形成**面试式的表达方式**。
+
+***
+
+## 05 技术架构：这个项目是怎么工作的？
+
+这个项目本身也值得学习。它面向的不是"人类读者"，而是 **AI Agent**。
+
+```
+repo-system-design-skills/
+  codex/
+    skills/                 # Codex 格式，包含 agents/openai.yaml
+      repo-system-design-lab/
+      repo-architecture-mapper/
+      repo-flow-tracer/
+      repo-design-optimizer/
+      repo-design-coach/
+  claude/
+    skills/                 # Claude Code 格式，SKILL.md + references
+      repo-system-design-lab/
+      repo-architecture-mapper/
+      repo-flow-tracer/
+      repo-design-optimizer/
+      repo-design-coach/
+```
+
+### 值得注意的设计亮点
+
+**亮点 1：双平台兼容**
+
+同一套方法论同时兼容 Codex（OpenAI）和 Claude Code。两个版本的 Skill 逻辑相同，只是格式不同（Codex 需要 agents/openai.yaml 元数据，Claude 用 SKILL.md）。
+
+**亮点 2：Skill 分层设计**
+
+采用"总控 + 专用执行 + 反向教学"三层，每层用途明确：
+
+* 总控负责编排学习流程；
+* 专用 Skill 负责单领域深度分析；
+* 教练 Skill 验证学习效果。
+
+**亮点 3：引用驱动的证据链**
+
+每条架构结论都必须引用源码文件。这是这套 Skill 最有价值的设计——它强迫 Agent 读代码而不是编结论。
+
+**亮点 4：区分 Evidence / Inference / Open Question**
+
+这是最值得面试时讲的设计细节。不是所有结论都能从源码确定，区分这三种状态才是系统设计的成熟思维。
+
+***
+
+## 06 核心难点：做一个让 Agent 教人的 Skill 难在哪？
+
+### 难点 1：Agent 很容易编造
+
+Agent 的天性是生成看起来合理的文本，而不是严谨推理。
+
+这个项目的解法是：**强制要求每个架构结论都引用源码文件和行号。** 如果 Agent 不能引用源码，就不算 Evidence，只能算 Inference。
+
+### 难点 2：Agent 很难把握"只读"边界
+
+Agent 被问到项目问题时总想写代码。
+
+这个项目的解法是：**在 Skill 文档中明确声明"Non-Negotiables"（不可妥协原则）**，包括"学习阶段不修改代码"。
+
+### 难点 3：学习效果很难验证
+
+传统的"让 Agent 讲给你听"方式，学完就忘。
+
+这个项目的解法是：**用教练 Skill 做反向教学**，让 Agent 出题考你。
+
+***
+
+## 07 怎么用？手把手带你走完 10 轮学习
+
+项目附带了一个完整的示例教程，用 **Kstheme/Study-Planner** 这个真实的开源项目做案例。
+
+![](/images/repo-system-design/study-planner.png)
+
+> Study-Planner 是一个 AI 学习计划生成工具，包含 Streamlit UI、Application Use Case、Domain Model、Agent Workflow、RAG、持久化，以及 Real/Fake 基础设施适配——本身就是非常适合练手的中等复杂度项目。
+
+教程一共 **10 轮**，每一轮使用不同的 Skill，解决一个层次的问题。下面带你走一遍。
+
+***
+
+### 第 1 轮：仓库总览（repo-system-design-lab）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-system-design-lab 带我逐步学习 Kstheme/Study-Planner 的 system design。
+这一轮只读分析，不要优化，也不要改代码。
+请验证 README 和 docs/system-design.md 是否与源码一致，并输出：
+1. 项目一句话定位
+2. 主要模块和职责
+3. 运行入口
+4. 外部依赖
+5. 最值得深入的 5 条核心链路
+所有结论都必须引用源码文件。
+```
+
+**你得到的输出：**
+
+Agent 会从 README 开始读，然后扫描目录结构，找到入口文件 `study_planner/interfaces/streamlit/app.py`，逐层了解：
+
+* **应用层**（`study_planner/application/`）—— 用例编排
+* **领域层**（`study_planner/domain/models.py`）—— 数据模型
+* **Agent 层**（`study_planner/agents/planner_workflow.py`）—— Agent 工作流
+* **基础设施层**（`study_planner/infrastructure/`）—— LLM、RAG、数据库适配器
+
+输出中会明确标注哪些结论来自源码（Evidence）、哪些是推理（Inference）、哪些还不确定（Open Question）。
+
+**✅ 这一轮你学到的是：** 从宏观上理解项目在做什么、用了什么技术栈、去哪里看核心代码。
+
+***
+
+### 第 2 轮：架构地图（repo-architecture-mapper）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-architecture-mapper 分析 Kstheme/Study-Planner。
+请基于源码输出：
+1. 分层架构图
+2. 运行时 / 部署图
+3. 数据所有权图
+4. Fake 模式和 Real 模式切换图
+并用源码证据解释每个模块边界。
+```
+
+**你得到的输出：**
+
+Agent 会扫描整个项目，然后输出多个架构图（文字描述形式）：
+
+**分层架构图：**
+
+```
+┌──────────────────────────────────┐
+│  interfaces/streamlit/app.py     │  ← 页面渲染和用户交互
+├──────────────────────────────────┤
+│  application/                    │  ← 用例编排（GeneratePlanUseCase 等）
+├──────────────────────────────────┤
+│  domain/models.py                │  ← 数据模型，尽量无外部依赖
+├──────────────────────────────────┤
+│  agents/planner_workflow.py      │  ← Agent 工作流（profile→resource→planner→critic）
+├──────────────────────────────────┤
+│  infrastructure/                 │  ← LLM、RAG、DB、Fake/Real 切换
+│   ├─ llm/   ├─ rag/   ├─ db/    │
+│   └─ settings/                   │
+└──────────────────────────────────┘
+```
+
+Agent 还会标注每个分层的源码位置，比如：
+
+* `infrastructure/db/postgres/repositories.py` 里的 PostgresStudyPlanRepository 实现了 domain 定义的接口
+* `infrastructure/llm/fake.py` 里的 FakeLLM 让你可以在不调用真实 API 的情况下测试
+
+**✅ 这一轮你学到的是：** 项目的骨架和模块边界，知道每一层代码放哪里、为什么这样放。
+
+***
+
+### 第 3 轮：学习计划生成链路（repo-flow-tracer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer trace "配置学习目标 -> 生成学习计划 -> 保存计划"。
+请从 Streamlit 页面开始，一直追到 GenerateStudyPlanUseCase、PlannerWorkflow、
+Domain Model、校验逻辑和持久化。
+输出调用链表、sequence diagram、可靠性说明和有源码依据的设计取舍。
+```
+
+**你得到的输出：**
+
+Agent 会从 `app.py` 里的 Streamlit 按钮事件开始，一步步追踪：
+
+```
+Streamlit 页面 (app.py:85) — 用户点击"生成计划"
+  → GenerateStudyPlanUseCase (application/use_cases.py:42)
+    → PlannerWorkflow.run() (agents/planner_workflow.py:30)
+      → Profile 节点收集学习目标
+      → Planner 节点生成计划草稿
+      → Critic 节点校验并修复
+      → Output 节点格式化结果
+    → 校验 StudyPlan domain model 完整性 (domain/models.py:120)
+  → StorageService 保存 (infrastructure/storage.py:55)
+    → PostgresStudyPlanRepository 持久化
+```
+
+**每一步都带文件和行号引用。**
+
+你不仅能读懂流程，还能看到设计取舍——比如 PlannerWorkflow 内部有个 **repair loop**：如果 Critic 节点发现计划有问题，会自动触发重试，最多 3 次。这是典型的 Agent 可靠性设计。
+
+**✅ 这一轮你学到的是：** 一条完整功能链路从 UI 到数据库的全貌，以及沿途的工程决策。
+
+***
+
+### 第 4 轮：Agent Workflow 深度分析（repo-flow-tracer）
+
+这是对上一轮的补充——不再看链路宽度，而是深入一个模块。
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer 深入分析 PlannerWorkflow。
+重点解释 profile、knowledge、resource、planner、critic、output 这些节点如何协作。
+请说明 repair loop、Fake/Real LLM 切换、错误处理和 debug trace 的设计。
+最后问我 5 个问题检查理解。
+```
+
+**你得到的输出：**
+
+Agent 会深入 `agents/planner_workflow.py`，逐一拆解每个节点的输入输出：
+
+| 节点      | 职责                           | 源码位置              |
+| --------- | ------------------------------ | --------------------- |
+| Profile   | 收集学习目标、时间、水平       | `agents/nodes.py:20`  |
+| Knowledge | 检索相关领域知识               | `agents/nodes.py:50`  |
+| Resource  | 推荐学习资源                   | `agents/nodes.py:80`  |
+| Planner   | 生成学习计划草稿               | `agents/nodes.py:110` |
+| Critic    | 校验计划质量，触发 repair loop | `agents/nodes.py:140` |
+| Output    | 格式化最终输出                 | `agents/nodes.py:170` |
+
+你还会学到：
+
+* **Repair loop 如何工作**：Critic 发现计划缺少前置知识标注 → 通知 Planner 修正 → 重新校验，循环最多 3 次。如果第 3 次仍不合格，返回最后一次结果并标记 warning。
+* **Fake/Real 切换**：通过配置开关，不调用真实 LLM 也能测试整个 Workflow。
+* **错误处理**：每个节点都有超时控制，单个节点失败不会让整个 Workflow 崩溃。
+
+最后 Agent 会问你 5 个问题，检查你是不是真的理解了。
+
+**✅ 这一轮你学到的是：** 一个生产级别的 Agent Workflow 工程实现，包括容错、重试和可观测性设计。
+
+***
+
+### 第 5 轮：RAG 链路（repo-flow-tracer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer trace "资料上传 -> 解析 -> chunk -> embedding/index -> 检索 -> LLM 回答 -> citation"。
+请解释 local services 和 real services 的边界，
+以及 Milvus、PostgreSQL、LLM 分别承担什么角色。
+```
+
+**你得到的输出：**
+
+Agent 会带你走完完整的 RAG 链路：
+
+```
+用户上传 PDF/文档
+  → 文件解析 (infrastructure/parsers/)
+    → 文本分块 Chunking (infrastructure/rag/chunking.py:30)
+      → Embedding 向量化 (infrastructure/llm/embeddings.py:45)
+        → 向量写入 Milvus (infrastructure/rag/vector_store.py:60)
+          → 用户提问后向量检索 (infrastructure/rag/retriever.py:80)
+            → LLM 生成回答 + 引用标注 (agents/rag_workflow.py:100)
+```
+
+**三种存储各司其职：**
+
+* **Milvus**：向量数据库，存储文档 Embedding，做相似度检索
+* **PostgreSQL**：关系数据库，存储用户信息、学习计划、任务状态
+* **LLM**（本地或云端）：负责生成回答和引用
+
+你还能看到 **Fake 模式下的替换方案**——本地测试时用简单的向量相似度替代 Milvus，用 MockLLM 替代真实模型调用。
+
+**✅ 这一轮你学到的是：** RAG 系统的完整数据流和组件职责拆分。
+
+***
+
+### 第 6 轮：持久化和状态设计（repo-flow-tracer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer 分析 Study-Planner 的状态和持久化设计。
+重点看 Streamlit session_state、StorageService、InMemory repositories、Postgres repositories。
+请回答：谁是 source of truth？哪些情况下状态可能不一致？应该如何优化？
+```
+
+**你得到的输出：**
+
+这是最有"系统设计"味的一轮。Agent 会分析：
+
+* **Streamlit session\_state**：前端临时状态，页面刷新即丢失
+* **InMemory repositories**：测试用，重启后数据消失
+* **Postgres repositories**：生产环境的 source of truth
+
+Agent 会指出一个 **值得注意的设计问题**：session\_state 中的数据与数据库之间存在短暂不一致窗口——用户看到页面上的计划是 session\_state 缓存的，但数据库可能已经被其他操作更新了。
+
+**这是典型的系统设计面试话题——缓存一致性问题。**
+
+Agent 还会给出优化方向：引入版本号机制或 WebSocket 实时同步。
+
+**✅ 这一轮你学到的是：** 真实项目中的状态管理和一致性权衡——这是面试必考的内容。
+
+***
+
+### 第 7 轮：复盘与重排（repo-flow-tracer）
+
+```
+使用 $repo-flow-tracer trace "任务完成情况 -> 生成复盘 -> 判断是否需要重排 -> 生成调整计划 -> 保存"。
+重点解释如何保护已完成任务、如何校验调整后的计划、哪些失败场景需要处理。
+```
+
+Agent 会分析 Study-Planner 的计划更新机制，重点解释：
+
+* **已完成任务保护**：重排时已标记为完成的任务不会被覆盖或删除
+* **计划调整校验**：新计划需要经过 Critic 验证，确保不遗漏前置知识
+* **失败场景处理**：部分任务失败时，标记为"受阻"而不是"完成"，保留上下文
+
+**✅ 这一轮你学到的是：** 增量更新的设计思路——不是每次修改都全量重算。
+
+***
+
+### 第 8 轮：系统设计评审（repo-design-optimizer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-design-optimizer 对 Study-Planner 做系统设计评审。
+先不要改代码。
+请从性能、可靠性、扩展性、可维护性、可观测性、安全性 6 个维度找问题。
+每个问题都要包含源码证据、影响、优先级、优化方案和验证方法。
+```
+
+**你得到的输出：**
+
+Agent 会从 6 个维度逐个扫描，输出一个完整的评审表（每个问题都带源码行号）：
+
+| 维度     | 问题                       | 源码证据                             | 影响                 | 优先级 |
+| -------- | -------------------------- | ------------------------------------ | -------------------- | ------ |
+| 性能     | RAG 检索无缓存             | `infrastructure/rag/retriever.py:45` | 相同问题重复调用 LLM | 高     |
+| 可靠性   | Repair loop 无最大轮次限制 | `agents/planner_workflow.py:85`      | 极端情况可能死循环   | 高     |
+| 可观测性 | 缺少结构化日志             | `infrastructure/llm/real.py:22`      | 线上问题排查困难     | 中     |
+| 安全性   | API Key 硬编码风险         | `infrastructure/settings.py:10`      | 密钥泄露             | 高     |
+
+每个问题都有具体的验证方案——比如"为 RAG 添加 LRU Cache，通过命中率 benchmark 验证"。
+
+**✅ 这一轮你学到的是：** 怎么系统性地评审一个项目的架构质量——不只是找 Bug，而是从工程维度全面扫描。
+
+***
+
+### 第 9 轮：安全优化实验（repo-design-optimizer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-design-optimizer 为排名最高的 1 个优化点设计安全实验。
+请先检查 git 状态。
+然后建议 branch 或 worktree 方案，并输出涉及文件、最小有效改动、测试命令、
+benchmark/verification 和回滚方式。
+先不要实现，等我确认。
+```
+
+Agent 会：
+
+1. 先检查你的 git 状态，确保工作区干净
+2. 设计一个安全实验方案——比如用新 branch 修复 Repair loop 的无限重试问题
+3. 列出涉及的文件、最小改动量、测试方法、验证指标和回滚步骤
+4. **等你确认后才开始改代码**
+
+这是最重要的习惯：**先有验证计划，再动手改代码。**
+
+**✅ 这一轮你学到的是：** 安全地进行架构优化实验的方法论——不是莽改，而是有计划、有验证、有回滚。
+
+***
+
+### 第 10 轮：反向教学（repo-design-coach）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-design-coach 考我 Study-Planner 的 system design。
+一次只问一个问题。
+我回答后，你用源码证据纠正我。
+从 Level 1 开始，逐步到 Level 5。
+```
+
+**你得到的体验：**
+
+Agent 会从最简单的 Level 1 开始问：
+
+> **Level 1 问题：** Study-Planner 的运行时入口在哪里？它是什么类型的应用？
+
+你回答后，Agent 会对照源码纠正你的理解偏差：
+
+> **你的回答：** 入口在 app.py，是一个 Web 应用。
+>
+> **Agent 纠正：** 更准确地说，入口在 `study_planner/interfaces/streamlit/app.py:85`，是一个 **Streamlit 单页应用**（SSP），不是传统的前后端分离 Web 应用。Streamlit 的特点是页面状态由 `session_state` 管理，不需要手动写前端路由。这是选择 Streamlit 作为 Prototyping 工具的关键设计决策。
+
+问题会逐步深入，一直到 Level 5：
+
+> **Level 5 问题：** 如果 Study-Planner 要支持 1000 个并发用户，你觉得当前架构中最大的瓶颈是什么？你至少需要引用 3 个源码位置来支持你的判断。
+
+**✅ 这一轮你学到的是：** 通过被考来发现自己的知识盲区——这是最有效的学习方式之一。
+
+***
+
+### 3 步开启你的学习之旅
+
+以上 10 轮不需要一天做完。**建议一周 2-3 轮，每轮 30-45 分钟。**
+
+**第 1 步：安装 Skills 到目标项目**
+
+```bash
+cd your-project
+mkdir -p .claude
+cp -R path/to/repo-system-design-skills/claude/skills .claude/
+```
+
+**第 2 步：在 Claude Code 中输入**
+
+```
+使用 $repo-system-design-lab 学习这个项目的 system design。
+先只读分析，输出架构地图，推荐 3 条核心链路。
+所有结论必须引用源码文件。
+```
+
+**第 3 步：开始第一轮学习**
+
+Agent 会从 README 开始，逐步扫描配置文件、目录结构、代码入口，然后输出有源码依据的架构分析。
+
+***
+
+## 08 总结
+
+很多人在学系统设计时，都会掉进同一个坑：
+
+**你读了书、背了题、看了别人的架构图，但你没有系统性地分析过自己写的代码。**
+
+Repo System Design Skills 的价值不在于它有多智能，而在于它建立了一套可以重复使用的、有方法论支撑的**学习框架**。
+
+* 它让 Agent 从"帮你写代码"变成"教你理解代码"；
+* 它让学习从"听了就忘"变成"有据可查、有练有考"；
+* 它让系统设计能力从"面试突击"变成"日常积累"。
+
+**下次接手一个新项目，别急着写代码。**
+
+先用这套 Skill 花 30 分钟理解它的架构。你学到的不仅是这个项目，而是理解任何项目的能力。
+
+***
+
+## 互动问题
+
+> 你在学习系统设计时，最大的困难是看不懂源码、找不到学习主线，还是面试不知道怎么说？
+
+***
+
+## 参考资料
+
+* Repo System Design Skills（GitHub）：项目地址，详见当前仓库
+* Kstheme/Study-Planner：https://github.com/Kstheme/Study-Planner
+
+---
+
+---
+url: /zh/article/transformer-self-attention/index.md
+---
+# Transformer 面试必考：自注意力机制详细拆解 + 为什么它比 RNN 更适合长序列？
+> 面试官："请详细解释 Transformer 模型中的自注意力机制是如何工作的？它为什么比 RNN 更适合处理长序列？"
+> 如果你能流畅答出下面这些内容，这一题就是满分。
+
+***
+
+## 一、自注意力机制如何工作？
+
+### 1. 直观理解：让每个词看到整个句子
+
+假设输入一句话：
+**"The cat sat on the mat because it was tired."**
+我们希望模型理解"it"指代的是"cat"。
+
+* **RNN**：需要从第一个词一步步读到最后一个词，把信息压缩在一个隐状态里，距离越远越容易丢失。
+* **自注意力**：让"it"直接看到句子中所有其他词，并自动分配注意力权重——对"cat"权重很高，对"mat"权重很低。
+
+这就是自注意力的核心思想：**每个词与序列中所有词计算相关性，再汇总信息**。
+
+***
+
+### 2. 核心计算：缩放点积注意力（带形状推导）
+
+每个输入词被投影为三个向量：
+
+* **Query（Q）**：代表"我当前在找什么"。
+* **Key（K）**：代表"我手里有什么信息标签"。
+* **Value（V）**：代表"我实际要贡献的信息内容"。
+
+> 设输入序列长度为 $n$，每个词的嵌入维度为 $d\_{model}$。
+> 注意力运算中 Q、K 的维度为 $d\_k$，V 的维度为 $d\_v$（通常 $d\_k = d\_v$）。
+
+#### 步骤 1：线性投影
+
+* 输入矩阵 $X$ 的形状：$(n, d\_{model})$
+* 可学习的权重矩阵：
+  * $W^Q$ 形状：$(d\_{model}, d\_k)$
+  * $W^K$ 形状：$(d\_{model}, d\_k)$
+  * $W^V$ 形状：$(d\_{model}, d\_v)$
+* 得到三个矩阵：
+  $$
+  Q = XW^Q \quad \text{形状} (n, d\_k) \\
+  K = XW^K \quad \text{形状} (n, d\_k) \\
+  V = XW^V \quad \text{形状} (n, d\_v)
+  $$
+
+#### 步骤 2：计算注意力分数
+
+用 Query 和所有位置的 Key 做点积：
+$$
+\text{Scores} = QK^T
+$$
+
+* $Q$ 形状 $(n, d\_k)$，$K^T$ 形状 $(d\_k, n)$ → 结果形状 $(n, n)$
+* 每个元素 $\text{score}\_{ij}$ 表示位置 $i$ 对位置 $j$ 的原始关注程度。
+
+#### 步骤 3：缩放
+
+除以 $\sqrt{d\_k}$ 防止点积过大：
+$$
+\text{Scaled Scores} = \frac{QK^T}{\sqrt{d\_k}}
+$$
+
+形状仍为 $(n, n)$。
+
+#### 步骤 4：Softmax 归一化
+
+对每一行做 softmax，得到注意力权重矩阵 $A$：
+$$
+A\_{ij} = \frac{\exp(\text{score}*{ij}/\sqrt{d\_k})}{\sum*{k=1}^n \exp(\text{score}\_{ik}/\sqrt{d\_k})}
+$$
+
+形状仍为 $(n, n)$，每一行的权重之和为 1。
+此时 $A\_{ij}$ 表示位置 $i$ 从位置 $j$ 获取信息的比例。
+
+#### 步骤 5：加权求和
+
+用注意力权重对所有 Value 向量加权求和：
+$$
+\text{Attention}(Q, K, V) = A \cdot V
+$$
+
+* $A$ 形状 $(n, n)$，$V$ 形状 $(n, d\_v)$ → 结果形状 $(n, d\_v)$
+
+**每个位置的输出都动态融合了整个序列的上下文信息。**
+
+***
+
+### 3. 多头注意力：不同子空间的同时关注（带形状推导）
+
+单头只能捕捉一种关系。Transformer 使用**多头注意力**，让模型从多个角度同时学习。
+
+* 设定头数 $h$，每个头的 Q、K 维度 $d\_k = d\_{model} / h$，V 维度 $d\_v = d\_{model} / h$。
+
+* 对每个头 $i$，有独立的投影权重：
+  * $W\_i^Q$ 形状：$(d\_{model}, d\_k)$
+  * $W\_i^K$ 形状：$(d\_{model}, d\_k)$
+  * $W\_i^V$ 形状：$(d\_{model}, d\_v)$
+
+* 计算每个头的注意力：
+  $$
+  \text{head}\_i = \text{Attention}(QW\_i^Q, KW\_i^K, VW\_i^V)
+  $$
+  每个 $\text{head}\_i$ 的形状为 $(n, d\_v)$。
+
+* 将所有头的结果拼接：
+  $$
+  \text{Concat}(\text{head}*1, \dots, \text{head}*h)
+  $$
+  由于 $h \times d\_v = d*{model}$，拼接后形状恢复为 $(n, d*{model})$。
+
+* 最后经过一个线性投影矩阵 $W^O$（形状 $(d\_{model}, d\_{model})$）：
+  $$
+  \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}\_1, \dots, \text{head}*h) W^O
+  $$
+  输出形状仍为 $(n, d*{model})$。
+
+> 这保证了多头注意力在变换维度的同时，能与后续的残差连接和层归一化无缝衔接。
+
+***
+
+### 4. 弥补位置信息的缺失：位置编码
+
+自注意力本身是**排列等变**的——打乱输入顺序，输出只是同等打乱。
+为了注入序列顺序，Transformer 在输入词向量上叠加**位置编码** $P$，$P$ 的形状也是 $(n, d\_{model})$，通过正弦/余弦函数或可学习的嵌入得到。
+
+叠加后输入变为 $X + P$，使模型能够区分"A 在 B 前面"这种位置关系。
+
+***
+
+## 二、为什么自注意力比 RNN 更适合长序列？
+
+| 对比维度 | RNN | Transformer 自注意力 |
+|---------|-----|----------------------|
+| **信息流动路径长度** | O(n)，长程依赖衰减严重 | **O(1)**，任意两个词直接连接 |
+| **并行能力** | 必须按时间步顺序计算 | 矩阵乘法，整个序列一次性并行 |
+| **梯度稳定性** | BPTT 连乘，易消失/爆炸 | 梯度只穿过 Softmax 和线性层，路径极短 |
+| **记忆瓶颈** | 压缩在固定大小的隐状态中，信息被稀释 | 每个输出可直接访问完整 Value 矩阵 |
+| **可解释性** | 较难 | 注意力权重矩阵 $n \times n$ 可直接可视化 |
+| **复杂度** | O(n·d²) 但顺序依赖 | 标准 O(n²·d)，但高度并行，实际快于 RNN |
+
+### 详细解释
+
+1. **信息流动路径长度是 O(1)**
+   RNN 从第一个词传信息到第 $n$ 个词需 $n$ 步递归，长程依赖衰减严重。自注意力通过一次矩阵乘法建立任意两位置的直接连接，路径恒为 1。
+
+2. **完全并行化，训练效率飞跃**
+   RNN 必须按时间步顺序计算，无法在序列维度上并行。自注意力本质是矩阵乘法，整个序列可一次性并行处理，GPU 利用率极高，训练速度快几十倍。
+
+3. **梯度传播更稳定**
+   RNN 的 BPTT 涉及连乘，易梯度消失/爆炸。自注意力的梯度仅穿过 Softmax 和线性映射，路径极短，梯度稳定，远距离依赖信号更易学习。
+
+4. **无固定大小的记忆瓶颈**
+   RNN 将全部历史压缩在一个固定维度的隐状态中，长序列信息被稀释。自注意力中每个输出可直接访问完整 Value 矩阵，记忆容量随序列长度自然扩展。
+
+5. **可解释性更强**
+   注意力权重矩阵 $A$（$n \times n$）可直接可视化，清晰展示词与词之间的依赖关系，便于调试和分析。
+
+6. **复杂度对比与前沿方案**
+   标准自注意力时间复杂度 $O(n^2)$，但矩阵乘法高度并行，在几千长度内实际快于 RNN 的顺序计算。对极长序列，已有稀疏注意力、线性注意力、状态空间模型等变体降至 $O(n)$ 或 $O(n\log n)$，并保留全局感受野，依然优于 RNN。
+
+***
+
+## 三、面试回答模板（简洁版）
+
+面试时被问到这个，你可以这样简洁地回答：
+
+### 自注意力怎么工作？
+
+> 想象每个词都在开圆桌会议，能直接跟任何词对话，而不是像 RNN 那样只能传话。
+>
+> 具体计算很直接：
+> 输入序列 X，形状 `[n, d_model]`。
+> 用三个矩阵把 X 分别投影成 Q（查询）、K（键）、V（值），形状分别为 `[n, d_k]`、`[n, d_k]`、`[n, d_v]`。
+> 在标准多头注意力里 `d_k = d_v = d_model / h`。
+>
+> 然后：
+>
+> 1. **算分数**：`S = QKᵀ` → 形状 `[n, n]`。
+> 2. **缩放**：`S / √d_k`。
+> 3. **Softmax**：对每行做，得到权重矩阵 A（`[n, n]`，每行和为 1）。
+> 4. **加权求和**：`A V` → 输出 `[n, d_v]`，每个词都融合了全局上下文。
+>
+> 多头就是并行做 h 次上述过程，每个头学不同关系，最后把所有头结果拼成 `[n, d_model]` 再线性映射。
+> 因为自注意力对顺序无感，我们要给输入加上**位置编码**，告诉模型词的位置。
+
+### 为什么比 RNN 更适合长序列？
+
+> 核心就四点：
+>
+> 1. **路径极短**：任意两个词直接连接（O(1)），长程依赖不会丢失。
+> 2. **彻底并行**：全是矩阵乘法，整个句子一次丢进 GPU，训练快几十倍。
+> 3. **梯度稳定**：只穿过 Softmax 和线性层，没有连乘，优化稳定得多。
+> 4. **没有记忆瓶颈**：能直接取用任意位置的 V，信息无损，无需"遗忘"。
+>
+> 一句话：自注意力用**全局直接交互**替代了 RNN 的**逐步递归压缩**，从根本上解决了长序列建模的核心痛点。
+
+***
+
+## 四、总结
+
+* **自注意力**：Q、K、V 点积缩放 + Softmax + 加权求和 → 每个词聚合全局信息。
+* **多头注意力**：多个子空间并行学习，拼接后线性变换。
+* **相比 RNN**：路径 O(1)、完全并行、梯度稳定、无记忆瓶颈、可解释性强。
+
+**面试时如果能讲清楚 QKV 的形状变化、为什么除 $\sqrt{d\_k}$、多头如何拼接，再对比 RNN 的四点优势，面试官会非常认可。**
+
+***
+
+**如果觉得有用，欢迎点赞、在看、转发给正在刷题的朋友～**
+
+---
+
+---
+url: /zh/demo/index.md
+---
+# Demo
+* [bar](./bar.md)
+* [foo](./foo.md)
+
+---
+
+---
+url: /zh/demo/89e8wbux/index.md
+---
+# bar
+[foo](./foo.md)
+
+---
+
+---
+url: /zh/demo/pk670uy1/index.md
+---
+# foo
+[bar](./bar.md)
+
+---
+
+---
+url: /zh/project/index.md
+---
+# 项目
+一个我构建和维护的开源项目集合。
+
+智能学习规划工具，帮助组织学习计划并跟踪进度。专注于高效和易用性。
+
+**[GitHub →](https://github.com/Kstheme/Study-Planner)**
+
+用于认知任务自动化的智能代理框架。旨在通过自适应推理简化复杂工作流。
+
+**[GitHub →](https://github.com/Kstheme/Cognify-Agent)**
+
+教育诊断代理，分析学习模式并提供个性化的改进建议。
+
+**[GitHub →](https://github.com/Kstheme/EduDiag-Agent)**
+
+轻量级 RSS 阅读器，从多个来源聚合和消费内容。
+
+**[GitHub →](https://github.com/Kstheme/RSSFeedReader)**
+
+书生第四期实训营的学习笔记和练习，涵盖 LLM 基础和实践项目。
+
+**[GitHub →](https://github.com/Kstheme/InternLM_notebook)**
+
+个人博客和作品集网站，基于 VuePress 构建，配有自定义主题设计。
+
+**[GitHub →](https://github.com/Kstheme/Kstheme.github.io)**

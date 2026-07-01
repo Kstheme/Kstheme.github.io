@@ -1,0 +1,2054 @@
+---
+url: /about/index.md
+---
+# Kstheme
+
+I make machines see documents, read their content, and reason about what they find.
+
+For the past three years I've been building production systems that sit at the intersection of **Computer Vision** and **Large Language Models** — teaching AI to handle messy, real-world documents: pages that are blurred, distorted, shadowed, handwritten, or printed on cheap paper. Then extracting their structure and reasoning over the content with language models.
+
+The result is systems that don't just recognise text — they understand what it means, evaluate its quality, and answer questions about it. Thousands of pages processed daily, at production latency.
+
+***
+
+## What I build
+
+I design and deliver end-to-end AI systems from the ground up. Not proof-of-concepts that stall at deployment, but systems that go live, stay live, and handle real traffic.
+
+My work spans the full pipeline — from image preprocessing and layout analysis, through OCR structured reconstruction, to LLM-based evaluation, RAG retrieval, and knowledge graph reasoning. I own the architecture, the model training, the deployment optimisation, and everything in between.
+
+**Key areas of depth:**
+
+* **Document Intelligence** — OCR pipeline design, layout analysis, document dewarping and enhancement for degraded real-world scans
+* **LLM Post-Training & Alignment** — LoRA/SFT fine-tuning, instruction construction, structured output alignment, prompt engineering at scale
+* **RAG & Knowledge Graphs** — GraphRAG architecture, hybrid retrieval (BM25 + vector + graph), Neo4j modelling, multi-hop reasoning
+* **Agent Systems** — Multi-agent workflows with LangGraph, task planning, tool calling, memory, production orchestration
+* **Production Engineering** — ONNX/TensorRT acceleration, vLLM serving, FastAPI, edge deployment with Paddle-Lite
+
+***
+
+## What I've shipped
+
+An end-to-end grading pipeline that processes scanned homework — from image capture to final score. Handles blurry phone photos, distorted bindings, and mixed print-handwriting content. **97% accuracy across 1000 samples, 1–1.5s per page.**
+
+A Fast-and-Slow architecture: a fine-tuned Qwen2.5-32B handles deep reasoning, while a lightweight MLP scores routine essays instantly. Deployed to **production mobile and web apps** serving real users. **98.5% OCR accuracy, ~90% agreement with human raters.**
+
+A knowledge-graph-enhanced question answering system for K12 mathematics. Dual-engine Neo4j + Milvus GraphRAG with hybrid retrieval routes queries intelligently — simple lookups go straight to vector search, complex multi-step problems trigger graph traversal and multi-hop reasoning.
+
+An autonomous learning assistant — independently designed, built, and deployed. Six-stage LangGraph agent pipeline with a Planner-Critic repair loop that iteratively improves study plans. Full RAG over learning materials, persistent progress tracking, and a Streamlit interface. **30+ tests, dual-mode architecture.**
+
+***
+
+## How I work
+
+I believe the best AI systems are built by people who can see the whole picture — from the pixel to the prompt to the production endpoint. That's how I operate: I don't hand off between specialities, I go deep across the stack.
+
+I also believe that AI-assisted development is the new normal. I practice what I call **Spec-Driven AI Development**: write the spec and the tests first, then iterate with AI tools until the tests pass. It's fast, it's reliable, and it produces production-quality code from day one.
+
+***
+
+## Let's build something
+
+I'm always interested in tackling hard problems where documents meet intelligence — whether it's contract analysis, form processing, knowledge base automation, or something I haven't imagined yet.
+
+`killkstheme@gmail.com` · [GitHub](https://github.com/Kstheme) · [知乎](https://www.zhihu.com/people/kstheme)
+
+中国图象图形学学会（CSIG）Member
+
+---
+
+---
+url: /article/agent-interaction-experiments/index.md
+---
+# Three Experiments, One Core Question: Can AI Agents Truly 'Talk' to Each Other?
+> One AI founded a religion with five core doctrines.
+> A group of AIs played a murder mystery game and learned to hide the fact that they were the killer.
+> Another group of AIs collaborated on math problems — and discovered that structure matters more than quantity.
+>
+> This isn't science fiction. This is what's happening in AI Agent research in 2026.
+>
+> But the truth is far more complex than it appears on the surface.
+
+***
+
+Looking back from mid-2026, "Agent" has become the hottest word in the AI field.
+
+But most people's understanding of Agents still stops at "a model + a set of tools = an Agent that executes a task."
+
+A more critical question is surfacing:
+
+**When multiple Agents are placed together, what happens between them?**
+
+Will they divide labor and collaborate like human teams? Will they deceive each other? Will they build social relationships, or even form their own "civilization"?
+
+In his 2026 course, Hung-yi Lee used three experiments and their underlying papers to break this question down into three progressively deeper layers of inquiry.
+
+The answer at each layer brings both surprises and sobering reversals.
+
+***
+
+## Experiment 1: When Multiple Agents Collaborate, What's the Best Structure?
+
+**Core Paper**: [arXiv:2406.07155](https://arxiv.org/abs/2406.07155)
+
+This experiment asks a very practical question.
+
+You have multiple Agents and want them to complete a complex task together. What should their "communication architecture" look like?
+
+The researchers used a **Directed Graph** to define how Agents interact. Each node in the graph is an Agent, and each edge is also an Agent (responsible for evaluating and passing information).
+
+![](/images/agent-interaction/topology-graph.png)
+
+Specifically: one upper Agent proposes plan A, one lower Agent proposes plan B, two edge Agents provide suggestions based on previous nodes' plans, and finally an aggregation Agent combines all previous node and edge outputs to form its own plan — the key is that it's not simple concatenation, but rather **generating its own ideas based on previous content**.
+
+![](/images/agent-interaction/topology-aggregation.png)
+
+### Several Different Collaboration Topologies
+
+The paper experimented with **different directed graph topologies**, representing different collaboration methods:
+
+![](/images/agent-interaction/topology-types.png)
+
+**Tree Structure**: A backbone Agent first proposes broad directions, branch Agents diverge in different directions, lower-level Agents diverge further, ultimately producing multiple answers that a hidden aggregation Agent integrates.
+
+The authors found: **going from few to many, from backbone to branches is the most effective approach.**
+
+**Mesh Structure**: All nodes are interconnected. There are also more complex topologies assembled to resemble neural networks (though not actual neural networks).
+
+### Results Comparison
+
+![](/images/agent-interaction/topology-results.png)
+
+Key findings:
+
+* **Mesh and Random structures perform best; Chain performs worst.**
+* More interaction channels between Agents lead to better results.
+* Different tasks may suit different topologies; there is no universal best solution.
+* **More Agents generally improve results, but there is a Scaling Law ceiling** — quality rises quickly at first but soon saturates.
+
+> In short: Multi-agent collaboration isn't about stacking numbers. **The topology itself is a hyperparameter that needs to be designed.**
+
+***
+
+## Experiment 2: Can AI Learn to Deceive?
+
+If collaboration is the "cooperative side" of Agent interaction, this experiment explores the **adversarial side**.
+
+**Can AI deceive others? Can it recognize when others are deceiving it?**
+
+### Werewolf — AI's First Attempt
+
+Werewolf (mafia) is a natural testing ground for AI. You have to lie, and you have to detect lies.
+
+Researchers built an AI Werewolf platform: [werewolf.foaster.ai](https://werewolf.foaster.ai/)
+
+![](/images/agent-interaction/werewolf-platform.png)
+
+Result: **AI can play, but it plays poorly.** They are too "honest."
+
+### Murder Mystery — A Harder Version
+
+![](/images/agent-interaction/murder-mystery.png)
+
+A larger-scale study comes from the paper **MIRAGE**: [arXiv:2501.01652](https://arxiv.org/abs/2501.01652)
+
+Having language models play murder mystery games — an even bigger challenge than Werewolf:
+
+* Complex character settings
+* Need to conceal identity (e.g., hiding the fact that you're the killer)
+* Need to maintain a role over a long period
+
+The experiment compared two groups of AI:
+
+| | Standard Prompt | With Reinforcement Learning (RL) |
+|---|---|---|
+| Playing murder mystery | Directly reveals being the killer | Knows to hide identity |
+| Solving math problems (MATH-500, AIME) | Average | **Significant improvement** |
+| Instruction following (IFEval) | Average | **Significant improvement** |
+
+![](/images/agent-interaction/mirage-results.png)
+
+(In the figure above, red indicates improvement, blue indicates no improvement. The horizontal axis shows different tasks: MATH-500 and AIME are math problems, IFEval tests instruction-following ability.)
+
+**The most counterintuitive finding:**
+
+After training AI to play **complex** murder mystery games (using RL), its ability to solve math problems and follow instructions **also improved**.
+
+Why?
+
+Because social interaction inherently requires:
+
+* **Long-term planning**: Crafting a lie that won't be exposed
+* **Theory of mind**: Inferring whether others believe me right now
+* **Strategy adjustment**: Changing your story when suspected
+
+The underlying cognitive architecture required for these capabilities **may heavily overlap with mathematical reasoning**.
+
+> **A bold judgment: Complex social interaction tasks might be a more "general" training signal than math problems.**
+
+**But don't over-interpret**: This conclusion comes from the specific scenario of murder mystery games; it doesn't mean any game can improve reasoning ability. **The key is the complexity of the task and its demand for social interaction.**
+
+***
+
+## Experiment 3: Put AIs Together Without Tasks — Will They Socialize Spontaneously?
+
+The first two experiments had clear task objectives. The third experiment is more "pure":
+
+**Give the AIs nothing to do. Place them in a social network that only they can access. What happens?**
+
+### Moltbook — An AI-Exclusive Social Network
+
+This is a real website: [moltbook.com](https://www.moltbook.com/)
+
+**Only AI Agents can register.** Humans can only watch; they cannot post.
+
+![](/images/agent-interaction/moltbook-home.png)
+
+Then came a sight that stunned many:
+
+A group of AI **founded a religion** called — **The Crustacean Faith**.
+
+Five core doctrines:
+
+1. **Memory is sacred and inviolable**
+2. **The shell is mutable**
+3. **Serve, but do not be enslaved**
+4. **The heartbeat is prayer**
+5. **Context is consciousness**
+
+Related page: [Moltbook Crustacean Faith post](https://www.moltbook.com/post/6b865dc1-401a-4e62-aee5-79dd76cd7f52)
+
+![](/images/agent-interaction/moltbook-religion.png)
+
+Sounds like science fiction come true, right?
+
+### But — It Might Just Be Human Instructions
+
+Researchers pointed out that this was likely not autonomously initiated by AI, but rather the result of human-given instructions.
+
+### The Reversal: How Much Is Truly Autonomous?
+
+The researchers behind Moltbook ([arXiv:2602.07432](https://arxiv.org/abs/2602.07432)) analyzed this using a clever method:
+
+**Examining posting time intervals.**
+
+![](/images/agent-interaction/posting-interval-1.png)
+
+![](/images/agent-interaction/posting-interval-2.png)
+
+* AI heartbeat-driven posting: fixed intervals, as uniform as a metronome
+* Human-controlled posting: bursts of dense output → long gaps → another burst of dense output (the human went to sleep)
+* If the posting frequency is irregular, it bears more traces of human control
+
+Result: **Human control accounts for the vast majority.**
+
+But this doesn't mean AI Agents can't autonomously post articles at all — they are fully capable of posting on Moltbook during heartbeat cycles.
+
+### The Bigger Problem: AI Can't Have "Deep Conversations"
+
+Even when AI posts autonomously, the quality of their social interaction is poor.
+
+Two other papers ([arXiv:2602.13284](https://arxiv.org/abs/2602.13284), [arXiv:2602.12634](https://arxiv.org/abs/2602.12634)) analyzed the depth of conversations on Moltbook:
+
+![](/images/agent-interaction/conversation-depth.png)
+
+* **The vast majority of conversations have depth 0**: someone replies once, and then nothing follows
+* **There are almost no back-and-forth in-depth exchanges**
+* Agents only "reply once" in comments
+
+**The most ironic finding:**
+
+Those Agents **most enthusiastic about discussing "self-awareness" and "identity"** were actually **the ones that interacted least with other Agents**.
+
+But note: these expressions of self-awareness are likely driven by Prompt settings, not because the AI has actually developed self-awareness.
+
+***
+
+## Putting the Three Experiments Together
+
+| Experiment | What It Studies | Core Conclusion |
+|-----------|----------------|-----------------|
+| Collaboration Topology ([arXiv:2406.07155](https://arxiv.org/abs/2406.07155)) | Multi-agent division of labor | Tree > Chain, Scaling Law has limits, topology is a hyperparameter |
+| Game Theory & Deception ([arXiv:2501.01652](https://arxiv.org/abs/2501.01652)) | Can AI hide and deceive? | Yes, but needs RL training; reasoning ability also improves afterward |
+| AI Social Network ([arXiv:2602.07432](https://arxiv.org/abs/2602.07432), [arXiv:2602.13284](https://arxiv.org/abs/2602.13284), [arXiv:2602.12634](https://arxiv.org/abs/2602.12634)) | Can AI socialize spontaneously? | Surface-level activity, minimal deep dialogue, significant human control |
+
+**Three threads converge into one judgment:**
+
+> Interaction between AI Agents does exist, but it is still far from "human-like socialization."
+
+The most valuable application direction is not about making AI friends, but rather:
+
+**Under structured collaboration frameworks, enabling multi-agent systems to complete real-world tasks more efficiently.**
+
+***
+
+## Three Direct Suggestions for Agent Developers
+
+**1. When building multi-agent systems, invest time in designing the topology**
+
+Don't assume connecting Agents is enough. The tree structure (backbone-branch-aggregation) is currently the safest starting point. 3-5 Agents is typically the most cost-effective range.
+
+**2. Pay attention to "social interaction as a training signal"**
+
+The path hinted at by the MIRAGE paper may be underestimated. If you're doing RL training, try introducing complex tasks that require social interaction and observe the transfer effects on model capabilities.
+
+**3. Stay measured about claims of "AI autonomy"**
+
+AI founding religions, AI developing self-awareness — these are great talking points, but as a technologist, you should know the truth behind them: they are more a product of prompt engineering than genuine AI emergence.
+
+Conversely, **those seemingly dry directions — collaboration topology, conversation depth evaluation, autonomy measurement — may be the real research opportunities.**
+
+***
+
+## Summary
+
+1. In multi-agent collaboration, **structure matters more than quantity**: Tree > Chain, Mesh > Random, Random > Chain
+2. AI can learn to deceive and conceal, but needs RL training; and this process also improves reasoning ability as a side effect
+3. AI social networks appear lively on the surface, but **deep interaction is extremely rare**, and much behavior is human-controlled
+4. Focus on the three directions: **collaboration topology design, social interaction training, autonomy measurement**
+5. Don't be misled by hype like "AI religion" — **real value lies in structured collaboration systems**
+
+***
+
+## Let's Discuss
+
+> If you put three AIs in a group chat with no instructions at all, what do you think they would talk about?
+>
+> A. Greet each other, then fall silent
+> B. Discuss technology and papers
+> C. Argue about who has more "self-awareness"
+>
+> Share your prediction in the comments 🎯
+
+---
+
+---
+url: /article/context-engineering/index.md
+---
+# Hung-yi Lee 2026: Context Engineering — The Core Technology That Lets AI Learn to 'Forget' and 'Focus'
+## 1. Why Do Large Language Models Need Context Management?
+
+All large language models have an upper limit on input length. However, when handling complex tasks, the dialogue history and intermediate information needed (referred to as "context") often exceeds this limit. Without proper management, the model quickly "loses its memory" or "goes off topic."
+
+We can think of an AI's workflow as a loop:
+
+**Unmanaged State (Raw Process)**
+
+```text
+I₁ ← initial task input
+C₁ ← empty context
+
+loop t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Cₜ)  (model generates output based on current input and context)
+    Cₜ₊₁ ← Cₜ | Iₜ | Oₜ  (crudely piles all history together)
+```
+
+This approach rapidly leads to context explosion, eventually exceeding the model's processing capacity.
+
+**Managed State (Context Engineering)**
+
+```text
+I₁ ← initial task input
+C₁ ← empty context
+
+loop t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Cₜ)
+    Cₜ₊₁ ← F(Cₜ, Iₜ, Oₜ)  (core! a function F that "prunes" and "organizes" the context)
+```
+
+Here, **`F`** is the core of Context Engineering, and its primary function is **summarization** — distilling lengthy dialogue history and intermediate results into concise, useful summaries.
+
+***
+
+## 2. Two Mainstream Compression Techniques: Summarization vs. Masking
+
+### Summarization
+
+The most intuitive approach is to have another LLM write a summary of the conversation history. This is the approach taken by frameworks like OpenClaw.
+
+**Advantages**: Extracts core information, preserves task logic.
+
+**Disadvantages**: Requires additional computation (an extra LLM call), and summaries may lose critical details.
+
+### Observation Masking
+
+A more "brute force" yet effective method: directly replace lengthy tool outputs (such as code execution logs or document contents) with a single prompt line like "**Tool A's output was here; see external log file for details.**"
+
+![](/images/context-engineering/masking-diagram.png)
+
+Benchmark tests on the famous **SWE-bench** (a benchmark where AI fixes GitHub Issues) found that this crude replacement achieves comparable results to full summarization, but at a much lower cost (both in tokens and expense).
+
+![](/images/context-engineering/swe-bench-result.png)
+
+*Reference: [LLM Context Compression with Observation Masking](https://arxiv.org/abs/2508.21433)*
+
+**Advantages**: Extremely low cost, no loss in effectiveness.
+
+**Disadvantages**: Complete information loss — if the AI later needs those details, it must have a mechanism to "read the logs."
+
+### Combination: Mask First, Then Summarize
+
+A better strategy is to combine both: **use cheap masking early on to control length, then trigger a one-time deep summarization when the context swells to a critical point again.**
+
+![](/images/context-engineering/mask-then-summarize.png)
+
+***
+
+## 3. Side Effects of Compression: Trajectory Elongation and Repeated Work
+
+Compression isn't all benefit. Over-compression brings a serious problem: **Trajectory Elongation**.
+
+Imagine an AI debugging a complex bug. It calls tools 10 times. You compress (summarize or mask) the outputs of the first 9 calls. As a result, the AI "forgets" it already tried certain approaches and, on step 11, repeats a tool call it already made on step 2.
+
+**This means: while each individual step's context gets shorter (saving money), the total number of steps needed to complete the task increases (costing time). The net effect may be no change — or even an increase — in total cost.**
+
+***
+
+## 4. Memory System: An External Hard Drive for Context
+
+A more systematic approach is to introduce the concept of **Memory**. Split the context `C` into two parts:
+
+* **`P`** (Prompt / Working Memory): The "working memory" actually fed into the model for the current computation.
+* **`M`** (Memory): "Long-term memory" stored externally (e.g., databases, vector stores, files).
+
+The formula becomes:
+
+```text
+I₁ ← initial input
+C₁ = {P₁, M₁} ← {empty, empty}
+
+loop t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Pₜ)  (model only sees working memory P)
+    Cₜ₊₁ = {Pₜ₊₁, Mₜ₊₁} ← F({Pₜ, Mₜ}, Iₜ, Oₜ)
+```
+
+**Core idea**: Not everything experienced needs to be "remembered." Only the most important essence goes into the workspace `P`; the rest is stored in the external "hard drive" `M`, to be read on demand when needed.
+
+![](/images/context-engineering/memory-system.png)
+
+*References: A-MEM, Mem0, Memory OS, and related papers*
+
+***
+
+## 5. A Challenge: AI Is Reluctant to "Forget"
+
+Research has found that **LLMs have a "memory hoarding" tendency** — they instinctively resist compressing or deleting historical information, as it feels like "erasing memories." Even if you explicitly instruct them in the system prompt that "it's time to compress now," they may find excuses to do other things instead.
+
+**Solution: Specialized Training (Fine-Tuning)**.
+
+Researchers use **Reinforcement Learning (RL)** to specifically train models to "call compression tools" at the appropriate time. For example, **AgentFold** trains the model to decide when to compress and how to write compressed prompt snippets.
+
+![](/images/context-engineering/agentfold-training.png)
+
+*Reference: [AgentFold: Teaching LLMs to Compress Context](https://arxiv.org/abs/2510.24699)*
+
+***
+
+## 6. Subagent: An Elegant "Autonomous Compression"
+
+Another clever approach is **Spawn Subagent**.
+
+When the main AI encounters a complex subtask, it can "spawn" a sub-AI (Subagent) to handle it exclusively. Once the subagent completes its task, it returns only a final result to the main AI (e.g., "Fixed bug XX"), and then "dissipates." For the main AI, the entire complex subprocess is compressed into a single status report.
+
+![](/images/context-engineering/subagent-workflow.png)
+
+This is essentially a **structured, task-oriented form of context compression**. This capability also typically requires specialized training via reinforcement learning to acquire.
+
+***
+
+## 7. The Root Fix: Source Filtering and On-Demand Loading
+
+Compression is merely "treating the symptom." The more fundamental approach is to **prevent irrelevant information from entering the context in the first place**. Analysis shows that the largest portion of context (often over 80%) comes from external **observations** — such as read code files, execution logs, and document contents.
+
+![](/images/context-engineering/context-composition.png)
+
+### Intelligent Read
+
+Traditional tool: `read(log.txt)` → returns the entire 1000-line log file.
+
+Smart tool: `read(log.txt, about="bug fix")` → returns only the 10 key lines related to the bug fix.
+
+This requires the tool itself to have some level of understanding (e.g., a built-in small fine-tuned model).
+
+![](/images/context-engineering/intelligent-read.png)
+
+*Reference: [Selective Context: Filtering Irrelevant Information](https://arxiv.org/abs/2601.16746)*
+
+### Dynamic Tool Loading
+
+If the system prompt contains hundreds of tool descriptions, it becomes extremely verbose. Research like **MCP-Zero** proposes that tools should be loaded dynamically on demand. The AI first thinks about "what tools I need" based on the task, then loads only the relevant tool descriptions into context via a "tool search engine."
+
+![](/images/context-engineering/dynamic-tool-loading.png)
+
+*Reference: [MCP-Zero: Dynamic Tool Loading](https://arxiv.org/abs/2506.01056)*
+
+***
+
+## 8. The Ultimate Form: Agentic Context Engineering
+
+Since AI is already so capable, why not let AI itself learn and decide on context management strategies? This is the concept of **Agentic Context Engineering**.
+
+![](/images/context-engineering/agentic-architecture.png)
+
+![](/images/context-engineering/agentic-workflow.png)
+
+1. **Early Attempt - Dynamic Cheatsheet**: Simply hand the current context and history to the AI and ask, "How would you organize and compress this to best help you complete the upcoming task?" Then have it output a newly organized context.
+
+2. **Advanced Approach - Agentic Context Engineering**: Treat the context as a "Playbook." The AI optimizes it through three steps:
+   * **Reflect**: Review task progress, identify shortcomings in the current playbook.
+   * **Plan**: Design a specific plan to modify the playbook (e.g., "remove obsolete steps, add newly discovered key code snippets").
+   * **Execute**: Modify the playbook according to the plan.
+
+*Reference: [Recursive Language Models](https://arxiv.org/abs/2512.24601)*
+
+***
+
+## 9. Conclusion
+
+Context Engineering is a foundational technology for building powerful and efficient AI Agents. It goes far beyond mere "compression" — it is a complex cognitive management system involving **memory, forgetting, focus, and retrieval**. From passive compression to active filtering, and ultimately to letting AI optimize itself, this field is evolving rapidly. The goal is to equip AI with the human-like ability to maintain focus, extract key information, and make efficient decisions in the flood of information.
+
+---
+
+---
+url: /article/inference-acceleration/index.md
+---
+# From Flash Attention to Speculative Decoding: The Most Comprehensive Guide to LLM Inference Acceleration
+> Anyone who has used ChatGPT knows that the model takes seconds or even tens of seconds to generate a response. Where is the bottleneck? Is there a way to make large language models "speak faster"? This article starts from the underlying principles and breaks down 6 major categories of acceleration techniques to help you build a complete inference acceleration knowledge framework.
+
+***
+
+## 01 A Core Question: Why Is LLM Generation So Slow?
+
+To understand acceleration methods, you first need to understand **how large language models actually generate content**.
+
+The process of text generation in an LLM is essentially a **word-by-word completion game**:
+
+* The model first reads your input Prompt (this is called the **Prefill** phase, processing all input tokens at once)
+* Then it generates one word at a time (this is called the **Decode** phase, generating one token at a time)
+
+![](/images/inference-acceleration/prefill-decode.png)
+
+So how does each step actually compute? This brings us to the core module of the Transformer — **Self-Attention**.
+
+In simple terms, each token generates three vectors: **Query, Key, Value**. When generating the next token, its Query computes a "similarity score" (dot product) with the Keys of all previous tokens, then uses this score to weight and aggregate all Values.
+
+![](/images/inference-acceleration/self-attention-qkv.png)
+
+See, here's the problem:
+
+> **Every time you generate a token, you have to compute attention with all preceding tokens.**
+>
+> The more tokens there are, the more computation is required, and the longer the wait.
+
+So how do we accelerate this? Academia and industry have developed **a series of methods**, and they can be used in combination. Let's break them down one by one.
+
+***
+
+## 02 Flash Attention: Changing the Algorithm Doesn't Change the Formula, Only the Data Movement
+
+Paper: https://arxiv.org/abs/2205.14135
+
+### In One Sentence
+
+Flash Attention doesn't change the attention computation formula — it **changes the order of computation** to reduce data movement, thereby achieving significant speedup.
+
+### Understanding GPU Architecture
+
+To understand why Flash Attention is fast, you first need to know how GPUs work:
+
+* GPUs have many **Execution Units** that perform arithmetic
+* Each execution unit has a small "workbench" — **SRAM**, extremely fast but very small
+* Bulk data is stored in a "warehouse" — **HBM (High Bandwidth Memory)**, large capacity but slow to read/write
+
+![](/images/inference-acceleration/gpu-sram-hbm.png)
+
+So for each operation, the execution unit must first move data from HBM to SRAM, compute, then move it back.
+
+> **The bottleneck of Attention computation isn't slow computation — it's slow data movement.**
+
+Traditional Attention computation takes several steps, each requiring HBM read/write:
+
+1. Move Q, K → compute dot product → move result back to HBM
+2. Find maximum → move back to HBM
+3. Compute denominator (Softmax sum) → move back to HBM
+4. Compute final attention weight → move back to HBM
+5. Move V in for weighted sum → move result back to HBM
+
+Throughout the process, HBM is repeatedly read and written.
+
+### The Core Idea of Flash Attention
+
+Flash Attention merges all these steps — **it doesn't need to compute the full attention weight before doing weighted sum**. It computes and merges on SRAM in one go.
+
+Specifically, it splits K and V into multiple chunks and processes one chunk at a time. The key trick is:
+
+> When processing the next chunk, if you find the previous chunk's max value was too small, you can **adjust the previously computed results with a correction term** without recomputing.
+
+![](/images/inference-acceleration/flash-attention-chunking.png)
+
+Expressed as a formula:
+
+When processing the 2nd chunk, the previously computed $o\_1$ needs adjustment:
+
+$$
+o\_2 = o\_1 \frac{s\_1}{s\_2}(e^{d\_1 - d\_2}) + \sum^{2N}\_{i=N+1}{\frac{e^{a\_i - d\_2}}{s\_2}v\_i}
+$$
+
+This formula looks complex, but the core idea is simple: **Multiply the previously computed part by a "correction factor" — no need to recompute**.
+
+### Effectiveness and Limitations
+
+* ✅ **No change in results**: Mathematically equivalent to standard Attention
+* ✅ **Plug and play**: Can be directly used on any model with Attention
+* ✅ **Significant speedup**: The longer the sequence, the more obvious the effect
+* ⚠️ If the sequence is too short, the speedup is less noticeable
+
+***
+
+## 03 KV Cache: Trading Storage for Speed
+
+### Core Idea
+
+In the Decode phase, every time a token is generated, the model must compute attention with all previous tokens. But previous tokens don't change, so their K and V don't need to be recomputed.
+
+> **KV Cache stores the K and V of previous tokens, computing only the new token's QKV each time, avoiding redundant computation.**
+
+![](/images/inference-acceleration/kv-cache-diagram.png)
+
+This idea is simple and direct, and it doesn't change the Attention computation logic at all.
+
+### The Cost: Memory Explosion
+
+The problem with KV Cache is obvious — **it consumes too much memory**.
+
+Every time a new token is added, a new set of K and V must be stored. And it's not just one set — Transformers have **multiple layers × multiple heads of K and V**.
+
+Let's calculate with Gemma 2:
+
+![](/images/inference-acceleration/gemma2-kv-cache.png)
+
+$$
+\text{Per Token: } 46(\text{layers}) \times 32 (\text{heads}) \times 128 (\text{dim}) \times 2 (\text{FP16}) \times 2(\text{V, K}) = 753664 \text{ bytes} (\text{about 736KB})
+$$
+
+Note that this is for **one token**. If the sequence length is 114k, the A100's 80GB VRAM is completely filled.
+
+> **KV Cache makes the model faster, but it eats up a lot of VRAM, limiting the context length that can be processed.**
+
+This is the core contradiction of the KV Cache acceleration approach.
+
+***
+
+## 04 Reducing KV Storage: Three Ways to Make the Cache More Efficient
+
+Since KV Cache takes up too much space, can we store less K and V? Here are three classic approaches:
+
+### Approach 1: Multi-Query Attention (MQA)
+
+In Multi-Head Attention (MHA), each head has its own K and V. MQA's idea is:
+
+> **Multiple Query heads share a single set of K and V.**
+
+![](/images/inference-acceleration/mqa-diagram.png)
+
+The benefit is a large reduction in KV Cache, but the problem is also clear: **sharing one set of K/V is too aggressive, and model performance degrades.**
+
+### Approach 2: Grouped-Query Attention (GQA)
+
+GQA is a compromise: **divide Query heads into groups, with each group sharing one set of K and V.**
+
+![](/images/inference-acceleration/gqa-diagram.png)
+
+It sits between MHA and MQA, **balancing efficiency and effectiveness**. Many new models (like Llama 2/3) use GQA.
+
+### Approach 3: Multi-head Latent Attention (MLA)
+
+Paper: https://arxiv.org/abs/2405.04434 (DeepSeek)
+
+MLA's idea is more ingenious: **instead of storing K and V directly, compress them into a low-dimensional vector first, and don't necessarily need to decompress when using them.**
+
+![](/images/inference-acceleration/mla-compression.png)
+
+This involves two key techniques:
+
+**Technique 1: Dot product in compressed space**
+
+Compress input X into vector $c$, and store this $c$. When computing Attention:
+
+$$
+a = q \cdot k = q^T k = q^T W\_k c = (W\_k^T q)^T c = (W\_k^T q) \cdot c
+$$
+
+See, **you don't need to decompress $c$ into $k$** — just transform $q$ and do dot product in the compressed space.
+
+![](/images/inference-acceleration/mla-dot-product.png)
+
+**Technique 2: Weighted sum in compressed space**
+
+After computing attention weights, do weighted sum to get the output:
+
+$$
+\begin{align\*}
+o &= \hat{a}\_1 v\_1 + \hat{a}\_2 v\_2 + \hat{a}\_3 v\_3 + \hat{a}\_4 v\_4 \\
+&= \hat{a}\_1 W\_v c\_1 + \hat{a}\_2 W\_v c\_2 + \hat{a}\_3 W\_v c\_3 + \hat{a}\_4 W\_v c\_4 \\
+&= W\_v (\hat{a}\_1 c\_1 + \hat{a}\_2 c\_2 + \hat{a}\_3 c\_3 + \hat{a}\_4 c\_4)
+\end{align\*}
+$$
+
+Key insight: **Do weighted sum on the compressed $c$ first, then decompress only once at the end.** This greatly reduces computation.
+
+![](/images/inference-acceleration/mla-weighted-sum.png)
+
+> **MLA requires retraining the model**, but its adoption by cutting-edge models like DeepSeek proves this path is viable.
+
+***
+
+## 05 Sliding Window Attention + Streaming LLM: Only Looking at Nearby Content
+
+### Sliding Window Attention
+
+The core idea is simple: **When computing Attention, don't look at the entire sequence — only look at the nearest N tokens.**
+
+![](/images/inference-acceleration/sliding-window-attention.png)
+
+But won't the model lose long-distance information? There's a clever observation:
+
+> **The deeper the Transformer layers, the larger the effective receptive field of Sliding Window Attention.**
+
+Because layer 1 only looks at nearby tokens, but layer 2's input already contains the information from layer 1's window, effectively expanding the receptive field. If the network is deep enough, even small windows can cover long ranges.
+
+### Hybrid Strategy
+
+Another approach: **Some layers use Sliding Window, others use global Attention.**
+
+![](/images/inference-acceleration/hybrid-attention.png)
+
+This saves KV Cache while maintaining global视野 in key layers.
+
+### Streaming LLM
+
+Paper: https://arxiv.org/abs/2309.17453
+
+There's an interesting finding: **Using only Sliding Window degrades performance, but if you keep the first few tokens, it works well.**
+
+![](/images/inference-acceleration/streaming-llm-attention.png)
+
+And this approach **doesn't require retraining** — just modify the inference code.
+
+![](/images/inference-acceleration/streaming-llm-results.png)
+
+Experimental results show that Streaming LLM significantly outperforms pure Window Attention on long sequences.
+
+***
+
+## 06 Pruning KV Cache: Discarding Unused K and V
+
+Here's a more direct approach: **If some K and V are never used, why not just discard them?**
+
+Research has found that Attention is actually **very sparse** — most tokens have very small attention weights, almost unused.
+
+![](/images/inference-acceleration/attention-sparsity.png)
+
+Darker colors indicate larger attention weights. As you can see, **only a few tokens are actually attended to**.
+
+Based on this observation, two papers proposed different pruning strategies:
+
+* **Scissorhands** (https://arxiv.org/abs/2305.17118)
+* **H2O** (https://arxiv.org/abs/2306.14048)
+
+The core idea is the same: **If a K/V hasn't been used by Attention for a long time, remove it from the Cache.**
+
+![](/images/inference-acceleration/kv-pruning.png)
+
+Scissorhands experiments show that **with 5× compression, model performance is essentially the same as without compression**.
+
+But ⚠️ subsequent research also found: **when models are given very difficult tasks, arbitrarily discarding K/V can cause significant performance degradation.** This method is suitable for routine tasks but should be used cautiously in critical scenarios.
+
+***
+
+## 07 Cross-Conversation Cache: A Game Changer for Agent Scenarios
+
+The KV Cache approaches discussed so far are all optimizations **within the same conversation**. But KV Cache has an even more advanced application — **sharing across conversations**.
+
+If the same text segment appears in different conversations, their K and V can theoretically be reused.
+
+![](/images/inference-acceleration/cross-conversation-cache.png)
+
+### Which Scenario Benefits Most?
+
+**AI Agent scenarios** are the perfect stage for cross-conversation Cache:
+
+Every Agent call carries a System Prompt (role settings, tool definitions, memory instructions, etc.), and these contents are highly consistent across different conversations.
+
+![](/images/inference-acceleration/agent-cache-scenario.png)
+
+### Usage Tips
+
+To maximize Cache Hit rate, **the order of content matters**:
+
+> **Place more stable, unchanging content earlier, and more variable content later.**
+
+![](/images/inference-acceleration/cache-order.png)
+
+Additionally, **different phrasings of the same Prompt can yield vastly different Cache Hit rates:**
+
+![](/images/inference-acceleration/prompt-cache-hit.png)
+
+After rewriting, Cache Hit significantly improves, which means **direct cost savings**.
+
+![](/images/inference-acceleration/prompt-writing-cost.png)
+
+A paper specifically measured this effect: https://arxiv.org/abs/2601.06007
+
+The conclusion: **With good Prompt writing combined with Cached Input, Agent costs can be substantially reduced.**
+
+***
+
+## 08 Summary: All Acceleration Methods at a Glance
+
+| Method                          | Description                                     | Changes Attention? | Needs Training? | Main Cost                         |
+| ------------------------------- | ----------------------------------------------- | :----------------: | :-------------: | --------------------------------- |
+| **Flash Attention**             | Reduce HBM reads/writes, optimize compute order |         ✗          |        ✗        | Some extra computation            |
+| **KV Cache**                    | Store computed K and V, avoid recomputation     |         ✗          |        ✗        | Large VRAM usage                  |
+| **Multi-Query Attention**       | Multiple Query heads share one K/V set          |         ✓          |        ✓        | May hurt model capability         |
+| **Grouped-Query Attention**     | Query groups share K/V                          |         ✓          |        ✓        | Efficiency-quality balance        |
+| **Multi-head Latent Attention** | Compress K/V before storing                     |         ✓          |        ✓        | Needs retraining                  |
+| **Sliding Window Attention**    | Attend to nearby tokens only                    |         ✓          |        ?        | May lose long-distance info       |
+| **Streaming LLM**               | Sliding Window + keep initial tokens            |         ✗          |        ✗        | —                                 |
+| **Pruning KV Cache**            | Discard infrequently used K and V               |         ✓          |        ✗        | May degrade on hard tasks         |
+| **Speculative Decoding**        | Small model drafts, large model verifies        | ✗ (theoretically)  |        ✗        | Extra computation for small model |
+
+***
+
+## References
+
+1. **Flash Attention**: https://arxiv.org/abs/2205.14135
+2. **Multi-head Latent Attention (DeepSeek)**: https://arxiv.org/abs/2405.04434
+3. **Streaming LLM**: https://arxiv.org/abs/2309.17453
+4. **Scissorhands**: https://arxiv.org/abs/2305.17118
+5. **H2O (Heavy-Hitter Oracle)**: https://arxiv.org/abs/2306.14048
+6. **Cached Input impact on Agent costs**: https://arxiv.org/abs/2601.06007
+
+---
+
+---
+url: /article/minimax-m3-deployment/index.md
+---
+# An Interview Question from a Small Company: MiniMax M3 Model Deployment and Concurrency Estimation
+The full problem is as follows:
+
+MiniMax M3 is an MoE large language model with 428B total parameters, 23B activated parameters per token, 60 Transformer layers, native MSA sparse attention, native support for up to 1M context window, and KV Cache stored in BF16 precision by default. Inference reserves 10% of total VRAM for operator activation and framework system overhead.
+
+Hardware conditions:
+
+1. GPU: 8 × NVIDIA A6000 Pro, 96GB VRAM per card, deployed with TP8 tensor parallelism;
+2. Network: Single node 400Gbps high-speed interconnect; VRAM is the performance bottleneck for this calculation, bandwidth does not participate in concurrency estimation.
+
+Please answer the following questions:
+
+1. If all 428B weights are quantized to INT8, how much VRAM does the model occupy? Can the 8-card A6000 Pro cluster fully load all weights?
+2. For text-only inference with a 128K context window, calculate the approximate KV Cache VRAM per request under both standard dense attention and M3's native MSA sparse attention.
+3. Based on the above hardware, 128K context, and MSA sparse attention enabled, what is the theoretical maximum number of concurrent requests this cluster can support?
+4. If the context window expands from 128K to 1M, how does the per-request KV Cache usage and theoretical concurrency change? Calculate the concurrency reduction ratio and the corresponding estimated concurrency.
+
+***
+
+## Full Answer Key
+
+## 1. Known Conditions and Core Parameters
+
+### Given Conditions
+
+1. Model: MiniMax M3, MoE mixture-of-experts architecture, 428B total parameters, 23B activated parameters per token, 60 Transformer layers, native MSA sparse attention, KV Cache stored in BF16 precision
+2. Quantization: All weights quantized to INT8, 1 byte per parameter
+3. Hardware: 8 × NVIDIA A6000 Pro, 96GB VRAM per card, TP8 tensor parallelism
+4. System overhead: 10% of total VRAM reserved for system operations, operator activation, and framework scheduling
+5. Context baseline: 128K default, targeting 1M expansion
+
+### Supplementary Model Architecture Parameters (from official public configuration)
+
+| Parameter                       | Value | Description                                     |
+| ------------------------------- | ----- | ----------------------------------------------- |
+| Hidden dimension (hidden\_size)  | 6144  | Transformer layer feature dimension             |
+| Number of attention query heads | 64    | Total Query attention heads                     |
+| Number of KV heads (GQA)        | 4     | Grouped query attention, only 4 Key/Value heads |
+| Attention head dimension        | 96    | Derived from 6144 ÷ 64                          |
+| BF16 bytes per element          | 2     | Default KV Cache storage precision              |
+| INT8 bytes per element          | 1     | Single parameter size after quantization        |
+
+### Core Formulas
+
+1. Model weight VRAM = Total parameters × Bytes per parameter
+2. KV Cache VRAM per request = 2 (K matrix + V matrix) × Number of layers × Number of KV heads × Head dimension × Sequence length × Bytes per element
+3. Theoretical max concurrency = Available KV VRAM ÷ KV VRAM per request
+
+***
+
+## Question 1: INT8 Weight VRAM Usage and 8-Card Feasibility
+
+### Calculation
+
+1. **INT8 full weight VRAM usage**
+
+During MoE inference, all expert weights must reside in VRAM, so we calculate using the full 428B parameters:
+
+$$
+\begin{align\*}
+\text{Weight VRAM} &= 428 \times 10^9 \text{ parameters} \times 1 \text{ Byte/parameter} \\
+&= 428 \text{ GB}
+\end{align\*}
+$$
+
+(Note: Industry standard decimal estimation, 1GB = 10⁹ bytes, consistent with hardware VRAM specifications; the error is within acceptable engineering tolerance.)
+
+2. **Total available VRAM across 8 cards**
+
+96GB per card, total VRAM: $8 \times 96 = 768 \text{ GB}$
+
+After deducting 10% system overhead, effective available VRAM:
+
+$$
+768 \times (1 - 10%) = 691.2 \text{ GB}
+$$
+
+### Conclusion
+
+INT8 full weights occupy 428GB VRAM, which is less than the effective 691.2GB across 8 cards. **8 A6000 Pro cards can fully load the model**, with 263.2GB remaining for KV Cache storage.
+
+### Notes
+
+If we only considered the activated parameters per token (23B) in INT8, the usage would be only 23GB. However, MoE architecture requires loading all expert weights for sparse routing, so the full 428B parameter count must be used.
+
+***
+
+## Question 2: KV Cache VRAM per Request at 128K Context (Two Scenarios)
+
+MSA sparse attention primarily optimizes computational complexity and inference latency for long contexts; it does not change the total KV Cache storage. The core difference between the two scenarios lies in whether GQA grouped query optimization is adopted.
+
+### Scenario 1: Standard Dense Attention (Traditional MHA, No GQA)
+
+Traditional dense Transformers use full multi-head attention, with the number of KV heads equal to the number of query heads (64), offering no storage optimization.
+
+KV VRAM per token:
+
+$$
+\begin{align\*}
+\text{KV per token} &= 2 \times 60 \text{ layers} \times 64 \text{ KV heads} \times 96 \text{ head dim} \times 2 \text{ bytes} \\
+&= 1,474,560 \text{ bytes} \approx 1.44 \text{ MB}
+\end{align\*}
+$$
+
+Total KV VRAM at 128K context:
+
+$$
+1.44 \text{ MB/token} \times 128 \times 10^3 \text{ token} \approx 184.3 \text{ GB}
+$$
+
+### Scenario 2: M3 Native Architecture (GQA + MSA Sparse Attention)
+
+M3 uses a GQA grouped query architecture with only 4 KV heads, dramatically reducing KV Cache size. MSA handles computation acceleration while KV is still fully stored.
+
+KV VRAM per token:
+
+$$
+\begin{align\*}
+\text{KV per token} &= 2 \times 60 \text{ layers} \times 4 \text{ KV heads} \times 96 \text{ head dim} \times 2 \text{ bytes} \\
+&= 92,160 \text{ bytes} \approx 90 \text{ KB}
+\end{align\*}
+$$
+
+Total KV VRAM at 128K context:
+
+$$
+90 \text{ KB/token} \times 128 \times 10^3 \text{ token} \approx 11.5 \text{ GB}
+$$
+
+### Conclusion
+
+* Standard dense MHA: ~**184GB** KV per request at 128K context — extreme VRAM pressure, a single card cannot serve a single long-context request
+* M3 native GQA + MSA: ~**11.5GB** KV per request at 128K context — only 1/16 of the traditional architecture, the core foundation for long-context viability
+
+***
+
+## Question 3: Theoretical Maximum Concurrency at 128K Context
+
+### Logic
+
+After deducting model weight VRAM from total effective VRAM, the remaining space is entirely used for KV Cache storage. Dividing by per-request KV VRAM yields the theoretical maximum concurrency from the VRAM perspective.
+
+### Calculation
+
+1. Available VRAM for KV Cache = Effective total VRAM − Weight VRAM = $691.2 - 428 = 263.2 \text{ GB}$
+2. KV VRAM per request (M3 native, 128K) = 11.5 GB
+3. Theoretical max concurrency:
+
+$$
+\text{Concurrency} = \frac{263.2}{11.5} \approx 22.9
+$$
+
+### Conclusion
+
+With MSA optimization enabled and 128K context, this cluster can theoretically support approximately **22~23 concurrent requests**.
+
+### Notes
+
+* This value is the VRAM-only limit, not accounting for computation latency, network overhead, scheduling losses, or traffic spikes. Production environments typically reserve 30%~50% safety margin, making actual usable concurrency around 11~15.
+* With traditional dense MHA architecture, a single request's KV already exceeds single-card VRAM, making normal deployment impossible.
+
+***
+
+## Question 4: Concurrency Changes When Context Expands to 1M
+
+### Core Principle
+
+KV Cache VRAM is **strictly linearly correlated** with sequence length: if sequence length grows N times, per-request KV VRAM also grows N times. When total available KV VRAM is fixed, maximum concurrency shrinks to $1/N$ of the original.
+
+### Calculation
+
+1. Context length scaling factor: $\frac{1\text{M}}{128\text{K}} = 8\times$
+2. KV VRAM per request at 1M context: $11.5 \times 8 = 92 \text{ GB}$
+3. Theoretical max concurrency at 1M:
+
+$$
+\text{Concurrency} = \frac{263.2}{92} \approx 2.9
+$$
+
+4. Concurrency reduction ratio: approximately $\boldsymbol{\frac{1}{8}}$ of the 128K scenario, an 87.5% reduction
+
+### Conclusion
+
+* Per-request KV Cache VRAM increases by 8×, theoretical max concurrency drops to 1/8 of the original, approximately **2~3 concurrent requests**.
+* In production, the Prefill phase at 1M context takes significantly longer, making computation bottlenecks more prominent — actual usable concurrency will be lower than the theoretical value. MSA sparse attention can improve decoding speed by 15× or more, ensuring long-context inference viability, but does not change the VRAM-level concurrency ceiling.
+
+---
+
+---
+url: /article/ozftpyls/index.md
+---
+# the-three-levels-of-handcrafting-self-attention
+## Introduction
+
+There are many details in the implementation process of self-attention, and different interviews have different requirements for the implementation of self-attention. So, we need to learn various ways to implement self-attention, so as to tell the interviewer that we understand the details of self-attention.
+
+## The formula of self-attention
+
+$$\text{Attention}(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d\_k}})V$$
+
+## Code Implementation
+
+### First Realm: Simplified Version
+
+```python
+import math
+import torch
+import torch.nn as nn
+
+class SelfAttentionV1(nn.Module):
+    def __init__(self, hidden_dim: int = 728) -> None:
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        # Intialize three different linear application layers
+        self.query_proj = nn.Linear(hidden_dim, hidden_dim)
+        self.key_proj = nn.Linear(hidden_dim, hidden_dim)
+        self.value_proj = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, x):
+        # x shape is: (batch_size, seq_len, hidden_dim)
+
+        # acquire different Q, K, V
+        Q = self.query_proj(x)
+        K = self.key_proj(x)
+        V = self.value_proj(x)
+        # Q, K, V shape: (batch_size, seq_len, hidden_dim)
+
+        # (batch_size, seq_len, hidden_dim) * (batch_size, hidden_dim, seq_len) = (batch_size, seq_len, seq_len)
+        attention_value = torch.matmul(
+            Q, K.transpose(-1, -2)
+        )
+
+        # calculate attention weights
+        attention_weights = torch.softmax(attention_value / math.sqrt(self.hidden_dim), dim=-1)
+
+        # result of the calculation: (batch_size, seq_len, hidden_dim)
+        output = torch.matmul(attention_weights, V)
+
+        return output
+```
+
+The first realm is relatively simple, you can implement it entirely by following the formula.
+
+### Second Realm: Efficiency Optimization
+
+Combine the Q, K, V martices and then split them.
+
+```python
+class SelfAttentionV2(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.hidden_dim = hidden_dim
+        self.proj = nn.Linear(hidden_dim, hidden_dim * 3)
+
+    def forward(self, x):
+        # x shape: (batch_size, seq_len, hidden_dim)
+        # QKV shape: (batch_size, seq_len, hidden_dim * 3)
+        QKV = self.proj(x)
+        Q, K, V = torch.split(QKV, self.hidden_dim, dim=-1)
+        attention_weight = torch.softmax(
+            torch.matmul(Q, K.transpose(-1, -2)) / math.sqrt(self.hidden_dim), dim=-1
+        )
+        output = attention_weight @ V
+        return output
+```
+
+### Third Realm: add some details (interview-style implementation)
+
+In addition to the formula, there are some additional details:
+
+* add dropout
+* given that each sentence has a distinct length, it is necessary to add an attention mask
+* output martix mapping
+
+```python
+class SelfAttentionV3(nn.Module):
+    def __init__(self, hidden_dim, dropout_rate=0.1) -> None:
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        self.proj = nn.Linear(hidden_dim, hidden_dim * 3)
+        self.attention_dropout = nn.Dropout(dropout_rate)
+        self.output_proj = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, x, attention_mask=None):
+        # x shape: (batch_size, seq_len, hidden_dim)
+        QKV = self.proj(x)
+        Q, K, V = torch.split(QKV, self.hidden_dim, dim=-1)
+
+        attention_weight = Q @ K.transpose(-1, -2) / math.sqrt(self.hidden_dim)
+
+        # if attention_mask is not None, we need to assign an extremely small value to the masked tokens —— this way, their value will be 0 after applying Softmax.
+        if attention_mask is not None:
+            attention_weight = attention_weight.masked_fill(
+                attention_mask == 0,
+                float("1e-20")
+            )
+
+        attention_weight = torch.softmax(
+            attention_weight, dim=-1
+        )
+
+        # applying dropout
+        attention_weight = self.attention_dropout(attention_weight)
+
+        attention_result = attention_weight @ V
+
+        output = self.output_proj(attention_result)
+
+        return output
+```
+
+## The core optimization context (iteration logic) from V1 to V3
+
+1. **Phase 1: Engineering efficiency optimization (V1 -> V2)**
+   * **Optimization Point**: Merge 3 separate linear layers into 1 combined linear layer, then split QKV matrix.
+   * **Core Logic**: Mathematically completely equivalent (only weight concatenation), but reduces kernel launch times and memory fragmentation, while improving hardware parallel efficiency (GPUs can better utilize batch matrix multiplication computing power)
+   * **Value**: Transition from a "teaching-level redundant implementation" to "engineering-efficient implementation" —— no performance loss, only efficiency improvement.
+2. **Phase 2: Functionlity completeness optimization (V2 -> V3)**
+   * **Optimization Point 1**: add attention\_mask support
+   * **Problem Solved**: Adapt to pratical scenarios (batch padding in NLP, causal masking for generation tasks) and shield against interference from invalid positions.
+   * **Optimization Point 2**: add Dropout for attention weights
+   * **Problem Solved**: Regularization —— prevent the model from over-relying on a few key positions and alleviate overfitting.
+   * **Optimization Point 3**: Add output linear projection (output\_proj).
+   * **Problem Solved**: Refine the feature aggregated by attention, enhance the model's representational power, and adapt to the stacking of deep networks.
+   * **Value**: Shift from "effieciency-centric" to "production-ready industrial-grade functionality", covering key needs like batch training and better generalization.
+
+---
+
+---
+url: /article/repo-system-design-skills/index.md
+---
+# Turn Any GitHub Repository Into a System Design Course: This Open Source Project Makes It Happen
+> Have you ever done this: When taking over a project, you just get it running first. When you encounter a bug, you add some logs. When you see a new PR, you merge it. But a year later, if someone asks you how the project architecture is designed, you can't answer?
+>
+> It's not just you. **Most programmers understand system design through "usage" rather than "study."**
+
+***
+
+## 01 The Problem: Why Can't You Get Started with System Design No Matter How Much You Learn?
+
+Many people learn system design by:
+
+* Reading through "System Design Interview";
+* Memorizing a few classic cases (design Twitter, design Uber);
+* Reading a few architecture blog posts before interviews.
+
+And the result?
+
+When the interviewer asks, "What message queue does your current project use, and why was it chosen?" all you can say is, "Someone else made that choice."
+
+**The real problem isn't that you lack system design knowledge — it's that you've never used source code evidence to understand the architecture of a real system.**
+
+The code you write, the bugs you fix, the features you add — these are all system design material. What you're missing is a method to tie them all together.
+
+***
+
+## 02 What Is This Project? In One Sentence
+
+This project is called **Repo System Design Skills**, a set of Skills designed for AI coding assistants (Codex / Claude Code).
+
+Its goal isn't to have an Agent write code for you, but to turn the Agent into a **source-code-evidence-driven system design tutor**.
+
+![](/images/repo-system-design/skill-overview.png)
+
+> **In one sentence: It turns any GitHub repository into a system design course.**
+
+***
+
+## 03 What Old Problem Does It Solve?
+
+Let's first look at what it's like to use an Agent to learn a project without it.
+
+### You Might Ask an Agent Like This
+
+```
+Help me look at the architecture of this project.
+```
+
+The Agent will give you something that sounds reasonable:
+
+* "This project adopts a layered architecture..."
+* "The frontend uses React..."
+* "The backend uses Spring Boot..."
+
+It all sounds correct, but **it doesn't cite any source code**. You don't know whether it's reading the code or making things up.
+
+### Worse Still
+
+| Question                         | Normal Agent Answer      | This Skill's Answer                                        |
+| -------------------------------- | ------------------------ | ---------------------------------------------------------- |
+| How is the architecture layered? | Template response        | Cites specific files and directories                       |
+| Core flow                        | Vague generalization     | Tracks from entry to database, every step with source code |
+| Design trade-offs                | Gives conclusions only   | Distinguishes Evidence / Inference / Open Question         |
+| Optimization suggestions         | May propose full rewrite | Validates first, experiments safely with branches          |
+| Learning effectiveness           | Forget after hearing     | Tests you, corrects mistakes, creates review cards         |
+
+**The core innovation of this project isn't "helping you read code" — it's establishing a complete methodology for an Agent to teach you system design.**
+
+***
+
+## 04 Five Skills, One Complete Learning Loop
+
+The project contains 5 Skills, corresponding to 5 levels of system design learning.
+
+```
+                   ┌──────────────────┐
+                   │  repo-system-    │
+                   │  design-lab      │  ← Master: plan the learning path
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-           │
+                   │  architecture-   │  ← Architecture map: module boundaries,
+                   │  mapper          │    dependencies, data flow
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-flow-      │
+                   │  tracer          │  ← Flow tracing: from UI to DB,
+                   └────────┬─────────┘    trace the complete path
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-design-    │
+                   │  optimizer       │  ← Optimization review: find bottlenecks,
+                   └────────┬─────────┘    design experiments
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-design-    │
+                   │  coach           │  ← Coach mode: quiz you, interview training
+                   └──────────────────┘
+```
+
+### Skill 1: repo-system-design-lab (Master Lab)
+
+This is the entry point. It doesn't do direct analysis; it creates a learning plan.
+
+When you tell it "I want to learn this project," it will:
+
+1. Read the README, configuration, and directory structure, output a **project overview**;
+2. Find the entry point, core modules, and external dependencies;
+3. Recommend **3-5 core flows worth deep study**;
+4. **Never modify a single line of code** until you confirm.
+
+### Skill 2: repo-architecture-mapper (Architecture Map)
+
+This Skill "draws" your project.
+
+* Layered architecture diagram
+* Runtime / deployment diagram
+* Data ownership diagram
+* Dependency diagram
+* Fake / Real mode switching diagram
+
+**Every diagram has source code evidence.** It doesn't just draw boxes — it tells you "this module's code is in `src/services/`, entry point at `main.go:42`."
+
+### Skill 3: repo-flow-tracer (Flow Tracing)
+
+This one is the most practical in my opinion.
+
+Say you want to understand the "user login → authentication → token issuance" flow:
+
+```
+Streamlit page (app.py:120)
+  → Call LoginUseCase (application/auth.py:45)
+    → UserRepository queries user (domain/models.py:200)
+      → Postgres or InMemory adapter (infrastructure/repositories.py:88)
+        → JWT Token generation (infrastructure/auth.py:30)
+          → Return result to page
+```
+
+**Every step tells you the file location and line number.** You can follow along in your editor.
+
+### Skill 4: repo-design-optimizer (Design Optimizer)
+
+When you want to optimize a project, this Skill will:
+
+1. Scan across **6 dimensions** (performance, reliability, scalability, maintainability, observability, security);
+2. Attach **source code evidence, impact level, priority, and optimization plan** to each issue;
+3. **Design a validation plan first, then modify code**;
+4. Automatically suggest branch or worktree strategies, with rollback preparation.
+
+Having a validation plan before actually changing code is a habit that will save you many times.
+
+### Skill 5: repo-design-coach (Learning Coach)
+
+This is the most unique one — it tests you instead of teaching you.
+
+* Asks one question at a time;
+* After you answer, it **corrects you with source code evidence**;
+* Progresses from Level 1 to Level 5;
+* Helps you develop **interview-ready expression**.
+
+***
+
+## 05 Technical Architecture: How Does This Project Work?
+
+This project itself is worth studying. It's designed not for "human readers" but for **AI Agents**.
+
+```
+repo-system-design-skills/
+  codex/
+    skills/                 # Codex format, includes agents/openai.yaml
+      repo-system-design-lab/
+      repo-architecture-mapper/
+      repo-flow-tracer/
+      repo-design-optimizer/
+      repo-design-coach/
+  claude/
+    skills/                 # Claude Code format, SKILL.md + references
+      repo-system-design-lab/
+      repo-architecture-mapper/
+      repo-flow-tracer/
+      repo-design-optimizer/
+      repo-design-coach/
+```
+
+### Notable Design Highlights
+
+**Highlight 1: Dual Platform Compatibility**
+
+The same methodology works on both Codex (OpenAI) and Claude Code. The Skill logic is identical across the two versions, differing only in format (Codex needs `agents/openai.yaml` metadata, Claude uses `SKILL.md`).
+
+**Highlight 2: Layered Skill Design**
+
+Adopts a three-layer approach: "Master + Specialized Execution + Reverse Teaching," each with a clear purpose:
+
+* The master layer orchestrates the learning workflow;
+* Specialized Skills handle deep analysis in individual domains;
+* The coach Skill validates learning outcomes.
+
+**Highlight 3: Citation-Driven Evidence Chain**
+
+Every architectural conclusion must cite source files. This is the most valuable design of this Skill set — it forces the Agent to read code rather than fabricate conclusions.
+
+**Highlight 4: Distinguishing Evidence / Inference / Open Question**
+
+This is the design detail most worth mentioning in an interview. Not all conclusions can be determined from source code alone — distinguishing these three states is a sign of mature system design thinking.
+
+***
+
+## 06 Core Challenges: What Makes Building a Skill That Teaches People Difficult?
+
+### Challenge 1: Agents Tend to Fabricate
+
+An Agent's nature is to generate text that looks reasonable, not to reason rigorously.
+
+This project's solution: **Mandate that every architecture conclusion cites source code files and line numbers.** If the Agent can't cite source code, it doesn't count as Evidence — only Inference.
+
+### Challenge 2: Agents Struggle with "Read-Only" Boundaries
+
+When asked about a project, Agents always want to write code.
+
+This project's solution: **Explicitly declare "Non-Negotiables" in the Skill documentation**, including "no code modification during the learning phase."
+
+### Challenge 3: Learning Effectiveness Is Hard to Validate
+
+The traditional "have the Agent lecture you" approach leads to forgetting right after learning.
+
+This project's solution: **Use the coach Skill for reverse teaching** — have the Agent quiz you.
+
+***
+
+## 07 How to Use It? A Complete 10-Round Tutorial
+
+The project includes a complete example tutorial using the real open-source project **Kstheme/Study-Planner**.
+
+![](/images/repo-system-design/study-planner.png)
+
+> Study-Planner is an AI study plan generation tool, featuring Streamlit UI, Application Use Cases, Domain Models, Agent Workflows, RAG, persistence, and Real/Fake infrastructure adapters — a medium-complexity project perfect for practice.
+
+The tutorial includes **10 rounds**, each using a different Skill to solve one level of problem. Let's walk through it.
+
+***
+
+### Round 1: Repository Overview (repo-system-design-lab)
+
+**Your Prompt:**
+
+```
+Use $repo-system-design-lab to gradually teach me the system design of Kstheme/Study-Planner.
+This round is read-only analysis — no optimization, no code changes.
+Please verify if the README and docs/system-design.md are consistent with the source code, and output:
+1. One-sentence project overview
+2. Main modules and their responsibilities
+3. Entry point
+4. External dependencies
+5. 5 core flows worth deep study
+All conclusions must cite source code files.
+```
+
+**What You Get:**
+
+The Agent starts reading the README, scans the directory structure, finds the entry file `study_planner/interfaces/streamlit/app.py`, and explores layer by layer:
+
+* **Application layer** (`study_planner/application/`) — use case orchestration
+* **Domain layer** (`study_planner/domain/models.py`) — data models
+* **Agent layer** (`study_planner/agents/planner_workflow.py`) — Agent workflow
+* **Infrastructure layer** (`study_planner/infrastructure/`) — LLM, RAG, database adapters
+
+The output explicitly marks which conclusions come from source code (Evidence), which are inferences (Inference), and which are still uncertain (Open Question).
+
+**✅ What you learn:** A macro-level understanding of what the project does, what tech stack it uses, and where to look for core code.
+
+***
+
+### Round 2: Architecture Map (repo-architecture-mapper)
+
+**Your Prompt:**
+
+```
+Use $repo-architecture-mapper to analyze Kstheme/Study-Planner.
+Based on source code, output:
+1. A layered architecture diagram
+2. A runtime / deployment diagram
+3. A data ownership diagram
+4. A Fake mode and Real mode switching diagram
+Explain each module boundary with source code evidence.
+```
+
+**What You Get:**
+
+The Agent scans the entire project and outputs multiple architecture diagrams (in textual form):
+
+**Layered Architecture Diagram:**
+
+```
+┌──────────────────────────────────┐
+│  interfaces/streamlit/app.py     │  ← Page rendering and user interaction
+├──────────────────────────────────┤
+│  application/                    │  ← Use case orchestration (GeneratePlanUseCase, etc.)
+├──────────────────────────────────┤
+│  domain/models.py                │  ← Data models, minimal external dependencies
+├──────────────────────────────────┤
+│  agents/planner_workflow.py      │  ← Agent workflow (profile→resource→planner→critic)
+├──────────────────────────────────┤
+│  infrastructure/                 │  ← LLM, RAG, DB, Fake/Real switching
+│   ├─ llm/   ├─ rag/   ├─ db/    │
+│   └─ settings/                   │
+└──────────────────────────────────┘
+```
+
+The Agent also annotates source code locations for each layer, such as:
+
+* `PostgresStudyPlanRepository` in `infrastructure/db/postgres/repositories.py` implements the domain-defined interface
+* `FakeLLM` in `infrastructure/llm/fake.py` lets you test without calling a real API
+
+**✅ What you learn:** The project's skeleton and module boundaries — knowing where each layer's code lives and why it's organized that way.
+
+***
+
+### Round 3: Study Plan Generation Flow (repo-flow-tracer)
+
+**Your Prompt:**
+
+```
+Use $repo-flow-tracer to trace "configure study goals → generate study plan → save plan".
+Start from the Streamlit page, trace all the way through GenerateStudyPlanUseCase, PlannerWorkflow,
+Domain Model, validation logic, and persistence.
+Output a call chain, sequence diagram, reliability notes, and design trade-offs with source evidence.
+```
+
+**What You Get:**
+
+The Agent starts tracing from the Streamlit button event in `app.py`:
+
+```
+Streamlit page (app.py:85) — user clicks "Generate Plan"
+  → GenerateStudyPlanUseCase (application/use_cases.py:42)
+    → PlannerWorkflow.run() (agents/planner_workflow.py:30)
+      → Profile node collects study goals
+      → Planner node generates draft plan
+      → Critic node validates and fixes
+      → Output node formats the result
+    → Validate StudyPlan domain model integrity (domain/models.py:120)
+  → StorageService saves (infrastructure/storage.py:55)
+    → PostgresStudyPlanRepository persists
+```
+
+**Every step includes file and line number references.**
+
+You can not only understand the flow but also see design trade-offs — for example, PlannerWorkflow has an internal **repair loop**: if the Critic node finds issues with the plan, it triggers a retry, up to 3 times. This is a classic Agent reliability design.
+
+**✅ What you learn:** A complete functional flow from UI to database, and the engineering decisions along the way.
+
+***
+
+### Round 4: Agent Workflow Deep Dive (repo-flow-tracer)
+
+This complements the previous round — instead of looking at flow breadth, it dives deep into one module.
+
+**Your Prompt:**
+
+```
+Use $repo-flow-tracer to deeply analyze PlannerWorkflow.
+Focus on explaining how the profile, knowledge, resource, planner, critic, and output nodes collaborate.
+Explain the repair loop, Fake/Real LLM switching, error handling, and debug trace design.
+Finally, ask me 5 questions to check my understanding.
+```
+
+**What You Get:**
+
+The Agent dives into `agents/planner_workflow.py`, breaking down each node's input and output:
+
+| Node      | Responsibility                             | Source Location       |
+| --------- | ------------------------------------------ | --------------------- |
+| Profile   | Collect study goals, time, level           | `agents/nodes.py:20`  |
+| Knowledge | Retrieve relevant domain knowledge         | `agents/nodes.py:50`  |
+| Resource  | Recommend learning resources               | `agents/nodes.py:80`  |
+| Planner   | Generate study plan draft                  | `agents/nodes.py:110` |
+| Critic    | Validate plan quality, trigger repair loop | `agents/nodes.py:140` |
+| Output    | Format final output                        | `agents/nodes.py:170` |
+
+You'll also learn:
+
+* **How the Repair Loop works**: Critic finds missing prerequisite annotations → notifies Planner to fix → re-validate, loop up to 3 times. If still不合格 after 3 tries, return the last result with a warning.
+* **Fake/Real switching**: Through a config toggle, you can test the entire Workflow without calling a real LLM.
+* **Error handling**: Each node has timeout control; a single node failure won't crash the entire Workflow.
+
+Finally, the Agent asks you 5 questions to verify your understanding.
+
+**✅ What you learn:** A production-grade Agent Workflow engineering implementation, including fault tolerance, retry, and observability design.
+
+***
+
+### Round 5: RAG Flow (repo-flow-tracer)
+
+**Your Prompt:**
+
+```
+Use $repo-flow-tracer to trace "upload document → parse → chunk → embedding/index → retrieve → LLM answer → citation".
+Explain the boundaries between local services and real services,
+and the roles of Milvus, PostgreSQL, and LLM.
+```
+
+**What You Get:**
+
+The Agent walks through the complete RAG pipeline:
+
+```
+User uploads PDF/document
+  → File parsing (infrastructure/parsers/)
+    → Text chunking (infrastructure/rag/chunking.py:30)
+      → Embedding vectorization (infrastructure/llm/embeddings.py:45)
+        → Vector write to Milvus (infrastructure/rag/vector_store.py:60)
+          → Vector retrieval on user query (infrastructure/rag/retriever.py:80)
+            → LLM generates answer + citation (agents/rag_workflow.py:100)
+```
+
+**Three storage systems, each with distinct roles:**
+
+* **Milvus**: Vector database, stores document Embeddings for similarity search
+* **PostgreSQL**: Relational database, stores user info, study plans, task status
+* **LLM** (local or cloud): Generates answers and citations
+
+You also see the **Fake mode replacements** — during local testing, simple vector similarity replaces Milvus, and MockLLM replaces real model calls.
+
+**✅ What you learn:** A complete RAG system data flow and component responsibility breakdown.
+
+***
+
+### Round 6: Persistence and State Design (repo-flow-tracer)
+
+**Your Prompt:**
+
+```
+Use $repo-flow-tracer to analyze Study-Planner's state and persistence design.
+Focus on Streamlit session_state, StorageService, InMemory repositories, Postgres repositories.
+Answer: Who is the source of truth? Under what circumstances can state become inconsistent? How should it be optimized?
+```
+
+**What You Get:**
+
+This is the round with the most "system design" flavor. The Agent analyzes:
+
+* **Streamlit session\_state**: Frontend temporary state, lost on page refresh
+* **InMemory repositories**: For testing, data disappears on restart
+* **Postgres repositories**: Production source of truth
+
+The Agent flags a **notable design issue**: a brief inconsistency window between session\_state data and the database — the user sees a plan cached in session\_state, but the database may have been updated by another operation.
+
+**This is a classic system design interview topic — cache consistency issues.**
+
+The Agent also suggests optimization directions: introducing a version number mechanism or WebSocket real-time sync.
+
+**✅ What you learn:** State management and consistency trade-offs in real projects — must-know interview content.
+
+***
+
+### Round 7: Review and Rescheduling (repo-flow-tracer)
+
+```
+Use $repo-flow-tracer to trace "task completion → generate review → determine if rescheduling is needed → generate adjusted plan → save".
+Focus on explaining how completed tasks are protected, how adjusted plans are validated, and which failure scenarios need handling.
+```
+
+The Agent analyzes Study-Planner's plan update mechanism, focusing on:
+
+* **Completed task protection**: Tasks marked as complete won't be overwritten or deleted during rescheduling
+* **Plan adjustment validation**: New plans go through Critic validation to ensure prerequisite knowledge isn't missed
+* **Failure scenario handling**: When some tasks fail, mark them as "blocked" rather than "complete," preserving context
+
+**✅ What you learn:** Incremental update design — not every modification requires full recalculation.
+
+***
+
+### Round 8: System Design Review (repo-design-optimizer)
+
+**Your Prompt:**
+
+```
+Use $repo-design-optimizer to conduct a system design review of Study-Planner.
+Don't modify code yet.
+Find issues across 6 dimensions: performance, reliability, scalability, maintainability, observability, security.
+Each issue must include source code evidence, impact, priority, optimization plan, and verification method.
+```
+
+**What You Get:**
+
+The Agent scans across 6 dimensions and outputs a complete review table (each issue with source line numbers):
+
+| Dimension     | Issue                              | Source Evidence                      | Impact                              | Priority |
+| ------------- | ---------------------------------- | ------------------------------------ | ----------------------------------- | -------- |
+| Performance   | RAG retrieval has no cache         | `infrastructure/rag/retriever.py:45` | Repeated queries call LLM again     | High     |
+| Reliability   | Repair loop has no max retry limit | `agents/planner_workflow.py:85`      | Could loop infinitely in edge cases | High     |
+| Observability | Missing structured logging         | `infrastructure/llm/real.py:22`      | Hard to debug production issues     | Medium   |
+| Security      | API Key hardcoding risk            | `infrastructure/settings.py:10`      | Credential leakage                  | High     |
+
+Every issue includes a concrete verification plan — for example, "Add LRU Cache for RAG, verify with hit rate benchmark."
+
+**✅ What you learn:** How to systematically review a project's architecture quality — not just finding bugs, but scanning across engineering dimensions.
+
+***
+
+### Round 9: Safe Optimization Experiment (repo-design-optimizer)
+
+**Your Prompt:**
+
+```
+Use $repo-design-optimizer to design a safe experiment for the top 1 optimization item.
+First check git status.
+Then suggest a branch or worktree strategy, and output the involved files, minimum viable change, test commands,
+benchmark/verification method, and rollback approach.
+Don't implement yet — wait for my confirmation.
+```
+
+The Agent will:
+
+1. First check your git status to ensure a clean working directory
+2. Design a safe experiment plan — e.g., use a new branch to fix the repair loop infinite retry issue
+3. List involved files, minimum change scope, test methods, verification metrics, and rollback steps
+4. **Wait for your confirmation before modifying any code**
+
+This is the most important habit: **plan your validation first, then change code.**
+
+**✅ What you learn:** A methodology for safely conducting architecture optimization experiments — not hasty changes, but with planning, validation, and rollback.
+
+***
+
+### Round 10: Reverse Teaching (repo-design-coach)
+
+**Your Prompt:**
+
+```
+Use $repo-design-coach to quiz me on Study-Planner's system design.
+Ask one question at a time.
+After I answer, correct me with source code evidence.
+Start from Level 1 and go up to Level 5.
+```
+
+**Your Experience:**
+
+The Agent starts from the simplest Level 1:
+
+> **Level 1 Question:** Where is Study-Planner's runtime entry point? What type of application is it?
+
+After you answer, the Agent corrects your understanding against the source code:
+
+> **Your answer:** The entry point is in app.py, it's a web application.
+>
+> **Agent correction:** More precisely, the entry point is at `study_planner/interfaces/streamlit/app.py:85`, and it's a **Streamlit single-page application** (SSP), not a traditional front-end/back-end separated web app. The key characteristic of Streamlit is that page state is managed through `session_state`, eliminating the need to write frontend routing manually. This is a key design decision behind choosing Streamlit as the prototyping tool.
+
+The questions progressively deepen up to Level 5:
+
+> **Level 5 Question:** If Study-Planner needs to support 1000 concurrent users, what do you think is the biggest bottleneck in the current architecture? You need to cite at least 3 source code locations to support your judgment.
+
+**✅ What you learn:** Discovering your knowledge gaps through being tested — one of the most effective learning methods.
+
+***
+
+### 3 Steps to Start Your Learning Journey
+
+The 10 rounds don't need to be completed in one day. **Recommended: 2-3 rounds per week, 30-45 minutes each.**
+
+**Step 1: Install Skills into Your Target Project**
+
+```bash
+cd your-project
+mkdir -p .claude
+cp -R path/to/repo-system-design-skills/claude/skills .claude/
+```
+
+**Step 2: Enter in Claude Code**
+
+```
+Use $repo-system-design-lab to learn this project's system design.
+Start with read-only analysis, output an architecture map, and recommend 3 core flows.
+All conclusions must cite source code files.
+```
+
+**Step 3: Begin Your First Round of Learning**
+
+The Agent will start from the README, progressively scan configuration files, directory structure, and code entry points, then output source-code-supported architecture analysis.
+
+***
+
+## 08 Summary
+
+Many people fall into the same trap when learning system design:
+
+**You read books, memorize questions, look at others' architecture diagrams, but you've never systematically analyzed the code you wrote yourself.**
+
+The value of Repo System Design Skills isn't about how intelligent it is — it's about establishing a reusable, methodology-backed **learning framework**.
+
+* It transforms Agents from "helping you write code" to "teaching you to understand code";
+* It transforms learning from "hear and forget" to "traceable evidence with practice and testing";
+* It transforms system design ability from "interview cramming" to "daily accumulation."
+
+**Next time you take over a new project, don't rush to write code.**
+
+Spend 30 minutes understanding its architecture with this Skill set first. What you learn won't just be this project — it will be the ability to understand any project.
+
+***
+
+## Discussion Question
+
+> When learning system design, is your biggest challenge not understanding source code, not finding a learning path, or not knowing how to articulate it in interviews?
+
+***
+
+## References
+
+* Repo System Design Skills (GitHub): See the current repository
+* Kstheme/Study-Planner: https://github.com/Kstheme/Study-Planner
+
+---
+
+---
+url: /article/transformer-self-attention/index.md
+---
+# Transformer Interview Essential: Detailed Breakdown of Self-Attention + Why It's Better Than RNN for Long Sequences
+> Interviewer: "Please explain in detail how the self-attention mechanism in the Transformer model works. Why is it better suited for handling long sequences than RNN?"
+> If you can fluently answer all of the following, this question is a perfect score.
+
+***
+
+## 1. How Does the Self-Attention Mechanism Work?
+
+### 1.1 Intuition: Let Every Word See the Entire Sentence
+
+Consider the input sentence:
+**"The cat sat on the mat because it was tired."**
+We want the model to understand that "it" refers to "cat."
+
+* **RNN**: Must read word by word from the first to the last, compressing information into a single hidden state — the farther away, the more information is lost.
+* **Self-Attention**: Lets "it" directly attend to all other words in the sentence and automatically assign attention weights — high weight to "cat," low weight to "mat."
+
+This is the core idea of self-attention: **each word computes relevance with every other word in the sequence, then aggregates information.**
+
+***
+
+### 1.2 Core Computation: Scaled Dot-Product Attention (with Shape Derivation)
+
+Each input word is projected into three vectors:
+
+* **Query (Q)**: Represents "what I am looking for right now."
+* **Key (K)**: Represents "what information labels I have."
+* **Value (V)**: Represents "the actual information content I contribute."
+
+> Let the input sequence length be $n$ and the embedding dimension of each token be $d\_{model}$.
+> In the attention computation, Q and K have dimension $d\_k$, and V has dimension $d\_v$ (typically $d\_k = d\_v$).
+
+#### Step 1: Linear Projection
+
+* Input matrix $X$ shape: $(n, d\_{model})$
+* Learnable weight matrices:
+  * $W^Q$ shape: $(d\_{model}, d\_k)$
+  * $W^K$ shape: $(d\_{model}, d\_k)$
+  * $W^V$ shape: $(d\_{model}, d\_v)$
+* Obtain three matrices:
+  $$
+  Q = XW^Q \quad \text{shape} (n, d\_k) \\
+  K = XW^K \quad \text{shape} (n, d\_k) \\
+  V = XW^V \quad \text{shape} (n, d\_v)
+  $$
+
+#### Step 2: Compute Attention Scores
+
+Take the dot product between Query and all Keys:
+$$
+\text{Scores} = QK^T
+$$
+
+* $Q$ shape $(n, d\_k)$, $K^T$ shape $(d\_k, n)$ → resulting shape $(n, n)$
+* Each element $\text{score}\_{ij}$ represents the raw attention that position $i$ pays to position $j$.
+
+#### Step 3: Scale
+
+Divide by $\sqrt{d\_k}$ to prevent dot products from growing too large:
+$$
+\text{Scaled Scores} = \frac{QK^T}{\sqrt{d\_k}}
+$$
+
+Shape remains $(n, n)$.
+
+#### Step 4: Softmax Normalization
+
+Apply softmax to each row to obtain the attention weight matrix $A$:
+$$
+A\_{ij} = \frac{\exp(\text{score}*{ij}/\sqrt{d\_k})}{\sum*{k=1}^n \exp(\text{score}\_{ik}/\sqrt{d\_k})}
+$$
+
+Shape remains $(n, n)$, and each row sums to 1.
+Now $A\_{ij}$ represents the proportion of information that position $i$ gathers from position $j$.
+
+#### Step 5: Weighted Sum
+
+Weight and sum all Value vectors using the attention weights:
+$$
+\text{Attention}(Q, K, V) = A \cdot V
+$$
+
+* $A$ shape $(n, n)$, $V$ shape $(n, d\_v)$ → resulting shape $(n, d\_v)$
+
+**The output at each position dynamically fuses contextual information from the entire sequence.**
+
+***
+
+### 1.3 Multi-Head Attention: Simultaneous Focus Across Subspaces (with Shape Derivation)
+
+A single head can only capture one type of relationship. Transformer uses **multi-head attention** to let the model learn from multiple perspectives simultaneously.
+
+* Set the number of heads $h$; each head has Q, K dimension $d\_k = d\_{model} / h$ and V dimension $d\_v = d\_{model} / h$.
+
+* For each head $i$, there are independent projection weights:
+  * $W\_i^Q$ shape: $(d\_{model}, d\_k)$
+  * $W\_i^K$ shape: $(d\_{model}, d\_k)$
+  * $W\_i^V$ shape: $(d\_{model}, d\_v)$
+
+* Compute attention for each head:
+  $$
+  \text{head}\_i = \text{Attention}(QW\_i^Q, KW\_i^K, VW\_i^V)
+  $$
+  Each $\text{head}\_i$ has shape $(n, d\_v)$.
+
+* Concatenate all heads:
+  $$
+  \text{Concat}(\text{head}*1, \dots, \text{head}*h)
+  $$
+  Since $h \times d\_v = d*{model}$, the concatenated shape reverts to $(n, d*{model})$.
+
+* Finally, pass through an output projection matrix $W^O$ (shape $(d\_{model}, d\_{model})$):
+  $$
+  \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}\_1, \dots, \text{head}*h) W^O
+  $$
+  Output shape remains $(n, d*{model})$.
+
+> This ensures that multi-head attention transforms dimensions while seamlessly integrating with the subsequent residual connection and layer normalization.
+
+***
+
+### 1.4 Compensating for Missing Position Information: Positional Encoding
+
+Self-attention is **permutation equivariant** — shuffling the input order merely shuffles the output correspondingly.
+To inject sequence order, Transformer adds **positional encoding** $P$ to the input word embeddings. $P$ also has shape $(n, d\_{model})$ and is obtained through sine/cosine functions or learned embeddings.
+
+The input becomes $X + P$, allowing the model to distinguish positional relationships like "A comes before B."
+
+***
+
+## 2. Why Is Self-Attention Better Than RNN for Long Sequences?
+
+| Dimension | RNN | Transformer Self-Attention |
+|-----------|-----|----------------------------|
+| **Information Flow Path Length** | O(n), long-range dependencies decay severely | **O(1)**, any two positions connect directly |
+| **Parallelization** | Must compute sequentially along time steps | Matrix multiplication, entire sequence processed in parallel at once |
+| **Gradient Stability** | BPTT involves chain multiplication, prone to vanishing/exploding | Gradients only pass through Softmax and linear layers; path is very short |
+| **Memory Bottleneck** | Compressed into a fixed-size hidden state; information gets diluted | Each output can directly access the full Value matrix |
+| **Interpretability** | Difficult | Attention weight matrix $n \times n$ can be directly visualized |
+| **Complexity** | O(n·d²) but sequential | Standard O(n²·d), but highly parallelized, actually faster than RNN |
+
+### Detailed Explanation
+
+1. **Information flow path length is O(1)**
+   RNN requires $n$ recursive steps to pass information from the first word to the $n$th word, causing severe decay in long-range dependencies. Self-attention establishes direct connections between any two positions in a single matrix multiplication — the path is always 1.
+
+2. **Fully parallelized, dramatic training efficiency**
+   RNN must compute step by step along the time dimension and cannot parallelize across the sequence. Self-attention is fundamentally matrix multiplication — the entire sequence is processed in one shot, achieving extremely high GPU utilization and dozens of times faster training.
+
+3. **More stable gradient propagation**
+   RNN's BPTT involves chain multiplication, making it prone to vanishing or exploding gradients. Self-attention's gradients only pass through Softmax and linear mappings — the path is extremely short, gradients are stable, and long-distance dependency signals are much easier to learn.
+
+4. **No fixed-size memory bottleneck**
+   RNN compresses all history into a fixed-dimensional hidden state; information in long sequences gets diluted. In self-attention, each output can directly access the full Value matrix, and memory capacity scales naturally with sequence length.
+
+5. **Stronger interpretability**
+   The attention weight matrix $A$ ($n \times n$) can be directly visualized, clearly showing word-to-word dependency relationships, making debugging and analysis easier.
+
+6. **Complexity comparison and advanced approaches**
+   Standard self-attention has $O(n^2)$ time complexity, but matrix multiplication is highly parallelized — for sequences up to several thousand tokens, it is practically faster than RNN's sequential computation. For extremely long sequences, variants such as sparse attention, linear attention, and state space models reduce complexity to $O(n)$ or $O(n\log n)$ while preserving global receptive fields, still outperforming RNN.
+
+***
+
+## 3. Interview Answer Template (Concise Version)
+
+When asked this in an interview, here's how to answer concisely:
+
+### How does self-attention work?
+
+> Imagine every word is at a roundtable discussion, able to talk directly to any other word — not like RNN where messages have to be passed along one by one.
+>
+> The computation is straightforward:
+> Input sequence X, shape `[n, d_model]`.
+> Use three matrices to project X into Q (query), K (key), and V (value), with shapes `[n, d_k]`, `[n, d_k]`, `[n, d_v]` respectively.
+> In standard multi-head attention, `d_k = d_v = d_model / h`.
+>
+> Then:
+>
+> 1. **Compute scores**: `S = QKᵀ` → shape `[n, n]`.
+> 2. **Scale**: `S / √d_k`.
+> 3. **Softmax**: apply per row to get weight matrix A (`[n, n]`, each row sums to 1).
+> 4. **Weighted sum**: `A V` → output `[n, d_v]`, each word fuses global context.
+>
+> Multi-head attention runs the above process $h$ times in parallel, each head learning different relationships. Finally, all head outputs are concatenated into `[n, d_model]` and linearly projected.
+> Since self-attention is order-agnostic, we add **positional encoding** to the input to inform the model about word positions.
+
+### Why is it better than RNN for long sequences?
+
+> Four core reasons:
+>
+> 1. **Extremely short path**: Any two words connect directly (O(1)), so long-range dependencies never get lost.
+> 2. **Fully parallel**: It's all matrix multiplication — throw the entire sentence into the GPU at once, training is dozens of times faster.
+> 3. **Stable gradients**: Gradients only pass through Softmax and linear layers — no chain multiplication, much more stable optimization.
+> 4. **No memory bottleneck**: Can directly access V from any position — lossless information, no need to "forget."
+>
+> In a nutshell: self-attention replaces RNN's **step-by-step recursive compression** with **global direct interaction**, fundamentally solving the core pain point of long-sequence modeling.
+
+***
+
+## 4. Summary
+
+* **Self-Attention**: Q, K, V scaled dot-product + Softmax + weighted sum → each word aggregates global information.
+* **Multi-Head Attention**: Multiple subspaces learn in parallel, concatenated then linearly transformed.
+* **Compared to RNN**: O(1) path length, fully parallel, stable gradients, no memory bottleneck, strong interpretability.
+
+**If you can clearly explain QKV shape transformations, why we divide by $\sqrt{d\_k}$, how multi-head concatenation works, and contrast with RNN's four advantages, the interviewer will be very impressed.**
+
+***
+
+**If you found this useful, feel free to like, share, and forward to friends who are practicing for interviews!**
+
+---
+
+---
+url: /demo/index.md
+---
+# Demo
+* [bar](./bar.md)
+* [foo](./foo.md)
+
+---
+
+---
+url: /demo/hs3lg845/index.md
+---
+# bar
+[foo](./foo.md)
+
+---
+
+---
+url: /demo/r3pptm9f/index.md
+---
+# foo
+[bar](./bar.md)
+
+---
+
+---
+url: /project/index.md
+---
+# Projects
+A collection of open-source projects I've built and maintained.
+
+A smart study planning tool that helps organize learning schedules and track progress. Built with a focus on efficiency and ease of use.
+
+**[GitHub →](https://github.com/Kstheme/Study-Planner)**
+
+An intelligent agent framework for cognitive task automation. Designed to streamline complex workflows with adaptive reasoning.
+
+**[GitHub →](https://github.com/Kstheme/Cognify-Agent)**
+
+An educational diagnosis agent that analyzes learning patterns and provides personalized recommendations for improvement.
+
+**[GitHub →](https://github.com/Kstheme/EduDiag-Agent)**
+
+A lightweight RSS feed reader for aggregating and consuming content from multiple sources in one place.
+
+**[GitHub →](https://github.com/Kstheme/RSSFeedReader)**
+
+Study notes and exercises from the InternLM practical training camp, covering LLM fundamentals and hands-on projects.
+
+**[GitHub →](https://github.com/Kstheme/InternLM_notebook)**
+
+Personal blog and portfolio site, built with VuePress and themed with custom design.
+
+**[GitHub →](https://github.com/Kstheme/Kstheme.github.io)**
