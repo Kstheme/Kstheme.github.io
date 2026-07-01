@@ -9,7 +9,7 @@ tags:
   - acceleration
   - hung-yi-lee
 title: "From Flash Attention to Speculative Decoding: The Most Comprehensive Guide to LLM Inference Acceleration"
-createTime: 2026/06/16 15:18:20
+createTime: 2026/07/01 18:16:40
 permalink: /article/inference-acceleration/
 ---
 
@@ -306,17 +306,17 @@ The conclusion: **With good Prompt writing combined with Cached Input, Agent cos
 
 ## 08 Summary: All Acceleration Methods at a Glance
 
-| Method | Description | Changes Attention? | Needs Training? | Main Cost |
-|--------|-------------|:-----------------:|:--------------:|-----------|
-| **Flash Attention** | Reduce HBM reads/writes, optimize compute order | ✗ | ✗ | Some extra computation |
-| **KV Cache** | Store computed K and V, avoid recomputation | ✗ | ✗ | Large VRAM usage |
-| **Multi-Query Attention** | Multiple Query heads share one K/V set | ✓ | ✓ | May hurt model capability |
-| **Grouped-Query Attention** | Query groups share K/V | ✓ | ✓ | Efficiency-quality balance |
-| **Multi-head Latent Attention** | Compress K/V before storing | ✓ | ✓ | Needs retraining |
-| **Sliding Window Attention** | Attend to nearby tokens only | ✓ | ? | May lose long-distance info |
-| **Streaming LLM** | Sliding Window + keep initial tokens | ✗ | ✗ | — |
-| **Pruning KV Cache** | Discard infrequently used K and V | ✓ | ✗ | May degrade on hard tasks |
-| **Speculative Decoding** | Small model drafts, large model verifies | ✗ (theoretically) | ✗ | Extra computation for small model |
+| Method                          | Description                                     | Changes Attention? | Needs Training? | Main Cost                         |
+| ------------------------------- | ----------------------------------------------- | :----------------: | :-------------: | --------------------------------- |
+| **Flash Attention**             | Reduce HBM reads/writes, optimize compute order |         ✗          |        ✗        | Some extra computation            |
+| **KV Cache**                    | Store computed K and V, avoid recomputation     |         ✗          |        ✗        | Large VRAM usage                  |
+| **Multi-Query Attention**       | Multiple Query heads share one K/V set          |         ✓          |        ✓        | May hurt model capability         |
+| **Grouped-Query Attention**     | Query groups share K/V                          |         ✓          |        ✓        | Efficiency-quality balance        |
+| **Multi-head Latent Attention** | Compress K/V before storing                     |         ✓          |        ✓        | Needs retraining                  |
+| **Sliding Window Attention**    | Attend to nearby tokens only                    |         ✓          |        ?        | May lose long-distance info       |
+| **Streaming LLM**               | Sliding Window + keep initial tokens            |         ✗          |        ✗        | —                                 |
+| **Pruning KV Cache**            | Discard infrequently used K and V               |         ✓          |        ✗        | May degrade on hard tasks         |
+| **Speculative Decoding**        | Small model drafts, large model verifies        | ✗ (theoretically)  |        ✗        | Extra computation for small model |
 
 ---
 
