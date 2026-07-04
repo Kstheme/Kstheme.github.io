@@ -332,19 +332,19 @@ Agent 适合处理这类任务：
 
 做 ToC，可以多看这些：
 
-- Product Hunt：https://www.producthunt.com/
-- YC 项目库：https://www.ycombinator.com/companies
-- AI Graveyard：https://dang.ai/ai-graveyard
-- Google Trends：https://trends.google.com/
-- 百度指数：https://index.baidu.com/
+- [Product Hunt](https://www.producthunt.com/)
+- [YC 项目库](https://www.ycombinator.com/companies)
+- [AI Graveyard](https://dang.ai/ai-graveyard)
+- [Google Trends](https://trends.google.com/)
+- [百度指数](https://index.baidu.com/)
 
 做 ToB 或开发者工具，可以多看这些：
 
-- G2 AI 类目：https://www.g2.com/categories/artificial-intelligence
-- Hacker News：https://news.ycombinator.com/
-- Reddit：https://www.reddit.com/
-- Similarweb：https://www.similarweb.com/
-- Semrush：https://www.semrush.com/
+- [G2 AI 类目](https://www.g2.com/categories/artificial-intelligence)
+- [Hacker News](https://news.ycombinator.com/)
+- [Reddit](https://www.reddit.com/)
+- [Similarweb](https://www.similarweb.com/)
+- [Semrush](https://www.semrush.com/)
 - GitHub Issues
 
 这些工具只能帮你找到信号，不能替你理解用户。
@@ -619,20 +619,20 @@ Cursor 提醒我们，产品要贴近用户已经在用的工作流。
 
 ## 参考资料
 
-1. YC 项目库：https://www.ycombinator.com/companies
-2. Product Hunt：https://www.producthunt.com/
-3. AI Graveyard：https://dang.ai/ai-graveyard
-4. G2 AI 类目：https://www.g2.com/categories/artificial-intelligence
-5. Google Trends：https://trends.google.com/
-6. 百度指数：https://index.baidu.com/
-7. Similarweb：https://www.similarweb.com/
-8. Semrush：https://www.semrush.com/
-9. Anthropic《Building Effective Agents》：https://www.anthropic.com/engineering/building-effective-agents
-10. LangChain Evaluation 相关视频：https://www.youtube.com/watch?v=vygFgCNR7WA&t=223s
-11. G2：https://www.g2.com/
-12. Reddit：https://www.reddit.com/
-13. Hacker News：https://news.ycombinator.com/
-14. LangSmith：https://www.langchain.com/langsmith
-15. OpenAI Evals：https://github.com/openai/evals
-16. Ragas：https://github.com/explodinggradients/ragas
-17. Promptfoo：https://www.promptfoo.dev/
+1. [YC 项目库](https://www.ycombinator.com/companies)
+2. [Product Hunt](https://www.producthunt.com/)
+3. [AI Graveyard](https://dang.ai/ai-graveyard)
+4. [G2 AI 类目](https://www.g2.com/categories/artificial-intelligence)
+5. [Google Trends](https://trends.google.com/)
+6. [百度指数](https://index.baidu.com/)
+7. [Similarweb](https://www.similarweb.com/)
+8. [Semrush](https://www.semrush.com/)
+9. [Anthropic《Building Effective Agents》](https://www.anthropic.com/engineering/building-effective-agents)
+10. [LangChain Evaluation 相关视频](https://www.youtube.com/watch?v=vygFgCNR7WA&t=223s)
+11. [G2](https://www.g2.com/)
+12. [Reddit](https://www.reddit.com/)
+13. [Hacker News](https://news.ycombinator.com/)
+14. [LangSmith](https://www.langchain.com/langsmith)
+15. [OpenAI Evals](https://github.com/openai/evals)
+16. [Ragas](https://github.com/explodinggradients/ragas)
+17. [Promptfoo](https://www.promptfoo.dev/)

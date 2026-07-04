@@ -332,18 +332,18 @@ Evidence can come from:
 
 For ToC, look at:
 
-- Product Hunt: https://www.producthunt.com/
-- YC Company List: https://www.ycombinator.com/companies
-- AI Graveyard: https://dang.ai/ai-graveyard
-- Google Trends: https://trends.google.com/
+- [Product Hunt](https://www.producthunt.com/)
+- [YC Company List](https://www.ycombinator.com/companies)
+- [AI Graveyard](https://dang.ai/ai-graveyard)
+- [Google Trends](https://trends.google.com/)
 
 For ToB or developer tools, look at:
 
-- G2 AI Category: https://www.g2.com/categories/artificial-intelligence
-- Hacker News: https://news.ycombinator.com/
-- Reddit: https://www.reddit.com/
-- Similarweb: https://www.similarweb.com/
-- Semrush: https://www.semrush.com/
+- [G2 AI Category](https://www.g2.com/categories/artificial-intelligence)
+- [Hacker News](https://news.ycombinator.com/)
+- [Reddit](https://www.reddit.com/)
+- [Similarweb](https://www.similarweb.com/)
+- [Semrush](https://www.semrush.com/)
 - GitHub Issues
 
 These tools help you find signals, but they can't understand users for you.
@@ -618,19 +618,19 @@ But by digging needs out of real tasks.
 
 ## References
 
-1. YC Company List: https://www.ycombinator.com/companies
-2. Product Hunt: https://www.producthunt.com/
-3. AI Graveyard: https://dang.ai/ai-graveyard
-4. G2 AI Category: https://www.g2.com/categories/artificial-intelligence
-5. Google Trends: https://trends.google.com/
-6. Similarweb: https://www.similarweb.com/
-7. Semrush: https://www.semrush.com/
-8. Anthropic "Building Effective Agents": https://www.anthropic.com/engineering/building-effective-agents
-9. LangChain Evaluation: https://www.youtube.com/watch?v=vygFgCNR7WA&t=223s
-10. G2: https://www.g2.com/
-11. Reddit: https://www.reddit.com/
-12. Hacker News: https://news.ycombinator.com/
-13. LangSmith: https://www.langchain.com/langsmith
-14. OpenAI Evals: https://github.com/openai/evals
-15. Ragas: https://github.com/explodinggradients/ragas
-16. Promptfoo: https://www.promptfoo.dev/
+1. [YC Company List](https://www.ycombinator.com/companies)
+2. [Product Hunt](https://www.producthunt.com/)
+3. [AI Graveyard](https://dang.ai/ai-graveyard)
+4. [G2 AI Category](https://www.g2.com/categories/artificial-intelligence)
+5. [Google Trends](https://trends.google.com/)
+6. [Similarweb](https://www.similarweb.com/)
+7. [Semrush](https://www.semrush.com/)
+8. [Anthropic "Building Effective Agents"](https://www.anthropic.com/engineering/building-effective-agents)
+9. [LangChain Evaluation](https://www.youtube.com/watch?v=vygFgCNR7WA&t=223s)
+10. [G2](https://www.g2.com/)
+11. [Reddit](https://www.reddit.com/)
+12. [Hacker News](https://news.ycombinator.com/)
+13. [LangSmith](https://www.langchain.com/langsmith)
+14. [OpenAI Evals](https://github.com/openai/evals)
+15. [Ragas](https://github.com/explodinggradients/ragas)
+16. [Promptfoo](https://www.promptfoo.dev/)
