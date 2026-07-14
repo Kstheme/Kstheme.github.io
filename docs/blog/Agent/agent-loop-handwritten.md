@@ -9,7 +9,7 @@ tags:
   - llm
   - openai
 title: "Learn Claude Code (Part 1): Write an Agent Loop from Scratch — Less Than 200 Lines to Run the Full Model + Tools Pipeline"
-createTime: 2026/07/04 13:44:40
+createTime: 2026/07/14 13:44:40
 permalink: /article/agent-loop-handwritten/
 ---
 
