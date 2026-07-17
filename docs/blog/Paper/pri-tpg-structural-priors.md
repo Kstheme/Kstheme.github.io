@@ -208,12 +208,12 @@ Pri-TPG's core structure is the:
 
 It's a directed graph.
 
-| Graph Element          | Meaning                                                           |
-| ---------------------- | ----------------------------------------------------------------- |
-| Node (v)               | A theorem                                                         |
-| Edge (u \rightarrow v) | Theorem u produces results that support using theorem v           |
-| Edge weight            | Frequency of this theorem transition in similar historical proofs |
-| START node             | Theorems more likely to be used first at the start of a proof     |
+| Graph Element            | Meaning                                                           |
+| ------------------------ | ----------------------------------------------------------------- |
+| Node (v)                 | A theorem                                                         |
+| Edge ($u \rightarrow v$) | Theorem u produces results that support using theorem v           |
+| Edge weight              | Frequency of this theorem transition in similar historical proofs |
+| START node               | Theorems more likely to be used first at the start of a proof     |
 
 For example, a local path might be:
 
