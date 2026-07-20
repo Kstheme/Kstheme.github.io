@@ -8,7 +8,7 @@ tags:
   - llm
   - theorem-proving
   - paper
-title: '本文提出了一种无需训练的长程推理方案 Pri-TPG，通过引入结构先验解决大语言模型在几何证明任务中出现的"结构漂移"问题。'
+title: "LLM 缺的不是更多知识，而是推理结构：精读 Pri-TPG"
 createTime: 2026/07/17 21:58:42
 permalink: /zh/article/pri-tpg-structural-priors/
 ---

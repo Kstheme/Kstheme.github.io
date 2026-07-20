@@ -8,7 +8,7 @@ tags:
   - llm
   - theorem-proving
   - paper
-title: "This Paper Proposes Pri-TPG, a Training-Free Long-Range Reasoning Method That Introduces Structural Priors to Solve 'Structural Drift' in LLM Geometry Theorem Proving"
+title: "LLMs Don't Lack More Knowledge, But Reasoning Structures: A Close Reading of Pri-TPG"
 createTime: 2026/07/17 21:58:42
 permalink: /article/pri-tpg-structural-priors/
 ---
