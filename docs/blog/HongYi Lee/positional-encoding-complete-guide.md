@@ -60,7 +60,7 @@ When tokens change order, their Embeddings become different, and the final Self-
 
 ### Sinusoidal Positional Embedding
 
-Reference: https://arxiv.org/abs/1706.03762
+Reference: [https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
 
 This Positional Embedding existed from the birth of the Transformer.
 
@@ -267,7 +267,7 @@ Since using Absolute Positional Embedding to achieve relative positioning is cir
 
 ### ALiBi (Attention with Linear Biases)
 
-Reference: https://arxiv.org/abs/2108.12409
+Reference: [https://arxiv.org/abs/2108.12409](https://arxiv.org/abs/2108.12409)
 
 ALiBi's approach: **discard Positional Embedding entirely**. Compute Attention scores without positional information, then **subtract $b(m-n)$** — the relative distance between positions $m$ and $n$. This makes Attention smaller for distant tokens. The constant $b$ is manually set and can differ per Attention Head.
 
@@ -279,7 +279,7 @@ ALiBi outperforms Sinusoidal methods across the board, especially on longer sequ
 
 ### T5's Learnable Relative Bias
 
-Reference: https://arxiv.org/abs/1910.10683
+Reference: [https://arxiv.org/abs/1910.10683](https://arxiv.org/abs/1910.10683)
 
 T5 uses a **learnable parameter** for the bias $b_{m-n}$ instead of manually setting it. However, the hand-crafted ALiBi actually outperformed the trained T5 approach.
 
@@ -289,7 +289,7 @@ ALiBi eventually gave way to stronger methods, but its lesson remains: **Relativ
 
 ### RoPE: Rotary Position Embedding
 
-Reference: https://arxiv.org/abs/2104.09864
+Reference: [https://arxiv.org/abs/2104.09864](https://arxiv.org/abs/2104.09864)
 
 RoPE is one of today's most popular methods. Instead of adding a positional embedding, it **applies a rotation to $k$ and $q$ vectors** to encode positional information.
 
@@ -519,7 +519,7 @@ If $q$ and $k$ differ by $2\theta$, but $q$ at $n+1$ and $k$ at $n$ differ by ju
 
 ## 04 Train Short, Test Long
 
-Reference: https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html
+Reference: [https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html](https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html)
 
 Can we train on short sequences but **handle very long sequences during testing without failure**?
 
@@ -541,7 +541,7 @@ When testing with $LN$ tokens, can we just assign positions up to $LN$?
 
 Can RoPE handle this? It seems not.
 
-(From: https://arxiv.org/abs/2108.12409)
+(From: [https://arxiv.org/abs/2108.12409](https://arxiv.org/abs/2108.12409))
 
 ![](/images/positional-encoding/pe-44.png)
 
@@ -561,8 +561,8 @@ During training, the maximum rotation angle seen is $N\theta$. Testing at $2N\th
 
 References:
 
-- https://arxiv.org/pdf/2306.15595
-- https://kaiokendev.github.io/context#a-bigger-problem
+- [https://arxiv.org/pdf/2306.15595](https://arxiv.org/pdf/2306.15595)
+- [https://kaiokendev.github.io/context#a-bigger-problem](https://kaiokendev.github.io/context#a-bigger-problem)
 
 Solution: **don't assign rotation angles beyond $N$**.
 
@@ -605,13 +605,13 @@ Meaning:
 - $i=0$: $f(L,0)=1$, no compression at highest frequency.
 - $i=\frac{d}{2}-1$: $f(L, \frac{d}{2}-1)=\frac{1}{L}$, maximum compression at lowest frequency.
 
-Reference: https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/
+Reference: [https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/](https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/)
 
 ![](/images/positional-encoding/pe-52.png)
 
 ### YaRN
 
-**YaRN** (Yet another RoPE extensionN method). Reference: https://arxiv.org/abs/2309.00071
+**YaRN** (Yet another RoPE extensionN method). Reference: [https://arxiv.org/abs/2309.00071](https://arxiv.org/abs/2309.00071)
 
 Keep some low-frequency scaling unchanged, keep some high-frequency scaling unchanged, **only modify the middle frequencies**.
 
@@ -621,7 +621,7 @@ Keep some low-frequency scaling unchanged, keep some high-frequency scaling unch
 
 Previous methods handle long sequences, but performance on short sequences may degrade.
 
-Reference: https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/
+Reference: [https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/](https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/)
 
 ![](/images/positional-encoding/pe-54.png)
 
@@ -641,7 +641,7 @@ Dynamic Scaling combined with Position Interpolation or NTK outperforms both alo
 
 Frequency-Based determines the compression function; Dynamic Scaling determines where compression begins. **LongRoPE** uses **Evolutionary Search** to find optimal strategies.
 
-Reference: https://arxiv.org/abs/2402.13753
+Reference: [https://arxiv.org/abs/2402.13753](https://arxiv.org/abs/2402.13753)
 
 ![](/images/positional-encoding/pe-58.png)
 
@@ -663,7 +663,7 @@ The first layer captures relationships between tokens. The second layer sees the
 
 ### NoPE: No Positional Embedding
 
-Reference: https://arxiv.org/pdf/2305.19466
+Reference: [https://arxiv.org/pdf/2305.19466](https://arxiv.org/pdf/2305.19466)
 
 Experiments show that **No Position Embedding works surprisingly well**. On Copy tasks, models with Positional Embedding degraded on long sequences, while NoPE maintained high accuracy.
 
@@ -683,22 +683,22 @@ DroPE **outperforms RoPE + YaRN** on extended contexts. Training at 2K context, 
 
 ![](/images/positional-encoding/pe-63.png)
 
-Reference: https://arxiv.org/pdf/2512.12167
+Reference: [https://arxiv.org/pdf/2512.12167](https://arxiv.org/pdf/2512.12167)
 
 ---
 
 ## References
 
-1. **Sinusoidal Positional Embedding (Original Transformer)**: https://arxiv.org/abs/1706.03762
-2. **ALiBi (Attention with Linear Biases)**: https://arxiv.org/abs/2108.12409
-3. **T5 (Text-to-Text Transfer Transformer)**: https://arxiv.org/abs/1910.10683
-4. **RoPE (Rotary Position Embedding)**: https://arxiv.org/abs/2104.09864
-5. **Train Short Test Long (RoPE Context Extension Survey)**: https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html
-6. **Position Interpolation**: https://arxiv.org/pdf/2306.15595
-7. **Position Interpolation (Kaiokendev blog)**: https://kaiokendev.github.io/context#a-bigger-problem
-8. **NTK-aware Scaling**: https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/
-9. **YaRN**: https://arxiv.org/abs/2309.00071
-10. **Dynamic Scaling**: https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/
-11. **LongRoPE**: https://arxiv.org/abs/2402.13753
-12. **NoPE**: https://arxiv.org/pdf/2305.19466
-13. **DroPE**: https://arxiv.org/pdf/2512.12167
+1. [**Sinusoidal Positional Embedding (Original Transformer)**](https://arxiv.org/abs/1706.03762)
+2. [**ALiBi (Attention with Linear Biases)**](https://arxiv.org/abs/2108.12409)
+3. [**T5 (Text-to-Text Transfer Transformer)**](https://arxiv.org/abs/1910.10683)
+4. [**RoPE (Rotary Position Embedding)**](https://arxiv.org/abs/2104.09864)
+5. [**Train Short Test Long (RoPE Context Extension Survey)**](https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html)
+6. [**Position Interpolation**](https://arxiv.org/pdf/2306.15595)
+7. [**Position Interpolation (Kaiokendev blog)**](https://kaiokendev.github.io/context#a-bigger-problem)
+8. [**NTK-aware Scaling**](https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/)
+9. [**YaRN**](https://arxiv.org/abs/2309.00071)
+10. [**Dynamic Scaling**](https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/)
+11. [**LongRoPE**](https://arxiv.org/abs/2402.13753)
+12. [**NoPE**](https://arxiv.org/pdf/2305.19466)
+13. [**DroPE**](https://arxiv.org/pdf/2512.12167)

@@ -62,7 +62,7 @@ Copyright Ownership: Kstheme, Contributors: Kstheme
 
 ### Sinusoidal Positional Embedding
 
-参考文献：https://arxiv.org/abs/1706.03762
+参考文献：[https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
 
 这个 Positional Embedding 是在 Transformer 诞生之初就存在的 Embedding。
 
@@ -292,7 +292,7 @@ $$
 
 ### ALiBi（Attention with Linear Biases）
 
-参考文献：https://arxiv.org/abs/2108.12409
+参考文献：[https://arxiv.org/abs/2108.12409](https://arxiv.org/abs/2108.12409)
 
 ALiBi 的做法是：**丢掉 Positional Embedding**。在没有 Positional Embedding 的情况下先把 Attention 分数算出来，然后**减掉 $b(m-n)$**。这个公式就是说减掉 $m$ 和 $n$ 两个位置之间的相对距离。减掉相对距离就会达成一个效果——距离越远 Attention 越小。而常数 $b$ 是你手动设置的数值，你可以给不同的 Attention Head 设置不同的数值。在这篇论文里，并没有设置很复杂的方法来设置 $b$，就凭直觉来设置。
 
@@ -304,7 +304,7 @@ ALiBi 的做法是：**丢掉 Positional Embedding**。在没有 Positional Embe
 
 ### T5 的可学习 Relative Bias
 
-参考文献：https://arxiv.org/abs/1910.10683
+参考文献：[https://arxiv.org/abs/1910.10683](https://arxiv.org/abs/1910.10683)
 
 讲到这边你可能会想说，这个 $b$ 都是人为设置的，如果直接用 **Learn 的方法** 会不会更好呢？其实早在 ALiBi 之前，就一定有人想过用 Learn 的方法来确定 $b$。
 
@@ -318,7 +318,7 @@ ALiBi 的做法是：**丢掉 Positional Embedding**。在没有 Positional Embe
 
 ### RoPE：Rotary Position Embedding
 
-参考文献：https://arxiv.org/abs/2104.09864
+参考文献：[https://arxiv.org/abs/2104.09864](https://arxiv.org/abs/2104.09864)
 
 RoPE 是现在最流行的方法之一。它是怎么做的？我们先讲结论：
 
@@ -592,7 +592,7 @@ $$
 
 ## 04 Train Short, Test Long
 
-参考文献：https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html
+参考文献：[https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html](https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html)
 
 我们能不能在训练的时候，虽然 Transformer 在训练阶段只能看见比较短的 Sequence，但是让它在**测试的时候看到非常长的 Sequence 也不要坏掉**？
 
@@ -612,7 +612,7 @@ $$
 
 RoPE 可以处理这样的状况吗？看样子是不行的。
 
-（下图来自文献：https://arxiv.org/abs/2108.12409）
+（下图来自文献：[https://arxiv.org/abs/2108.12409](https://arxiv.org/abs/2108.12409)）
 
 ![](/images/positional-encoding/pe-44.png)
 
@@ -634,8 +634,8 @@ RoPE 可以处理这样的状况吗？看样子是不行的。
 
 参考文献：
 
-- https://arxiv.org/pdf/2306.15595
-- https://kaiokendev.github.io/context#a-bigger-problem
+- [https://arxiv.org/pdf/2306.15595](https://arxiv.org/pdf/2306.15595)
+- [https://kaiokendev.github.io/context#a-bigger-problem](https://kaiokendev.github.io/context#a-bigger-problem)
 
 那么要怎么办呢？那就是**不要给它超过 $N$ 的旋转角度**。
 
@@ -688,7 +688,7 @@ $$
 
 不过 NTK-aware Scaling 的方法并没有一篇对应的 Paper，它是出现在 Reddit 的文章里面。
 
-参考文献：https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/
+参考文献：[https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/](https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/)
 
 ![](/images/positional-encoding/pe-52.png)
 
@@ -696,7 +696,7 @@ $$
 
 另外一种知名的变体叫做 **YaRN**（Yet another RoPE extensionN method）。
 
-参考文献：https://arxiv.org/abs/2309.00071
+参考文献：[https://arxiv.org/abs/2309.00071](https://arxiv.org/abs/2309.00071)
 
 YaRN 的思想是：保留一些低频维度的 Scaling 不变，保留一些高频维度的 Scaling 不变，**只变中间的**。
 
@@ -706,7 +706,7 @@ YaRN 的思想是：保留一些低频维度的 Scaling 不变，保留一些高
 
 还有一种另外的想法叫做 **Dynamic Scaling**。它的核心思想是：之前的方法可能长的序列都能做，但是对于短的 Sequence 来说，可能它的效果会变得更差。
 
-参考文献：https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/
+参考文献：[https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/](https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/)
 
 ![](/images/positional-encoding/pe-54.png)
 
@@ -728,7 +728,7 @@ YaRN 的思想是：保留一些低频维度的 Scaling 不变，保留一些高
 
 Frequency-Based 方法是决定后面的压缩函数，Dynamic Scaling 来决定在哪个地方开始压缩。具体要怎么决定呢？有一篇论文叫做 **LongRoPE**，用了一个 **Evolutionary Search** 的方法，去找出最好的 Frequency-Based 方法和最好的 Dynamic Scaling 方法。
 
-参考文献：https://arxiv.org/abs/2402.13753
+参考文献：[https://arxiv.org/abs/2402.13753](https://arxiv.org/abs/2402.13753)
 
 ![](/images/positional-encoding/pe-58.png)
 
@@ -754,7 +754,7 @@ Frequency-Based 方法是决定后面的压缩函数，Dynamic Scaling 来决定
 
 这篇论文提出了一个方法叫做 **NoPE**，就是没有 Positional Embedding。
 
-参考文献：https://arxiv.org/pdf/2305.19466
+参考文献：[https://arxiv.org/pdf/2305.19466](https://arxiv.org/pdf/2305.19466)
 
 这篇论文训练了一些 Transformer 来做任务，发现其实**不加 Position Embedding 也没关系**。下图是一些结论，横轴代表做的任务长度，纵轴代表准确率，准确率越高越好。
 
@@ -778,22 +778,22 @@ Frequency-Based 方法是决定后面的压缩函数，Dynamic Scaling 来决定
 
 ![](/images/positional-encoding/pe-63.png)
 
-参考文献：https://arxiv.org/pdf/2512.12167
+参考文献：[https://arxiv.org/pdf/2512.12167](https://arxiv.org/pdf/2512.12167)
 
 ---
 
 ## 参考资料
 
-1. **Sinusoidal Positional Embedding（原始 Transformer）**：https://arxiv.org/abs/1706.03762
-2. **ALiBi（Attention with Linear Biases）**：https://arxiv.org/abs/2108.12409
-3. **T5（Text-to-Text Transfer Transformer）**：https://arxiv.org/abs/1910.10683
-4. **RoPE（Rotary Position Embedding）**：https://arxiv.org/abs/2104.09864
-5. **Train Short Test Long（RoPE Context Extension 综述）**：https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html
-6. **Position Interpolation**：https://arxiv.org/pdf/2306.15595
-7. **Position Interpolation（Kaiokendev 博客）**：https://kaiokendev.github.io/context#a-bigger-problem
-8. **NTK-aware Scaling（Reddit 帖）**：https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/
-9. **YaRN（Yet another RoPE extensionN method）**：https://arxiv.org/abs/2309.00071
-10. **Dynamic Scaling（Reddit 帖）**：https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/
-11. **LongRoPE**：https://arxiv.org/abs/2402.13753
-12. **NoPE（No Positional Embedding）**：https://arxiv.org/pdf/2305.19466
-13. **DroPE**：https://arxiv.org/pdf/2512.12167
+1. [**Sinusoidal Positional Embedding（原始 Transformer）**](https://arxiv.org/abs/1706.03762)
+2. [**ALiBi（Attention with Linear Biases）**](https://arxiv.org/abs/2108.12409)
+3. [**T5（Text-to-Text Transfer Transformer）**](https://arxiv.org/abs/1910.10683)
+4. [**RoPE（Rotary Position Embedding）**](https://arxiv.org/abs/2104.09864)
+5. [**Train Short Test Long（RoPE Context Extension 综述）**](https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html)
+6. [**Position Interpolation**](https://arxiv.org/pdf/2306.15595)
+7. [**Position Interpolation（Kaiokendev 博客）**](https://kaiokendev.github.io/context#a-bigger-problem)
+8. [**NTK-aware Scaling（Reddit 帖）**](https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/)
+9. [**YaRN（Yet another RoPE extensionN method）**](https://arxiv.org/abs/2309.00071)
+10. [**Dynamic Scaling（Reddit 帖）**](https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/)
+11. [**LongRoPE**](https://arxiv.org/abs/2402.13753)
+12. [**NoPE（No Positional Embedding）**](https://arxiv.org/pdf/2305.19466)
+13. [**DroPE**](https://arxiv.org/pdf/2512.12167)
