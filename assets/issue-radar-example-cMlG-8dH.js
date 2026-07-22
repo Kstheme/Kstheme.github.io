@@ -1,0 +1,1 @@
+var e=`/images/agent-product/framework-matrix.png`,t=`/images/agent-product/scenario-quadrant.png`,n=`/images/agent-product/product-evaluation.png`,r=`/images/agent-product/user-interview.png`,i=`/images/agent-product/issue-radar-example.png`;export{e as a,t as i,r as n,n as r,i as t};

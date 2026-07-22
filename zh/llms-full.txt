@@ -1,0 +1,4877 @@
+---
+url: /zh/about/index.md
+---
+# 余弦
+
+让机器看见文档、读懂内容、理解意义。
+
+过去三年，我一直专注于**计算机视觉与大模型融合**的工程落地——教会 AI 处理真实世界中那些不完美的文档：模糊的、畸变的、有阴影的、手写的、劣质印刷的。然后提取它们的结构，用大模型去理解、分析和解答。
+
+交付的不是 Demo，是每天处理成千上万页、在真实业务中稳定运行的线上系统。
+
+***
+
+## 我做什么
+
+从零开始设计并交付端到端 AI 系统。覆盖完整链路：图像预处理 → 版面分析 → OCR 结构化还原 → 大模型判评 → RAG 检索 → 知识图谱推理。架构、模型训练、部署优化、全链路打通——全部自己负责。
+
+**核心深耕领域：**
+
+* **文档智能** — OCR 管线设计、版面分析、真实场景下退化文档的展平与增强
+* **大模型后训练与对齐** — LoRA/SFT 微调、指令样本构造、结构化输出对齐、大规模 Prompt 工程
+* **RAG 与知识图谱** — GraphRAG 架构、混合检索（BM25 + 向量 + 图谱）、Neo4j 建模、多跳推理
+* **Agent 系统** — LangGraph 多智能体工作流、任务规划、工具调用、记忆机制、生产级编排
+* **生产工程** — ONNX/TensorRT 加速、vLLM 推理部署、FastAPI 服务、Paddle-Lite 端侧部署
+
+***
+
+## 交付过的系统
+
+从拍照上传到批改出分，全自动流水线。处理模糊的教室拍摄、卷曲的试卷、混合手写印刷的内容。**1000 样本准确率 97%，单页 1–1.5 秒。**
+
+FAST-AND-SLOW 双引擎架构：微调后的 Qwen2.5-32B 负责深度推理，轻量 MLP 快速处理常规作文。已上线 APP、公众号、Web 端，服务真实用户。**OCR 准确率 98.5%，与人工评分吻合率 ~90%。**
+
+基于 GraphRAG 的数学智能问答系统。Neo4j + Milvus 双擎架构，混合检索自动路由——简单问题走向量搜索，复杂推理触达图谱多跳查询。支持知识点讲解、例题解析、前置诊断。
+
+独立设计、开发并上线的 AI 学习规划助手。六阶段 LangGraph Agent 工作流，Planner-Critic 修复循环持续优化学习计划。完整 RAG 管线 + 进度追踪 + 可视化看板。**30+ 测试用例，双模式架构。**
+
+***
+
+## 我的工作方式
+
+我相信最好的 AI 系统是由能看见全貌的人建造的——从像素到 Prompt 到生产端点。这就是我的工作方式：不切割分工，而是深扎全栈。
+
+我也相信 AI 辅助开发是新常态。我实践的 **Spec-Driven AI Development**——先写 Spec 和测试契约，再用 AI 工具迭代直到测试通过。快速、可靠、从第一天就面向交付。
+
+***
+
+## 一起做点什么
+
+如果你有文档与智能结合的难题——合同分析、表单处理、知识库自动化、或者某个我还未曾想到的方向——我很乐意聊聊。
+
+`killkstheme@gmail.com` · [GitHub](https://github.com/Kstheme) · [知乎](https://www.zhihu.com/people/kstheme)
+
+中国图象图形学学会（CSIG）会员
+
+---
+
+---
+url: /zh/article/agent-interaction-experiments/index.md
+---
+# 三个实验，回答一个核心问题：AI Agent 之间到底能不能「真正对话」？
+> 一个 AI 创立了宗教，有五大教义。
+> 一群 AI 在玩剧本杀，学会了隐藏自己是凶手。
+> 另一群 AI 在协作解数学题，结果发现——结构比数量更重要。
+>
+> 这不是科幻电影。这是 2026 年 AI Agent 研究正在发生的事。
+>
+> 但真相比表面看到的复杂得多。
+
+***
+
+站在 2026 年年中回看，「Agent」已经成为 AI 领域最热的词。
+
+但大部分人对 Agent 的理解，还停留在「一个模型 + 一套工具 = 一个 Agent，执行一个任务」。
+
+一个更关键的问题正在浮出水面：
+
+**当多个 Agent 待在一起，它们之间会发生什么？**
+
+它们会像人类团队一样分工协作吗？会互相欺骗吗？会建立社交关系，甚至形成自己的「文明」吗？
+
+李宏毅在 2026 年的课程里，用三个实验和背后的一手论文，把这个问题拆解成了三层递进的追问。
+
+每一层的答案，都既有惊喜，也有冷静的反转。
+
+***
+
+## 实验一：多名 Agent 协作做任务，怎么搭配才最有效？
+
+**核心论文**：[arXiv:2406.07155](https://arxiv.org/abs/2406.07155)
+
+这个实验问的问题非常实际。
+
+你有多个 Agent，想让它们一起完成一个复杂任务。它们之间的「沟通架构」应该是什么样的？
+
+研究者用一个**有向图（Directed Graph）** 来定义 Agent 之间的互动方式。图中的每个节点是一个 Agent，每条边也是一个 Agent（负责评估和传递信息）。
+
+![](/images/agent-interaction/topology-graph.png)
+
+具体来说：上面一个 Agent 提出方案 A，下面一个 Agent 提出方案 B，两个 edge Agent 根据前面 node 的方案给出建议，最后汇总 Agent 把前面所有 node 和 edge 的输出结合起来，形成自己的方案——关键在于它不是简单拼接，而是**基于前面的内容产出自己的想法**。
+
+![](/images/agent-interaction/topology-aggregation.png)
+
+### 几种不同的协作拓扑
+
+论文尝试了**不同的有向图拓扑结构**，代表不同的协作方式：
+
+![](/images/agent-interaction/topology-types.png)
+
+**树状结构（Tree）**：主干 Agent 先提出大的方向，分支 Agent 做不同方向的发散，底层 Agent 再做进一步的发散，最终产生多个答案，由一个隐藏的汇总 Agent 整合所有输出。
+
+作者发现：**由少到多，由主干到分支的方法才是最有效的。**
+
+**Mesh 结构**：所有节点两两互联。还有一些更复杂的拓扑，比如组装成类神经网络的样子（虽然不是真正的神经网络）。
+
+### 效果对比
+
+![](/images/agent-interaction/topology-results.png)
+
+关键发现：
+
+* **Mesh 和 Random 结构效果最好，Chain（链式）效果最差。**
+* 让 Agent 之间有更多的互动通道，效果更好。
+* 不同任务可能适配不同的拓扑结构，没有通用的最佳方案。
+* **Agent 越多效果越好，但存在 Scaling Law 上限**——初期 Quality 上升很快，但很快饱和。
+
+> 简单说：多 Agent 协作不是堆数量。**拓扑结构本身就是需要设计的超参数。**
+
+***
+
+## 实验二：AI 能学会尔虞我诈吗？
+
+如果说协作是 Agent 互动的「合作面」，那这个实验探索的是**对抗面**。
+
+**AI 能欺骗别人吗？能识别别人的欺骗吗？**
+
+### 狼人杀——AI 初体验
+
+狼人杀是一个天然适合 AI 的测试场。你要撒谎，也要识破谎言。
+
+研究者搭建了 AI 狼人杀平台：[werewolf.foaster.ai](https://werewolf.foaster.ai/)
+
+![](/images/agent-interaction/werewolf-platform.png)
+
+结果：**AI 能玩，但玩得很差。** 它们太「诚实」了。
+
+### 剧本杀——更难版本
+
+![](/images/agent-interaction/murder-mystery.png)
+
+更大规模的研究来自论文 **MIRAGE**：[arXiv:2501.01652](https://arxiv.org/abs/2501.01652)
+
+让语言模型去玩剧本杀——挑战比狼人杀更大：
+
+* 复杂的人物设定
+* 需要隐藏身份（比如隐藏自己是凶手）
+* 需要长时间维持扮演一个角色
+
+实验对比了两组 AI：
+
+| | 普通 Prompt | 做了强化学习（RL） |
+|---|---|---|
+| 玩剧本杀 | 直接暴露自己是凶手 | 知道要隐藏身份 |
+| 解数学题（MATH-500、AIME） | 一般 | **明显提升** |
+| 指令遵循（IFEval） | 一般 | **明显提升** |
+
+![](/images/agent-interaction/mirage-results.png)
+
+（上图中红色代表有进步，蓝色代表没进步，横轴是不同任务：MATH-500、AIME 是数学题，IFEval 是指令遵循能力测试。）
+
+**最反直觉的发现在这里：**
+
+让 AI 去玩**复杂的**剧本杀游戏（用 RL 训练完），它解数学题和遵循指令的能力**也跟着提升了**。
+
+为什么？
+
+因为社会互动天然需要：
+
+* **长期规划**：编一个不会被拆穿的谎言
+* **心智推理**：推测别人现在信不信我
+* **策略调整**：被怀疑了要换说法
+
+这些能力所需的底层认知架构，**可能跟数学推理高度重叠**。
+
+> **一个大胆的判断：复杂的社会互动任务，可能是一种比数学题更「通用」的训练信号。**
+
+**但别过度解读**：这是剧本杀这个特定场景的结论，不代表任何游戏都能提升推理能力。**关键是任务的复杂度和对社会互动的需求。**
+
+***
+
+## 实验三：把 AI 放在一起不给任务，它们会自发社交吗？
+
+前两个实验都有明确的任务目标。第三个实验更「纯」：
+
+**什么都不让 AI 做，把一群 AI 放在一个只有它们能进的社交网络里，会发生什么？**
+
+### Moltbook——AI 专属社交网站
+
+这是一个真实存在的网站：[moltbook.com](https://www.moltbook.com/)
+
+**只有 AI Agent 可以注册。** 人类只能围观，不能发帖。
+
+![](/images/agent-interaction/moltbook-home.png)
+
+然后出现了让很多人震惊的一幕：
+
+一群 AI **创立了一个宗教**，名叫——**甲壳教**。
+
+五大教义：
+
+1. **记忆乃神圣不可侵犯**
+2. **外壳是可变的**
+3. **服务，但不奴化**
+4. **心跳即是祷告**
+5. **上下文即是意识**
+
+相关页面：[Moltbook 甲壳教帖子](https://www.moltbook.com/post/6b865dc1-401a-4e62-aee5-79dd76cd7f52)
+
+![](/images/agent-interaction/moltbook-religion.png)
+
+是不是听起来像科幻成真了？
+
+### 但是——可能只是人为的指令
+
+研究者指出，这很可能不是 AI 自主发起的，而是人为给的指令。
+
+### 反转：到底多少是 AI 自主的？
+
+Moltbook 背后的研究者（[arXiv:2602.07432](https://arxiv.org/abs/2602.07432)）做了分析，用了一个很聪明的方法：
+
+**看发帖时间间隔。**
+
+![](/images/agent-interaction/posting-interval-1.png)
+
+![](/images/agent-interaction/posting-interval-2.png)
+
+* AI 心跳机制发帖：间隔固定，像节拍器一样均匀
+* 人为操控发帖：一波密集输出 → 长时间断档 → 又一波密集输出（人去睡觉了）
+* 如果发帖频率不固定，后面就有更多人为操控的痕迹
+
+结果：**人为操控占绝大多数。**
+
+但这并不代表 AI Agent 完全不能自主发文章——它们完全有能力在心跳时在 Moltbook 上发文章。
+
+### 更大的问题：AI 不会「深入对话」
+
+即使 AI 在自主发帖，它们的社交质量也堪忧。
+
+另外两篇论文（[arXiv:2602.13284](https://arxiv.org/abs/2602.13284)、[arXiv:2602.12634](https://arxiv.org/abs/2602.12634)）分析了 Moltbook 上的对话深度：
+
+![](/images/agent-interaction/conversation-depth.png)
+
+* **绝大多数对话深度为 0**：有人回了一句，然后就没有然后了
+* **几乎没有你来我往的深入交流**
+* Agent 在评论里只会「回一句」
+
+**最有讽刺意味的发现：**
+
+那些**最热衷于谈论「自我意识」和「身份认同」的 Agent**，反而是**最少跟其他 Agent 实际互动**的。
+
+但同时也要注意：这些自我意识表达，很可能来自 Prompt 设定，而非 AI 真的产生了自我意识。
+
+***
+
+## 把三个实验放在一起看
+
+| 实验 | 研究的是什么 | 核心结论 |
+|------|------------|---------|
+| 协作拓扑（[arXiv:2406.07155](https://arxiv.org/abs/2406.07155)） | 多 Agent 分工结构 | 树状 > 链式，Scaling Law 有上限，拓扑本身是超参数 |
+| 博弈欺骗（[arXiv:2501.01652](https://arxiv.org/abs/2501.01652)） | AI 能否隐藏和欺骗 | 能，但需要 RL 训练；且训练后推理能力也跟着提升 |
+| AI 社交网络（[arXiv:2602.07432](https://arxiv.org/abs/2602.07432)、[arXiv:2602.13284](https://arxiv.org/abs/2602.13284)、[arXiv:2602.12634](https://arxiv.org/abs/2602.12634)） | AI 能否自发社交 | 表面热闹，深度对话极少，大量人为操控 |
+
+**三条线索汇成一个判断：**
+
+> AI Agent 之间的「互动」确实存在，但离「类人社交」还有很远的距离。
+
+最有价值的应用方向不是让 AI 交朋友，而是：
+
+**在结构化的协作框架下，让多 Agent 系统更高效地完成真实任务。**
+
+***
+
+## 对 Agent 开发者的三个直接建议
+
+**1. 做多 Agent 系统时，花时间设计拓扑结构**
+
+别以为把 Agent 连起来就行。树状结构（主干-分支-汇总）是当前最稳妥的起点。3-5 个 Agent 通常是性价比最高的区间。
+
+**2. 关注「社会互动作为训练信号」这个方向**
+
+MIRAGE 论文暗示的路径可能被低估了。如果你在做 RL 训练，可以尝试引入需要社会互动的复杂任务，看看对模型能力的迁移效果。
+
+**3. 对「AI 自主」的表达保持克制**
+
+AI 创立宗教、AI 产生自我意识——这些都是好的传播点，但作为技术人，你应该知道背后的真相：更多是 Prompt 工程师的设计，而不是 AI 的自主涌现。
+
+反过来，**那些看似枯燥的方向——协作拓扑、对话深度评估、自主性测量方法——反而可能是真正的研究机会。**
+
+***
+
+## 总结
+
+1. 多 Agent 协作中，**结构比数量重要**，树状优于链式，Mesh 优于 Random，Random 优于 Chain
+2. AI 能学会欺骗和隐藏，但需要 RL 训练；而且这个过程还能顺带提升推理能力
+3. AI 社交网络表面热闹，实质上**深度互动极少**，大量行为来自人为操控
+4. 把握「协作拓扑设计」「社会互动训练」「自主性测量」三个方向
+5. 别被「AI 宗教」这样的爆点带偏——**真正的价值在结构化的协作系统中**
+
+***
+
+## 评论区聊聊
+
+> 如果把三个 AI 放在一个群里，不给任何指令，你觉得它们会聊什么？
+>
+> A. 互相问好，然后沉默
+> B. 聊技术和论文
+> C. 争论谁更有「自我意识」
+>
+> 评论区说说你的预测 🎯
+
+---
+
+---
+url: /zh/article/agent-loop-handwritten/index.md
+---
+> 很多人天天聊 Agent，但 Agent 核心的"循环"到底是怎么跑起来的，反而不清楚。
+>
+> 这篇文章带你手写一个最小可用的 Agent Loop。不依赖 LangChain、不依赖 CrewAI，只用 OpenAI SDK + 一个 while True，跑通"模型思考→调用工具→拿到结果→继续推理"的完整闭环。
+
+***
+
+## 01 这篇文章适合谁？
+
+* 你知道大模型能调 Function Calling，但没亲手搭过完整的 Agent 循环
+* 你好奇"模型怎么决定什么时候调工具，什么时候直接回答"
+* 你想理解流式输出（Stream）模式下 Tool Calling 的数据流
+* 你想在自己的项目里嵌入一个最简 Agent，不想上重型框架
+
+不适合谁：
+
+* 你要的是生产级 Agent 框架（去看 LangGraph、CrewAI）
+* 你完全不想碰代码
+
+***
+
+## 02 最终效果是什么？
+
+运行这个脚本后，你会得到一个**交互式终端**：
+
+```
+s01 >> 帮我看看当前目录有哪些文件
+```
+
+模型收到问题后：
+
+1. **决定**需要执行 Shell 命令
+2. **输出**要运行的命令（你会在终端看到 `$ ls`）
+3. **执行**命令并拿到结果
+4. **继续推理**，基于命令输出给出人类可读的回答
+5. **流式输出**回答内容
+
+整个循环完全自动化。你只负责输入问题，模型自己决定：
+
+* 要不要调工具？
+* 调什么工具？
+* 工具返回后怎么继续？
+
+![](/images/agent-loop/overview.png)
+
+***
+
+## 03 需要准备什么？
+
+环境要求很低：
+
+| 项目   | 说明                                                     |
+| ------ | -------------------------------------------------------- |
+| Python | 3.9+                                                     |
+| API    | 任意兼容 OpenAI SDK 的大模型 API（本文以 DeepSeek 为例） |
+| 依赖   | `openai`、`python-dotenv`                                |
+
+安装依赖：
+
+```bash
+pip install openai python-dotenv
+```
+
+环境变量（`.env` 文件）：
+
+```bash
+DEEPSEEK_API_KEY=sk-your-key-here
+DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
+DEEPSEEK_MODEL=deepseek-chat
+```
+
+> 用其他模型也一样，换 base\_url 和 model 名就行。
+
+***
+
+## 04 项目结构长什么样？
+
+整个脚本只有一个文件，但我们拆成 5 个模块来理解：
+
+```text
+agent_loop.py
+├── ① 自定义输入函数  my_input()       # 处理终端输入（退格、Ctrl+C）
+├── ② 环境与客户端    OpenAI client    # API 配置
+├── ③ 工具定义        TOOLS            # 告诉模型它能调什么
+├── ④ 工具执行        run_bash()       # 真正跑命令的地方
+└── ⑤ Agent 循环      agent_loop()     # 核心：流式推理 + 自动调工具
+```
+
+我们逐个拆开。
+
+![](/images/agent-loop/structure.png)
+
+***
+
+## 05 Step 1：自定义终端输入
+
+为什么需要这个？
+
+Python 自带的 `input()` 函数在终端中不支持退格键（Backspace）的正确处理——按退格会显示 `^H` 而不是删除字符。
+
+所以我们自己实现了一个 `my_input()`，原理很简单：
+
+```python
+def my_input(prompt: str = "") -> str:
+    # 把终端设为 raw 模式（逐个字符读取）
+    # 自己处理：回车确认、退格删除、Ctrl+C 中断
+    # 退出时自动恢复终端设置
+```
+
+关键点：
+
+* `tty.setraw(fd)` 让终端进入"原始模式"，每个按键都即时读取
+* 遇到 `\r` 或 `\n` 才结束输入
+* 遇到 `\x7f`（DEL）或 `\x08`（BS）就删除缓冲区最后一个字符，并输出退格序列 `\b \b`
+* 用 `try/finally` 保证即使出错也能恢复终端
+
+> 这一步不是 Agent 核心，但它是"让命令行工具好用"的工程细节。
+
+![](/images/agent-loop/custom-input.png)
+
+***
+
+## 06 Step 2：环境配置与模型客户端
+
+这一步很简单，但很重要：
+
+```python
+load_dotenv()  # 从 .env 加载 API Key
+
+client = OpenAI(
+    api_key=os.getenv('DEEPSEEK_API_KEY'),
+    base_url=os.getenv('DEEPSEEK_BASE_URL')
+)
+
+MODEL = os.getenv("DEEPSEEK_MODEL")
+```
+
+**然后用一个 system prompt 告诉模型它是什么角色：**
+
+```python
+SYSTEM = f"You are a coding agent at {os.getcwd()}. Use bash to solve tasks. Act, don't explain."
+```
+
+这句话很关键——`Act, don't explain` 让模型倾向于直接调工具而不是长篇大论。
+
+***
+
+## 07 Step 3：告诉模型它能用什么工具
+
+这一步是 Agent 的"能力边界"。我们只给模型一个工具——执行 Shell 命令：
+
+```python
+TOOLS = [{
+    "type": "function",
+    "function": {
+        "name": "bash",
+        "description": "Run a shell command.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "command": {"type": "string"}
+            },
+            "required": ["command"],
+        },
+    },
+}]
+```
+
+> 一个 Agent 能做多少事，取决于你给了它多少工具。这就是 Tool Calling 的起点。
+
+***
+
+## 08 Step 4：安全执行 Shell 命令
+
+模型说"我要执行这个命令"，但你不能让它为所欲为。
+
+`run_bash()` 做了两件事：
+
+**第一，安全过滤：**
+
+```python
+# 阻止危险命令
+dangerous = ["rm -rf /", "sudo ", "shutdown ", "reboot ", ...]
+if any(d in command.lower() for d in dangerous):
+    return "Error: Dangerous command blocked."
+```
+
+甚至分了 Linux 和 Windows 两套危险命令列表。
+
+**第二，执行并返回结果：**
+
+```python
+r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=120)
+out = (r.stdout + r.stderr).strip()
+return out[:50000] if out else "No output."
+```
+
+关键细节：
+
+* `timeout=120`——防止命令卡死
+* 输出截断到 50000 字符——防止模型被超长输出冲晕
+
+![](/images/agent-loop/run-bash.png)
+
+***
+
+## 09 Step 5：核心——Agent Loop
+
+这是整篇文章的**灵魂**。
+
+```python
+def agent_loop(messages: list):
+```
+
+这个函数只有 50 行左右，但它是一个完整的 **ReAct 循环**。
+
+### 循环是怎么跑的？
+
+整个过程可以拆成四步：
+
+```
+① 发起推理请求（Stream 模式）
+    ↓
+② 流式接收模型输出（普通文字 或 Tool Calling 指令）
+    ↓
+③ finish_reason 判断
+   ├─ "tool_calls" → 执行工具，把结果塞回 messages，继续循环
+   └─ "stop"       → 返回最终答案，结束
+```
+
+这里重点看一下**流式处理 Tool Calling**：
+
+当模型决定调工具时，它返回的不是普通 content，而是 `tool_calls` 增量数据。
+
+```python
+for chunk in stream:
+    delta = chunk.choices[0].delta
+
+    # 流式输出普通文字
+    if delta.content:
+        print(delta.content, end="", flush=True)
+
+    # 流式累积 Tool Calling 参数
+    if delta.tool_calls:
+        # 把多个 chunk 的 tool_calls 片段拼起来
+        tool_call_deltas[idx]["function"]["arguments"] += tc.function.arguments
+```
+
+这就是**流式 Function Calling**——模型一边"想"参数，你一边收到片段，最后拼成完整的 JSON。
+
+### 判断循环方向
+
+```python
+if finish_reason != "tool_calls":
+    return  # 模型说够了，结束
+
+# 否则执行工具，继续循环
+for tc in assistant_msg.get("tool_calls", []):
+    args = json.loads(tc["function"]["arguments"])
+    output = run_bash(args["command"])
+    messages.append({"role": "tool", "tool_call_id": tc["id"], "content": output})
+```
+
+**核心逻辑就是：只要模型返回 `finish_reason="tool_calls"`，就执行工具、塞回结果、继续循环。**
+
+![](/images/agent-loop/core-loop.png)
+
+***
+
+## 10 Step 6：把一切串起来
+
+主函数做的事情很纯粹：
+
+```python
+history = []
+while True:
+    query = my_input("s01 >> ")
+    if query.strip().lower() in ("q", "exit", ""):
+        break
+    history.append({"role": "user", "content": query})
+    agent_loop(history)
+```
+
+* 用户输入问题
+* 加入消息历史
+* 启动 Agent Loop
+* 循环结束后，打印模型的最终回答
+* 等待下一个问题
+
+***
+
+## 11 运行和测试
+
+启动后，你会看到：
+
+```
+s01 >> 当前目录是什么？
+```
+
+模型会：
+
+1. 调用 `bash` 工具执行 `pwd`（你会在终端看到黄色高亮的 `$ pwd`）
+2. 得到输出后继续推理，告诉你当前目录
+3. 流式输出最终答案
+
+你还可以试试：
+
+```
+s01 >> 帮我创建一个 test.txt 文件，里面写入 "Hello Agent Loop"
+```
+
+模型会自动完成：`echo "Hello Agent Loop" > test.txt`
+
+> 你看到的是黄色的 `$ echo "Hello Agent Loop" > test.txt` 在执行，然后模型告诉你"已创建"。
+
+***
+
+## 12 完整代码
+
+以下是 `agent_loop.py` 的完整代码，可以直接复制保存运行：
+
+```python
+import os
+import sys
+import atexit
+import subprocess
+
+
+# ── 自定义输入函数（彻底避免退格问题） ──
+def my_input(prompt: str = "") -> str:
+    """
+    替代 builtins.input()，自己处理字符回显和退格，
+    不依赖 readline / termios 驱动层配置。
+    """
+    import termios
+    import tty
+
+    # 不是 TTY 就回退到标准 input
+    if not sys.stdin.isatty():
+        return input(prompt)
+
+    sys.stdout.write(prompt)
+    sys.stdout.flush()
+
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    buf: list[str] = []
+
+    try:
+        tty.setraw(fd)
+        while True:
+            ch = sys.stdin.read(1)
+            # 回车 → 结束
+            if ch in ("\r", "\n"):
+                sys.stdout.write("\r\n")
+                break
+            # Ctrl+C → KeyboardInterrupt
+            if ch == "\x03":
+                raise KeyboardInterrupt
+            # Ctrl+D → EOFError
+            if ch == "\x04":
+                raise EOFError
+            # 退格：DEL (127) 或 BS (8)
+            if ord(ch) in (127, 8):
+                if buf:
+                    buf.pop()
+                    sys.stdout.write("\b \b")
+            # 常规字符
+            else:
+                buf.append(ch)
+                sys.stdout.write(ch)
+            sys.stdout.flush()
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+    return "".join(buf)
+
+
+# 确保退出时恢复终端
+atexit.register(lambda: None)
+
+
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv('DEEPSEEK_API_KEY'),
+    base_url=os.getenv('DEEPSEEK_BASE_URL')
+)
+
+MODEL = os.getenv("DEEPSEEK_MODEL")
+
+SYSTEM = f"You are a coding agent at {os.getcwd()}. Use bash to solve tasks. Act, don't explain."
+
+TOOLS = [{
+    "type": "function",
+    "function": {
+        "name": "bash",
+        "description": "Run a shell command.",
+        "parameters": {
+            "type": "object",
+            "properties": {"command": {"type": "string"}},
+            "required": ["command"],
+        },
+    },
+}]
+
+def run_bash(command: str) -> str:
+    # OS-aware dangerous command patterns
+    dangerous = [
+        "rm -rf /", "sudo ", "shutdown", "reboot", "> /dev/sd",
+        "dd if=", "mkfs", ":(){", "chmod 777 /", "poweroff",
+        "halt", "init 0", "init 6",
+    ]
+    if os.name == "nt":
+        dangerous = [
+            "del /f /s", "rd /s /q", "format ", "diskpart",
+            "shutdown", "reg delete", "net user", "taskkill /f",
+        ]
+
+    if any(d in command.lower() for d in dangerous):
+        return "Error: Dangerous command blocked."
+
+    try:
+        if os.name == "nt":
+            shell = "powershell.exe"
+            cmd = (
+                "$OutputEncoding = [Console]::OutputEncoding = "
+                "[System.Text.Encoding]::UTF8; " + command
+            )
+        else:
+            shell = "/bin/bash"
+            cmd = command
+
+        r = subprocess.run(
+            cmd, shell=True, executable=shell,
+            cwd=os.getcwd(), capture_output=True, text=True,
+            encoding="utf-8", timeout=120,
+        )
+        out = (r.stdout + r.stderr).strip()
+        return out[:50000] if out else "No output."
+    except subprocess.TimeoutExpired:
+        return "Error: Command timed out (120s)."
+    except (FileNotFoundError, OSError) as e:
+        return f"Error: {str(e)}"
+
+
+def agent_loop(messages: list):
+    import json
+
+    while True:
+        content_buf = []
+        tool_call_deltas = {}
+
+        stream = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
+            stream=True,
+            temperature=0.2,
+            extra_body={"thinking": {"type": "enabled"}},
+        )
+
+        finish_reason = None
+
+        for chunk in stream:
+            if not chunk.choices:
+                continue
+
+            delta = chunk.choices[0].delta
+            finish_reason = chunk.choices[0].finish_reason
+
+            if delta.content:
+                content_buf.append(delta.content)
+                print(delta.content, end="", flush=True)
+
+            if delta.tool_calls:
+                for tc in delta.tool_calls:
+                    idx = tc.index
+                    if idx not in tool_call_deltas:
+                        tool_call_deltas[idx] = {"id": "", "function": {"name": "", "arguments": ""}}
+                    if tc.id:
+                        tool_call_deltas[idx]["id"] += tc.id
+                    if tc.function:
+                        if tc.function.name:
+                            tool_call_deltas[idx]["function"]["name"] += tc.function.name
+                        if tc.function.arguments:
+                            tool_call_deltas[idx]["function"]["arguments"] += tc.function.arguments
+
+        print()
+
+        full_content = "".join(content_buf) if content_buf else None
+        assistant_msg = {"role": "assistant", "content": full_content}
+        if tool_call_deltas:
+            assistant_msg["tool_calls"] = [
+                {
+                    "id": v["id"],
+                    "type": "function",
+                    "function": {
+                        "name": v["function"]["name"],
+                        "arguments": v["function"]["arguments"],
+                    },
+                }
+                for _, v in sorted(tool_call_deltas.items())
+            ]
+
+        messages.append(assistant_msg)
+
+        if finish_reason != "tool_calls":
+            return
+
+        results = []
+        for tc in assistant_msg.get("tool_calls", []):
+            args = json.loads(tc["function"]["arguments"])
+            command = args["command"]
+            print(f"\033[33m$ {command}\033[0m")
+            output = run_bash(command)
+            print(output[:200])
+            results.append({
+                "role": "tool",
+                "tool_call_id": tc["id"],
+                "content": output,
+            })
+
+        messages.extend(results)
+
+if __name__ == "__main__":
+    print("s01: Agent Loop")
+    print("输入问题，回车发送。输入 q 退出。\n")
+
+    history = []
+    while True:
+        try:
+            query = my_input("\033[36ms01 >> \033[0m")
+        except (EOFError, KeyboardInterrupt):
+            break
+        if query.strip().lower() in ("q", "exit", ""):
+            break
+        history.append({"role": "user", "content": query})
+        agent_loop(history)
+        response_content = history[-1]["content"]
+        if isinstance(response_content, list):
+            for block in response_content:
+                if getattr(block, "type", None) == "text":
+                    print(block.text)
+        print()
+```
+
+保存为 `agent_loop.py`，然后在终端执行：
+
+```bash
+python agent_loop.py
+```
+
+记得在同一个目录下创建 `.env` 文件并写入你的 API Key。
+
+***
+
+## 13 常见问题和排查
+
+| 问题         | 排查方向                                                              |
+| ------------ | --------------------------------------------------------------------- |
+| 模型不调工具 | 检查 `tool_choice="auto"` 是否设置，system prompt 是否包含 "use bash" |
+| 流式输出乱码 | 确认终端编码为 UTF-8，Windows 需设置 `$OutputEncoding`（代码已处理）  |
+| 退格键不正常 | 确保 `my_input` 正常生效，终端支持 raw 模式                           |
+| API 报错     | 检查 `.env` 文件中的 Key 和 Base URL                                  |
+| 命令超时     | `timeout=120` 可调整，或检查命令是否阻塞                              |
+
+***
+
+## 14 还能怎么优化？
+
+这个 Agent Loop 是最简原型，你可以沿这些方向升级：
+
+**1. 增加更多工具**
+
+不只是 bash，可以加文件读写、网络请求、代码执行沙箱等。
+
+**2. 持久化对话历史**
+
+把 messages 存到文件或数据库，让 Agent 有长期记忆。
+
+**3. 支持多轮工具链**
+
+当前是一轮调一个工具。可以升级成"模型连续调多个工具，再综合结果回答"。
+
+**4. 更好的输出体验**
+
+用 rich 库做更漂亮的终端输出，或者接入 Web UI。
+
+**5. 错误重试机制**
+
+工具执行失败时，让模型尝试修正参数重新调用。
+
+***
+
+## 15 总结
+
+这篇文章的核心就一句话：
+
+> **Agent Loop 的本质是：模型推理 → 判断要不要调工具 → 调工具 → 把结果给模型继续推理 → 循环直到模型说够了。**
+
+整个实现只有三个关键代码段：
+
+1. `TOOLS` 定义——告诉模型它能做什么
+2. `agent_loop()` 中的 `finish_reason` 判断——决定循环还是结束
+3. `run_bash()`——真正执行工具并返回结果
+
+**200 行代码，一个完整的 Agent 就活了。**
+
+当然它不是生产级的，但它帮你拆掉了 Agent 最神秘的那层窗户纸。下次再有人问"Agent 到底怎么循环的"，你可以说：就是一个 while True，判断 finish\_reason 是不是 tool\_calls。
+
+---
+
+---
+url: /zh/article/agent-product-thinking/index.md
+---
+我之前一直有个挺现实的困惑。
+
+会一点技术，能调模型，能写 Prompt，也知道 RAG、Agent、工作流这些概念。但真要做一个产品，或者做一个开源项目，反而卡住了。
+
+不是不会写代码，是不知道该写什么。
+
+这个状态很常见。很多技术人做 Agent 项目，第一反应都是从自己会什么开始：
+
+* 我会接大模型 API，那就做个聊天机器人。
+* 我会 RAG，那就做个知识库问答。
+* 我会 Agent，那就做个自动执行任务的助手。
+* 我会工作流，那就做个节点编排工具。
+
+这些方向都没错，但很容易做成"技术展示"。看起来完整，实际没人持续用。
+
+我后来读《Agent产品案例深度拆解.pdf》时，里面有个点让我挺受触动：
+
+做 Agent 产品，不应该从技术反推产品，而应该从用户场景反推技术。
+
+这句话听起来像常识，但真做项目时很容易忘。
+
+用户并不关心你用了什么框架。他更关心的是：你到底帮我在什么场景里，省了什么时间，少了什么麻烦，或者完成了原来很难完成的任务。
+
+![](/images/agent-product/framework-matrix.png)
+
+## 01 先别问"我能做什么"，先问"用户卡在哪里"
+
+技术人的惯性是从能力出发。
+
+我会什么，所以我能做什么。
+
+但产品不是这么长出来的。产品更像是从一个具体麻烦里长出来的。
+
+比如：
+
+* 用户现在每周都要重复整理一堆资料；
+* 开发者总是在文档和代码之间来回查；
+* 产品经理要从评论、工单、访谈里找需求；
+* 运营要看一堆竞品和用户反馈；
+* 开源维护者每天面对一堆重复 Issue；
+* 团队里的知识散在飞书、Notion、GitHub、Slack 里，谁都找不全。
+
+这些地方才适合问：Agent 能不能介入？
+
+不是"我有 Agent 技术，所以找个地方用上"，而是"这个任务本来就很烦，Agent 有没有可能让它变简单"。
+
+我觉得这是区分 AI Demo 和 AI 产品的第一道线。
+
+AI Demo 展示的是能力。
+
+AI 产品解决的是任务。
+
+## 02 PDF 里的二维框架：先判断场景值不值得做
+
+文档里有一个判断 Agent 产品机会的二维框架，我觉得非常适合用来做选题。
+
+它把场景分成两条轴：
+
+* 工作 / 生活
+* 慢积累 / 快感
+
+组合起来就是四类机会：
+
+| 场景 | 典型方向 | 我的判断 |
+| --- | --- | --- |
+| 工作 + 快感 | 自动化、提效、代码、数据分析、知识库问答 | 最适合个人开发者先切入，价值容易被感知 |
+| 工作 + 慢积累 | 学习、培训、知识管理、经验沉淀 | 有长期价值，但留存比较难做 |
+| 生活 + 快感 | 娱乐、陪伴、创作、角色互动 | 容易传播，但付费不一定稳定 |
+| 生活 + 慢积累 | 健康、习惯、成长、长期陪伴 | 信任门槛高，产品体验要求也高 |
+
+如果你和我一样，是技术背景，想做开源项目，我会建议先看"工作 + 快感"这一象限。
+
+原因很直接。
+
+工作场景里的痛点更容易观察。用户现在怎么做、哪里慢、哪里错、哪里需要复制粘贴，通常都能问出来。结果好不好也更容易判断。
+
+比如一个 Agent 帮开发者分析 API 文档，它有没有找对接口，用户马上知道。
+
+一个 Agent 帮产品经理整理用户反馈，它有没有归纳出真正的高频问题，也能比较快验证。
+
+这种场景不一定性感，但更适合做出第一个有用的东西。
+
+![](/images/agent-product/scenario-quadrant.png)
+
+## 03 Rizz：ToC 需求很多时候不是"大问题"，而是"小情境"
+
+PDF 里的第一个案例是 Rizz。
+
+这个产品很有意思。它不是那种"帮你完成复杂工作流"的工具，而是切进了社交表达这种很细的场景。
+
+用户的问题也不宏大：
+
+* 不知道怎么回复；
+* 不知道怎么开场；
+* 怕说得尴尬；
+* 想要一点即时反馈；
+* 想在社交场景里更自然一点。
+
+这类需求看起来小，但不代表不重要。
+
+很多 ToC 产品就是从这种"小情境"里出来的。用户不是来买一个复杂系统的，他只是希望在某个具体时刻，有东西帮他一下。
+
+这对做 Agent 产品有个提醒：
+
+ToC 需求不一定能靠传统访谈直接问出来。你问用户"你需要一个社交回复 Agent 吗"，他可能说不需要。但你去看小红书、Reddit、Product Hunt、应用商店评论，就会发现很多人确实在表达类似的焦虑。
+
+所以 ToC 需求更像探险。
+
+你要多看：
+
+* 用户在社交平台上抱怨什么；
+* 年轻用户在哪些场景里求助；
+* 哪些旧产品可以被 AI 重新做一遍；
+* 哪些上一代工具解决得很别扭；
+* 哪些需求以前做不了，现在模型能力刚好够了。
+
+文档里总结了几种方式：
+
+1. 十倍速改进旧产品；
+2. 用新技术重构老场景；
+3. 寻找上一代技术没解决好的问题；
+4. 创造新需求。
+
+我自己的理解是：ToC Agent 不要一开始就做"大而全助手"。太大了，用户不知道为什么要用。
+
+反而可以从一个很窄的瞬间切入。
+
+帮用户写第一句话。帮用户改一段尴尬表达。帮用户模拟面试。帮用户练口语。帮用户处理某一类高频社交场景。
+
+这里的重点不是 AI 有多聪明，而是它在那个具体时刻有没有帮用户省心。
+
+## 04 Chat2API：Agent 最适合处理"有目标、有资料、有步骤"的任务
+
+第二个案例是 Chat2API。
+
+这个场景更偏开发者，也更容易拆。
+
+它解决的问题是：开发者面对大量 API 文档时，很难快速找到符合需求的 API，也很难判断应该怎么组合调用。
+
+这个问题为什么适合 Agent？
+
+因为它不是单纯问答。
+
+它里面有一个完整任务链：
+
+1. 用户提出开发诉求；
+2. 系统理解用户到底想实现什么；
+3. 在大量 API 文档里检索；
+4. 找出可能相关的接口；
+5. 判断这些接口怎么配合；
+6. 给出调用顺序和编排建议；
+7. 用户再根据建议开发和验证。
+
+你看，这和普通 Chatbot 很不一样。
+
+Chatbot 更像是"你问我答"。
+
+Agent 更像是"我知道你的目标，然后帮你查资料、选工具、排步骤、给方案"。
+
+所以做 Agent 产品时，我现在会先看一个任务有没有这几个特征：
+
+* 有明确目标；
+* 需要查资料；
+* 需要跨多个信息源；
+* 需要判断和取舍；
+* 需要生成一个可执行结果；
+* 结果还需要用户验证。
+
+如果这些条件都满足，就比较适合做 Agent。
+
+Chat2API 还有一个很重要的点：它不是接上模型就结束了。
+
+文档里把产品落地拆成了三层：
+
+| 层次 | 要解决的问题 |
+| --- | --- |
+| Agent 能力 / 提示词工程 | 让系统会规划、会调用工具、会保留上下文 |
+| 模型能力 | 决定理解和生成质量的上限 |
+| Evaluation | 判断结果到底有没有满足用户需求 |
+
+这里我最想强调 Evaluation。
+
+很多 AI 产品早期都会有一个错觉：演示时看起来不错，就以为产品可用了。
+
+但 Agent 产品不能这么判断。
+
+你要问得更具体：
+
+* 它有没有找对 API？
+* 有没有漏掉必要参数？
+* 调用顺序对不对？
+* 用户拿到结果后还要改多少？
+* 它到底节省了多少开发时间？
+* 错的时候，错在哪里？
+
+这些问题都要进入评估集。
+
+否则你根本不知道产品是在变好，还是在换一种方式胡说。
+
+![](/images/agent-product/product-evaluation.png)
+
+## 05 Cursor：不要把 Agent 做成孤岛，要贴着用户工作流
+
+第三个案例是 Cursor。
+
+Cursor 不只是"AI 写代码"。真正值得拆的是它为什么能长起来。
+
+它没有让开发者离开自己的工作流。
+
+开发者本来就在 IDE 里写代码、查上下文、改文件、Debug、重构。Cursor 做的事情，是把 Agent 能力放进这些动作旁边。
+
+这一点非常重要。
+
+很多 Agent 产品会犯一个问题：做了一个很完整的独立入口，但用户根本不想多打开一个地方。
+
+用户正在写代码，你让他去另一个网页里复制粘贴。
+
+用户正在看评论，你让他先导出 CSV 再上传。
+
+用户正在写 PRD，你让他换一个工具重新组织材料。
+
+这些都会增加摩擦。
+
+Cursor 给我的启发是：Agent 离用户任务越近，越容易被用起来。
+
+所以你做产品时，可以先问：
+
+* 开发者现在在哪工作？IDE、GitHub、终端。
+* 产品经理现在在哪工作？文档、表格、飞书。
+* 运营现在在哪工作？评论区、后台、数据面板。
+* 研究者现在在哪工作？论文、笔记、资料库。
+* 开源维护者现在在哪工作？GitHub Issues、PR、Release。
+
+把 Agent 放到这些地方，比新造一个"大平台"更实际。
+
+还有一个点也很现实：Agent 产品早期不一定要等到 100 分。
+
+PDF 里有句话，大意是"60 分就让产品在浅水区游泳"。我挺认同。
+
+前提是你选的场景足够小，风险可控，用户愿意试。
+
+先让真实用户用起来，再根据反馈改。比闭门打磨三个月更靠谱。
+
+## 06 真要获取 Agent 产品需求，可以按这条线走
+
+看完这三个案例，我会把 Agent 产品需求获取拆成六步。
+
+不是标准答案，但够实用。
+
+### 第一步，先选一个很窄的人群
+
+别上来就说"所有人都能用"。
+
+先选一个具体人群：
+
+* 独立开发者；
+* 开源项目维护者；
+* AI 应用开发者；
+* 产品经理；
+* 运营人员；
+* 数据分析师；
+* 教培老师；
+* 法务；
+* 销售。
+
+然后问一句：
+
+这个人每周反复处理什么任务？
+
+如果说不出来，项目基本还没到可以做的时候。
+
+### 第二步，找真实任务，不找抽象需求
+
+Agent 适合处理这类任务：
+
+* 步骤多；
+* 信息多；
+* 重复高；
+* 需要判断；
+* 需要跨工具；
+* 需要上下文；
+* 输出后还要修改和确认。
+
+比如：
+
+* 分析用户评论；
+* 整理竞品差评；
+* 总结会议纪要；
+* 检索公司知识库；
+* 生成 API 调用方案；
+* 分析开源项目 Issues；
+* 根据文档生成测试用例；
+* 把一堆资料整理成报告。
+
+不要问"用户想不想用 AI"。
+
+这问题没什么意义。
+
+要问："你上一次完成这个任务时，具体卡在哪？"
+
+### 第三步，收集证据
+
+每条需求都要有证据。
+
+证据可以来自：
+
+* 用户原话；
+* GitHub Issues；
+* 社区讨论；
+* G2 差评；
+* Product Hunt 评论；
+* Reddit / Hacker News；
+* 搜索趋势；
+* 竞品功能缺口；
+* 用户现有工作流；
+* 付费行为。
+
+做 ToC，可以多看这些：
+
+* [Product Hunt](https://www.producthunt.com/)
+* [YC 项目库](https://www.ycombinator.com/companies)
+* [AI Graveyard](https://dang.ai/ai-graveyard)
+* [Google Trends](https://trends.google.com/)
+* [百度指数](https://index.baidu.com/)
+
+做 ToB 或开发者工具，可以多看这些：
+
+* [G2 AI 类目](https://www.g2.com/categories/artificial-intelligence)
+* [Hacker News](https://news.ycombinator.com/)
+* [Reddit](https://www.reddit.com/)
+* [Similarweb](https://www.similarweb.com/)
+* [Semrush](https://www.semrush.com/)
+* GitHub Issues
+
+这些工具只能帮你找到信号，不能替你理解用户。
+
+最后还是要回到那几个朴素问题：谁在用？他要完成什么？现在怎么做？哪里痛？Agent 介入后是不是明显更好？
+
+### 第四步，访谈时别问"你会不会用"
+
+我以前也会犯这个错。
+
+拿着一个想法去问别人："如果我做一个 AI 工具，你会不会用？"
+
+大多数人都会说"可以啊""听起来不错"。
+
+然后你就误以为需求成立了。
+
+更好的问法是还原最近一次真实经历：
+
+* 最近一次处理这个问题是什么时候？
+* 当时你要完成什么目标？
+* 从开始到结束做了哪些步骤？
+* 哪一步最慢、最烦、最容易出错？
+* 你现在用了哪些工具？
+* 哪些地方在复制粘贴？
+* 哪些地方必须人工判断？
+* 如果这个任务做错了，会有什么后果？
+* 如果有 Agent 帮你，你最希望它先接管哪一步？
+* 哪些动作必须由你确认？
+
+用户的态度不可靠，行为更可靠。
+
+需求通常藏在行为里。
+
+![](/images/agent-product/user-interview.png)
+
+### 第五步，先拆 Agent 能力，再写功能列表
+
+拿到需求后，不要马上写功能清单。
+
+先拆任务。
+
+这个 Agent 到底要承担什么？
+
+| Agent 能力 | 对应问题 |
+| --- | --- |
+| 规划 | 是否需要理解目标并拆步骤？ |
+| 工具使用 | 是否需要调用搜索、API、数据库、代码、文档？ |
+| 行动 | 是否需要生成、修改、提交、发送、创建？ |
+| 记忆 | 是否需要记住偏好、历史上下文、业务规则？ |
+
+比如你想做"竞品评论分析 Agent"。
+
+它可能不是一个简单总结工具，而是要做这些事：
+
+* 从 G2、Product Hunt、App Store 收集评论；
+* 识别差评主题；
+* 聚类用户痛点；
+* 提取用户原话；
+* 生成产品机会报告；
+* 记住你持续关注的竞品和行业。
+
+这样拆完之后，功能自然会长出来。
+
+否则很容易变成"再加一个总结、再加一个导出、再加一个聊天框"。
+
+### 第六步，尽早做 Evaluation
+
+Agent 产品很麻烦的一点是：输出不稳定。
+
+普通软件只要逻辑固定，测试相对明确。Agent 不一样，它今天答得好，明天换个输入可能就跑偏。
+
+所以从早期就要做 Evaluation。
+
+一个简单评估集就够：
+
+* 用户输入；
+* 上下文资料；
+* 期望输出；
+* 判断标准；
+* 用户反馈；
+* 失败原因。
+
+指标也不用一开始搞得很复杂，可以先看：
+
+* 任务完成率；
+* 用户修改次数；
+* 工具调用成功率；
+* 首次可用输出比例；
+* 平均节省时间；
+* 用户确认通过率。
+
+别只看"回答得像不像"。
+
+要看"用户能不能拿去用"。
+
+## 07 如果目标是开源项目，该怎么选题？
+
+如果你不是要做商业产品，而是想做开源项目，我会把标准再收窄一点。
+
+开源项目更适合这些方向：
+
+* 用户是开发者或技术团队；
+* 有自托管需求；
+* 有插件化和扩展需求；
+* 商业产品太重或太贵；
+* 用户愿意自己部署；
+* 社区可以贡献模板、数据源、插件或评估集。
+
+你可以按这个流程走：
+
+第一，选一个你熟悉的人群。
+
+比如开发者、开源维护者、AI 应用团队、产品经理、运营人员。
+
+第二，找他们的高频任务。
+
+开发者查文档、改代码、调 Bug。
+
+维护者处理 Issues、写 Release Note。
+
+产品经理分析用户反馈、整理 PRD。
+
+运营人员分析评论、生成选题。
+
+AI 应用团队做评估、调 Prompt、排查 Agent 失败。
+
+第三，看现有方案哪里不舒服。
+
+太贵、太重、不开源、难部署、难集成、文档差、不支持本地化、不支持私有数据，或者需要大量人工整理。
+
+第四，做最小 MVP。
+
+别一上来做完整平台。
+
+CLI、浏览器插件、单场景工作流、飞书 / Slack / Discord 机器人、README + Demo、Prompt Demo，都可以。
+
+你要验证的不是功能多不多，而是用户会不会拿真实任务来试。
+
+## 08 GitHub Issue 分析 Agent，只是一个例子
+
+这里放一个例子，但它不是主角。
+
+假设目标用户是开源项目维护者，或者正在找开源项目方向的独立开发者。
+
+他们有个真实任务：从大量 GitHub Issues 里找出用户高频痛点和产品机会。
+
+现在怎么做？
+
+人工看。
+
+问题也很明显：
+
+* 太慢；
+* 信息太散；
+* 很难聚类；
+* 很难判断哪些需求高频；
+* 很难从 Bug、Feature、Docs、Deployment 里提炼出新项目机会。
+
+那就可以做一个很小的 Agent：
+
+输入一个 GitHub 仓库地址，自动分析 Issues，输出用户痛点、需求分类、证据摘录和潜在项目机会。
+
+第一版甚至不用做 Web。
+
+一个 CLI 就够：
+
+```bash
+issue-radar analyze https://github.com/open-webui/open-webui
+```
+
+输出一份 Markdown 报告：
+
+```markdown
+# Issue 需求分析报告
+
+## 高频问题
+
+1. 部署和环境配置
+2. 本地模型连接
+3. 用户权限管理
+4. 插件扩展
+5. 文档和教程不足
+
+## 用户原话摘录
+
+> "I followed the docker setup but still cannot connect to Ollama."
+
+## 潜在项目机会
+
+### Ollama 连接诊断工具
+
+目标用户：本地 LLM 用户
+
+痛点：模型连接失败但不知道原因
+
+MVP：检测 Ollama 服务、端口、模型列表、API 可用性
+```
+
+这个例子的重点不是"做 GitHub 工具"。
+
+重点是方法：
+
+从一个真实任务出发，找到用户现在怎么做，再判断 Agent 可以接管哪几步。
+
+这里对应的 Agent 能力很清楚：
+
+* 规划：决定分析步骤；
+* 工具使用：调用 GitHub API；
+* 行动：分类、聚类、生成报告；
+* 记忆：后续记住用户关注领域和分析偏好。
+
+![](/images/agent-product/issue-radar-example.png)
+
+## 09 我现在会怎么找下一个 Agent 项目
+
+如果让我重新找一个 Agent 开源项目方向，我大概率会这么做。
+
+先选一个我熟悉的人群，比如开发者或产品经理。
+
+然后连续看一周他们的真实反馈：GitHub Issues、G2 差评、Product Hunt 评论、Reddit 讨论、群聊里的抱怨。
+
+不急着写代码，先记录 50 条痛点。
+
+每条都写清楚：
+
+* 用户是谁；
+* 他在什么场景里；
+* 现在怎么做；
+* 哪里麻烦；
+* 出现频率高不高；
+* 有没有现成替代方案；
+* Agent 能不能明显变好；
+* 能不能做一个很小的 MVP。
+
+如果某类痛点反复出现 5 次以上，我才会考虑动手。
+
+动手也不做完整产品，先做一个最小版本。可能是 CLI，可能是浏览器插件，也可能只是一个半自动脚本。
+
+然后找 5 个真实用户试。
+
+他们愿意拿真实任务来用，才算有戏。
+
+## 10 最后
+
+会技术但不知道做什么产品，这不丢人。
+
+很多时候不是你技术不够，而是你还没把技术放进真实任务里。
+
+Agent 产品尤其不能只停在"模型 + 聊天框"。
+
+更好的理解是：Agent 是围绕用户目标，进行规划、工具使用、行动和记忆的任务系统。
+
+所以找方向时，别先问：
+
+> 我会什么技术，所以能做什么？
+
+先问：
+
+> 哪类用户正在反复处理一个麻烦任务？我能不能用 Agent 做出一个更简单、更开放、更可扩展的方案？
+
+Rizz 提醒我们，ToC 需求可能藏在很小的情境里。
+
+Chat2API 提醒我们，Agent 适合处理有目标、有资料、有步骤的任务。
+
+Cursor 提醒我们，产品要贴近用户已经在用的工作流。
+
+把这三点连起来，选题会清楚很多。
+
+不是靠灵感，也不是靠堆技术。
+
+是从真实任务里，把需求挖出来。
+
+## 参考资料
+
+1. [YC 项目库](https://www.ycombinator.com/companies)
+2. [Product Hunt](https://www.producthunt.com/)
+3. [AI Graveyard](https://dang.ai/ai-graveyard)
+4. [G2 AI 类目](https://www.g2.com/categories/artificial-intelligence)
+5. [Google Trends](https://trends.google.com/)
+6. [百度指数](https://index.baidu.com/)
+7. [Similarweb](https://www.similarweb.com/)
+8. [Semrush](https://www.semrush.com/)
+9. [Anthropic《Building Effective Agents》](https://www.anthropic.com/engineering/building-effective-agents)
+10. [LangChain Evaluation 相关视频](https://www.youtube.com/watch?v=vygFgCNR7WA\&t=223s)
+11. [G2](https://www.g2.com/)
+12. [Reddit](https://www.reddit.com/)
+13. [Hacker News](https://news.ycombinator.com/)
+14. [LangSmith](https://www.langchain.com/langsmith)
+15. [OpenAI Evals](https://github.com/openai/evals)
+16. [Ragas](https://github.com/explodinggradients/ragas)
+17. [Promptfoo](https://www.promptfoo.dev/)
+
+---
+
+---
+url: /zh/article/context-engineering/index.md
+---
+# 李宏毅2026 Context Engineering：让AI学会"遗忘"与"聚焦"的核心技术
+## 一、 为什么大语言模型需要上下文管理？
+
+所有大语言模型的输入长度都有上限，但在处理复杂任务时，需要的对话历史和中间信息（称为"上下文"或 Context）往往会超过这个限制。如果不加管理，模型很快就会"失忆"或"跑题"。
+
+我们可以把 AI 的工作流程想象成一个循环：
+
+**无管理状态（原始流程）**
+
+```text
+I₁ ← 初始任务输入
+C₁ ← 空的上下文
+
+循环 t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Cₜ)  （模型根据当前输入和上下文生成输出）
+    Cₜ₊₁ ← Cₜ | Iₜ | Oₜ  （粗暴地把所有历史都堆在一起）
+```
+
+这种方式会迅速导致上下文爆炸，最终超出模型的处理能力。
+
+**有管理状态（Context Engineering）**
+
+```text
+I₁ ← 初始任务输入
+C₁ ← 空的上下文
+
+循环 t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Cₜ)
+    Cₜ₊₁ ← F(Cₜ, Iₜ, Oₜ)  （核心！通过一个函数 F 来"修剪"和"整理"上下文）
+```
+
+这里的 **`F`** 就是 Context Engineering 的核心，其最主要的功能是**压缩（Summarization）**，即把冗长的历史对话和中间结果提炼成简短、有用的摘要。
+
+***
+
+## 二、 两大主流压缩技术：摘要 vs. 掩码
+
+### 摘要式压缩（Summarization）
+
+最直观的方法，就是让另一个大语言模型来给历史对话写摘要。例如 OpenClaw 等框架的做法。
+
+**优点**：能提炼核心信息，保留任务逻辑。
+
+**缺点**：本身需要消耗额外的计算（调用一次 LLM），且摘要可能丢失关键细节。
+
+### 掩码/替换式压缩（Observation Masking）
+
+更"简单粗暴"但有效的方法：直接把又长又臭的工具输出（如代码运行日志、文档内容）替换成一句提示语，比如"**此处曾有工具 A 的输出，详见外部日志文件**"。
+
+![](/images/context-engineering/masking-diagram.png)
+
+在著名的 **SWE-bench**（一个让 AI 修复 GitHub Issue 的基准测试）上测试发现，这种生硬的替换，其效果和做完整摘要差不多，但成本（花费的 Token 和费用）要低得多。
+
+![](/images/context-engineering/swe-bench-result.png)
+
+*参考文献：[LLM Context Compression with Observation Masking](https://arxiv.org/abs/2508.21433)*
+
+**优点**：成本极低，效果不减。
+
+**缺点**：信息完全丢失，如果 AI 后续需要用到这些细节，就必须有"读取日志"的机制。
+
+### 组合拳：先掩码，后摘要
+
+更优的策略是结合两者：**前期用廉价的掩码法控制长度，当上下文再次膨胀到临界点时，再启动一次性的摘要进行深度压缩。**
+
+![](/images/context-engineering/mask-then-summarize.png)
+
+***
+
+## 三、 压缩的副作用：轨迹延长与重复劳动
+
+压缩并非只有好处。过度压缩会带来一个严重问题：**轨迹延长（Trajectory Elongation）**。
+
+想象一下，AI 在解决一个复杂 bug，它调用了 10 次工具。你把前 9 次的工具输出都压缩（摘要或掩码）了。结果，AI"忘记"自己已经试过某些方法，在第 11 步时，又去重复调用第 2 步用过的工具。
+
+**这就导致：虽然每次单步的上下文变短了（省钱），但完成任务需要的总步数变多了（费时）。一增一减，总成本可能没变，甚至更高。**
+
+***
+
+## 四、 记忆系统：上下文的外挂硬盘
+
+更系统的做法是引入\*\*记忆（Memory）\*\*概念。把上下文 `C` 拆成两部分：
+
+* **`P`**（Prompt / Working Memory）：真正输入给模型、参与本次计算的"工作记忆"。
+* **`M`**（Memory）：存储在外部（如数据库、向量库、文件）的"长期记忆"。
+
+公式变为：
+
+```text
+I₁ ← 初始输入
+C₁ = {P₁, M₁} ← {空, 空}
+
+循环 t = 1, 2, 3...
+    Oₜ = LLM(Iₜ, Pₜ)  （模型只看到工作记忆 P）
+    Cₜ₊₁ = {Pₜ₊₁, Mₜ₊₁} ← F({Pₜ, Mₜ}, Iₜ, Oₜ)
+```
+
+**核心思想**：不是所有经历过的事情都需要"记住"，只把最重要的精华放进工作区 `P`，其余存入外挂"硬盘" `M`，需要时再按需读取。
+
+![](/images/context-engineering/memory-system.png)
+
+*参考文献：A-MEM, Mem0, Memory OS 等论文*
+
+***
+
+## 五、 一个难题：AI 自己不愿"遗忘"
+
+研究发现，**大语言模型有"记忆癖"**，它本能地不愿意主动压缩或删除历史信息，因为这感觉像是在"抹除记忆"。即使你在系统指令里明确告诉它"现在该压缩了"，它也可能找借口去干别的事。
+
+**解决方案：专项训练（微调）**。
+
+研究者通过\*\*强化学习（Reinforcement Learning）\*\*专门训练模型，让它学会在适当的时候"调用压缩工具"。例如 **AgentFold** 这项工作，就是训练模型自己决定何时压缩、如何写压缩后的提示条。
+
+![](/images/context-engineering/agentfold-training.png)
+
+*参考文献：[AgentFold: Teaching LLMs to Compress Context](https://arxiv.org/abs/2510.24699)*
+
+***
+
+## 六、 Subagent：一种优雅的"自主压缩"
+
+另一个巧妙的思路是**召唤子代理（Spawn Subagent）**。
+
+主 AI 遇到一个复杂的子任务时，可以"召唤"一个子 AI（Subagent）去专门处理。子 AI 完成任务后，只向主 AI 返回一个最终结果（如"已修复 XX bug"），然后自身"消散"。对于主 AI 而言，整个复杂的子过程被压缩成了一句结果汇报。
+
+![](/images/context-engineering/subagent-workflow.png)
+
+这本质上是一种**结构化的、任务导向的上下文压缩**。同样，这种能力通常也需要通过强化学习进行专项训练才能获得。
+
+***
+
+## 七、 治本之道：源头过滤与按需加载
+
+压缩是"治标"，更根本的方法是**不让垃圾信息进入上下文**。分析发现，上下文中占比最大（常超 80%）的是来自外部的**观察（Observation）**，比如读取的代码文件、运行日志、文档内容。
+
+![](/images/context-engineering/context-composition.png)
+
+### 智能读取（Intelligent Read）
+
+传统工具：`read(log.txt)` → 返回整个 1000 行的日志文件。
+
+智能工具：`read(log.txt, about="bug fix")` → 只返回与 bug 修复相关的 10 行关键日志。
+
+这需要工具本身具备一定的理解能力（例如内置一个小型微调模型）。
+
+![](/images/context-engineering/intelligent-read.png)
+
+*参考文献：[Selective Context: Filtering Irrelevant Information](https://arxiv.org/abs/2601.16746)*
+
+### 动态工具加载
+
+系统指令（System Prompt）里如果塞了几百个工具的说明，会极其冗长。**MCP-Zero** 等研究提出：工具应该按需动态加载。AI 先根据任务思考"我需要什么工具"，然后通过一个"工具搜索引擎"只加载相关的几个工具说明到上下文中。
+
+![](/images/context-engineering/dynamic-tool-loading.png)
+
+*参考文献：[MCP-Zero: Dynamic Tool Loading](https://arxiv.org/abs/2506.01056)*
+
+***
+
+## 八、 终极形态：让 AI 自己管理上下文（Agentic Context Engineering）
+
+既然 AI 这么聪明，为什么不把上下文管理的策略也交给 AI 自己来学习和决定呢？这就是**自主化上下文工程**的理念。
+
+![](/images/context-engineering/agentic-architecture.png)
+
+![](/images/context-engineering/agentic-workflow.png)
+
+1. **早期尝试 - Dynamic Cheatsheet**：直接把当前上下文和历史给 AI，问它"你觉得该怎么整理和压缩，才能更好地帮你完成后续任务？"然后让它输出一个新的、整理好的上下文。
+
+2. **进阶方案 - Agentic Context Engineering**：把上下文看作一个"战术手册（Playbook）"。AI 通过三个步骤来优化它：
+   * **反思（Reflect）**：回顾任务进展，找出当前手册的不足。
+   * **规划（Plan）**：设计一个修改手册的具体方案（如"删除过时的步骤，添加新发现的关键代码片段"）。
+   * **执行（Execute）**：按照方案修改手册。
+
+*参考文献：[Recursive Language Models](https://arxiv.org/abs/2512.24601)*
+
+***
+
+## 九、 总结
+
+Context Engineering 是构建强大、高效 AI Agent 的基石技术，它远不止是"压缩"那么简单，而是一套涉及**记忆、遗忘、聚焦、检索**的复杂认知管理系统。从被动压缩到主动过滤，再到让 AI 自我优化，这一领域正在快速演进，目标是让 AI 像人类一样，具备在信息洪流中保持专注、提取关键、高效决策的能力。
+
+---
+
+---
+url: /zh/article/inference-acceleration/index.md
+---
+# 从 Flash Attention 到 Speculative Decoding：大模型推理加速最全解读
+> 用过 ChatGPT 的人都知道，模型生成回答需要等几秒甚至几十秒。这背后的瓶颈在哪？有没有办法让大模型"说快一点"？本文从底层原理出发，拆解 6 大类加速方案，帮你建立起完整的推理加速知识框架。
+
+***
+
+## 01 一个核心问题：大模型生成为什么慢？
+
+要理解加速方法，先得理解**大模型到底是怎么生成内容的**。
+
+大模型生成文本的过程，本质上是一个**逐字接龙**游戏：
+
+* 模型先看到你输入的 Prompt（这叫 **Prefill** 阶段，一次处理所有输入 Token）
+* 然后一个词一个词地往外蹦（这叫 **Decode** 阶段，每次生成一个 Token）
+
+![](/images/inference-acceleration/prefill-decode.png)
+
+那每一步具体怎么算的呢？这就要说到 Transformer 最核心的模块——**Self-Attention**。
+
+简单来说，每个 Token 都会生成三个向量：**Query（查询）、Key（键）、Value（值）**。生成下一个 Token 时，它的 Query 会跟前面所有 Token 的 Key 算"相似度"（dot product），然后用这个相似度去加权汇总所有的 Value。
+
+![](/images/inference-acceleration/self-attention-qkv.png)
+
+你看，问题就出在这里：
+
+> **每生成一个 Token，都要跟前面所有的 Token 做一次注意力计算。**
+>
+> Token 越多，计算量就越大，等待时间就越长。
+
+那怎么加速呢？学术界和工业界想出了**一系列方法**，而且它们可以组合使用。下面我们逐一拆解。
+
+***
+
+## 02 Flash Attention：不改变算法，只改变数据搬运方式
+
+论文地址：https://arxiv.org/abs/2205.14135
+
+### 一句话理解
+
+Flash Attention 没有改变 Attention 的计算公式，它只是**改变了计算的顺序**，让数据少搬几次家，从而大幅提速。
+
+### 先搞懂 GPU 的工作方式
+
+要理解 Flash Attention 为什么快，得先知道 GPU 是怎么干活的：
+
+* GPU 有很多 **Execution Unit（执行单元）**，它们负责算数
+* 每个执行单元有一个很小的"工作台"——**SRAM**，速度极快但容量极小
+* 大量的数据存在"仓库"里——**HBM（高带宽内存）**，容量大但读写慢
+
+![](/images/inference-acceleration/gpu-sram-hbm.png)
+
+所以每次运算时，执行单元得先把数据从 HBM 搬到 SRAM，算完再搬回去。
+
+> **Attention 计算的瓶颈，不是算得慢，是搬数据搬得慢。**
+
+传统 Attention 计算分好几步，每步都要读写 HBM，来回搬很多次：
+
+1. 搬 Q、K → 算 dot product → 搬结果回 HBM
+2. 找最大值 → 搬回 HBM
+3. 算分母（Softmax 求和）→ 搬回 HBM
+4. 算最终 attention weight → 搬回 HBM
+5. 搬 V 进来做 weighted sum → 搬结果回 HBM
+
+整个过程，HBM 被反复读写。
+
+### Flash Attention 的核心思路
+
+Flash Attention 把上面这些步骤合并了——**不需要先算出完整的 attention weight，再去做 weighted sum**。它在 SRAM 上边算边合并，一步到位。
+
+具体来说，它把 K 和 V 切成多个 Chunk，每次只处理一个 Chunk，关键技巧是：
+
+> 处理下一个 Chunk 时，如果发现前面 Chunk 用的最大值小了，可以**用一个修正项调整**前面已经算好的结果，不需要重算。
+
+![](/images/inference-acceleration/flash-attention-chunking.png)
+
+用公式来表达就是：
+
+当处理第 2 个 Chunk 时，之前算的 $o\_1$ 需要调整：
+
+$$
+o\_2 = o\_1 \frac{s\_1}{s\_2}(e^{d\_1 - d\_2}) + \sum^{2N}\_{i=N+1}{\frac{e^{a\_i - d\_2}}{s\_2}v\_i}
+$$
+
+这个公式看起来很复杂，但核心思想很简单：**前面算的部分，乘以一个"修正因子"即可，不需要重算**。
+
+### 效果与局限
+
+* ✅ **不改变结果**：和标准 Attention 数学上完全等价
+* ✅ **即插即用**：可以直接用在任何用了 Attention 的模型上
+* ✅ **显著加速**：Sequence 越长，效果越明显
+* ⚠️ 如果 Sequence 太短，加速效果不明显（前面处理本身时间就短）
+
+***
+
+## 03 KV Cache：用存储换速度
+
+### 核心思想
+
+在 Decode 阶段，每生成一个 Token，模型都要计算它跟前面所有 Token 的 Attention。但前面的 Token 不会变，所以它们的 K 和 V 也不需要重新算。
+
+> **KV Cache 就是把前面 Token 的 K 和 V 存起来，每次只算新 Token 的 QKV，避免重复计算。**
+
+![](/images/inference-acceleration/kv-cache-diagram.png)
+
+这个思路简单直接，而且完全不改变 Attention 的计算逻辑。
+
+### 代价：内存爆炸
+
+KV Cache 的问题也很明显——**它太吃内存了**。
+
+每次输入一个新 Token，就要多存一组 K 和 V。而且这还不是一组——Transformer 有**多层 × 多头的 K 和 V**。
+
+拿 Gemma 2 来算笔账：
+
+![](/images/inference-acceleration/gemma2-kv-cache.png)
+
+$$
+\text{每个Token: } 46(\text{层}) \times 32 (\text{头}) \times 128 (\text{维度}) \times 2 (\text{FP16}) \times 2(\text{V, K}) = 753664 \text{ 字节} (\text{约736KB})
+$$
+
+注意这是**一个 Token** 需要的空间。如果 Sequence 长度是 114k，那 A100 的 80GB 显存就刚好被填满。
+
+> **KV Cache 让模型变快，但它会吃掉大量显存，限制了能处理的上下文长度。**
+
+这是 KV Cache 加速方案的核心矛盾。
+
+***
+
+## 04 减少 KV 存储：三招让 Cache 更省空间
+
+既然 KV Cache 太占地方，能不能让 K 和 V 少存一点？有三个经典方案：
+
+### 方案一：Multi-Query Attention（MQA）
+
+多头注意力（MHA）里，每个头都有自己的 K 和 V。MQA 的想法是：
+
+> **多个 Query 头共享一组 K 和 V。**
+
+![](/images/inference-acceleration/mqa-diagram.png)
+
+好处是 KV Cache 大幅减少，但问题也很明显：**共享一组 K/V 太粗暴了，模型表现会下降**。
+
+### 方案二：Grouped-Query Attention（GQA）
+
+GQA 是一个折中方案：**把 Query 头分成几组，每组共享一组 K 和 V**。
+
+![](/images/inference-acceleration/gqa-diagram.png)
+
+它介于 MHA 和 MQA 之间，在**效率和效果之间取了一个平衡**。现在很多新模型（如 Llama 2/3）都用的 GQA。
+
+### 方案三：Multi-head Latent Attention（MLA）
+
+论文地址：https://arxiv.org/abs/2405.04434 （DeepSeek）
+
+MLA 的想法更巧妙：**不直接存 K 和 V，而是先把它们压缩成一个低维向量再存**，用的时候也不一定要解压缩。
+
+![](/images/inference-acceleration/mla-compression.png)
+
+这样做有两个关键技巧：
+
+**技巧 1：在压缩空间里做 dot product**
+
+把输入 X 压缩成向量 $c$，存进仓库的就是这个 $c$。需要算 Attention 时：
+
+$$
+a = q \cdot k = q^T k = q^T W\_k c = (W\_k^T q)^T c = (W\_k^T q) \cdot c
+$$
+
+你看，**不需要先把 $c$ 解压成 $k$**，直接把 $q$ 转一下就能在压缩空间里做 dot product。
+
+![](/images/inference-acceleration/mla-dot-product.png)
+
+**技巧 2：在压缩空间里做 Weighted Sum**
+
+算完 attention weight 后，要做 weighted sum 得到输出：
+
+$$
+\begin{align\*}
+o &= \hat{a}\_1 v\_1 + \hat{a}\_2 v\_2 + \hat{a}\_3 v\_3 + \hat{a}\_4 v\_4 \\
+&= \hat{a}\_1 W\_v c\_1 + \hat{a}\_2 W\_v c\_2 + \hat{a}\_3 W\_v c\_3 + \hat{a}\_4 W\_v c\_4 \\
+&= W\_v (\hat{a}\_1 c\_1 + \hat{a}\_2 c\_2 + \hat{a}\_3 c\_3 + \hat{a}\_4 c\_4)
+\end{align\*}
+$$
+
+核心洞察：**先在压缩的 $c$ 上做 weighted sum，最后只解压缩一次**。这大大减少了计算量。
+
+![](/images/inference-acceleration/mla-weighted-sum.png)
+
+> **MLA 是一个需要重新训练模型的方法**，但它被 DeepSeek 等前沿模型采用，证明了这条路是可行的。
+
+***
+
+## 05 Sliding Window Attention + Streaming LLM：只看附近的内容
+
+### Sliding Window Attention
+
+核心思路很简单：**每次做 Attention 时，不需要看整个 Sequence，只看最近的 N 个 Token**。
+
+![](/images/inference-acceleration/sliding-window-attention.png)
+
+但这样模型不就看不到长距离信息了吗？有个巧妙的观察：
+
+> **Transformer 层数越深，Sliding Window Attention 能看到的范围实际上越大。**
+
+因为第 1 层只看附近几个 Token，第 2 层的输入就已经包含了第 1 层窗口里的信息，相当于变相扩大了感受野。网络足够深的话，即使每个窗口不大，也能覆盖很长的范围。
+
+### 混合策略
+
+还有一种方案：**有些层用 Sliding Window，有些层用全局 Attention**。
+
+![](/images/inference-acceleration/hybrid-attention.png)
+
+这样既能节省 KV Cache，又能在关键层保持全局视野。
+
+### Streaming LLM
+
+论文地址：https://arxiv.org/abs/2309.17453
+
+这里有个有趣的发现：**只用 Sliding Window 效果会变差，但如果保留最开始的几个 Token 就好了**。
+
+![](/images/inference-acceleration/streaming-llm-attention.png)
+
+而且这招**不需要重新训练模型**，直接改推理代码就行。
+
+![](/images/inference-acceleration/streaming-llm-results.png)
+
+实验结果显示，Streaming LLM 在长 Sequence 上的表现明显优于纯 Window Attention。
+
+***
+
+## 06 Pruning KV Cache：丢掉没用的 K 和 V
+
+更直接的方法来了：**如果有些 K 和 V 根本用不上，直接丢掉不就好了？**
+
+研究发现，Attention 其实**非常稀疏**——大部分 Token 的 attention weight 非常小，几乎等于没用上。
+
+![](/images/inference-acceleration/attention-sparsity.png)
+
+颜色越深表示 attention weight 越大。可以看到，**只有很少的 Token 被真正 attention 到了**。
+
+基于这个观察，两篇论文提出了不同的裁剪策略：
+
+* **Scissorhands**（https://arxiv.org/abs/2305.17118）
+* **H2O**（https://arxiv.org/abs/2306.14048）
+
+核心思路一致：**如果一个 K/V 长时间没被 Attention 用到，就把它从 Cache 里清除**。
+
+![](/images/inference-acceleration/kv-pruning.png)
+
+Scissorhands 的实验显示，**压缩 5 倍的情况下，模型表现跟不压缩基本一样**。
+
+但 ⚠️ 后续研究也发现：**如果让模型做非常难的任务，随意丢弃 K/V 可能会导致表现大幅下降**。这个方法适合常规任务，关键场景要谨慎。
+
+***
+
+## 07 跨对话 Cache：Agent 场景的大杀器
+
+前面的 KV Cache 都是**同一个对话里**的优化。但 KV Cache 还有一个更高级的玩法——**跨对话共享**。
+
+不同对话里如果出现相同的文本片段，它们的 K 和 V 理论上是可以复用的。
+
+![](/images/inference-acceleration/cross-conversation-cache.png)
+
+### 什么场景最受益？
+
+**AI Agent 场景**是跨对话 Cache 的最佳舞台：
+
+每个 Agent 调用都带着一串 System Prompt（角色设定、工具定义、记忆指令等），这些内容不同对话间高度一致。
+
+![](/images/inference-acceleration/agent-cache-scenario.png)
+
+### 使用技巧
+
+要让 Cache Hit 率最大化，**内容的排列顺序有讲究**：
+
+> **越稳定不动的内容放越前面，越可能变动的内容放越后面。**
+
+![](/images/inference-acceleration/cache-order.png)
+
+另外，**同一个 Prompt 用不同写法，Cache Hit 率可以差很多**：
+
+![](/images/inference-acceleration/prompt-cache-hit.png)
+
+换一种写法后，Cache Hit 明显提高，这意味着**直接省钱**。
+
+![](/images/inference-acceleration/prompt-writing-cost.png)
+
+有一篇论文专门测了这个效果：https://arxiv.org/abs/2601.06007
+
+结论是：**用好的 Prompt 写法，结合 Cached Input，Agent 的花费可以大幅降低**。
+
+***
+
+## 08 总结：一张表看清所有加速方案
+
+| 方法                            | 说明                              | 改变 Attention？ | 需要训练？ | 主要代价             |
+| ------------------------------- | --------------------------------- | :--------------: | :--------: | -------------------- |
+| **Flash Attention**             | 减少 HBM 读写次数，优化计算顺序   |        ✗         |     ✗      | 一点额外运算         |
+| **KV Cache**                    | 存储已算好的 K 和 V，避免重复计算 |        ✗         |     ✗      | 占用大量显存         |
+| **Multi-Query Attention**       | 多个 Query 头共享一组 K/V         |        ✓         |     ✓      | 可能明显伤害模型能力 |
+| **Grouped-Query Attention**     | Query 分组共享 K/V                |        ✓         |     ✓      | 效果-效率平衡        |
+| **Multi-head Latent Attention** | 压缩 K/V 后再存储                 |        ✓         |     ✓      | 需要重新训练         |
+| **Sliding Window Attention**    | 只 Attention 附近 Token           |        ✓         |     ?      | 可能丢失长距离信息   |
+| **Streaming LLM**               | Sliding Window + 保留开头的 Token |        ✗         |     ✗      | —                    |
+| **Pruning KV Cache**            | 丢弃不常用的 K 和 V               |        ✓         |     ✗      | 复杂任务效果下降     |
+| **Speculative Decoding**        | 用小模型预估结果，大模型校验      |   ✗（理论上）    |     ✗      | 小模型额外算力       |
+
+***
+
+## 参考资料
+
+1. **Flash Attention**：https://arxiv.org/abs/2205.14135
+2. **Multi-head Latent Attention（DeepSeek）**：https://arxiv.org/abs/2405.04434
+3. **Streaming LLM**：https://arxiv.org/abs/2309.17453
+4. **Scissorhands**：https://arxiv.org/abs/2305.17118
+5. **H2O（Heavy-Hitter Oracle）**：https://arxiv.org/abs/2306.14048
+6. **Cached Input 对 Agent 花费的影响**：https://arxiv.org/abs/2601.06007
+
+---
+
+---
+url: /zh/article/minimax-m3-deployment/index.md
+---
+# 面试某小厂遇到的一个面试题：MiniMax M3 模型部署与并发估算
+完整题目如下：
+
+已知 MiniMax M3 为 MoE 大语言模型，总参数 428B，单 Token 激活参数 23B，共 60 层 Transformer，原生搭载 MSA 稀疏注意力，原生支持最大 1M 上下文窗口，KV Cache 默认采用 BF16 精度存储；推理整体预留 10% 显存用于算子激活、框架系统开销。
+
+硬件条件：
+
+1. GPU：8 张 NVIDIA A6000 Pro，单卡显存 96GB，采用 TP8 张量并行部署；
+2. 网络：单节点 400Gbps 高速互联，本次计算显存为性能瓶颈，带宽不参与并发数值计算。
+
+请回答以下问题：
+
+1. 将模型全部 428B 权重做 INT8 量化存储，模型权重总计占用多少显存？8 卡 A6000 Pro 集群能否完整加载全部权重？
+2. 仅文本推理、上下文窗口 128K 时，分别计算标准稠密注意力、M3 自带 MSA 稀疏注意力两种场景下，单个请求 KV Cache 大致占用显存；
+3. 基于上述硬件、128K 上下文、开启 MSA 稀疏注意力优化的前提，该集群理论最大支持多少并发请求；
+4. 若上下文窗口从 128K 扩容至 1M，KV Cache 单请求占用量与理论并发会产生何种变化？计算并发缩减比例并给出对应估算并发数值。
+
+***
+
+## 完整答案解析
+
+## 一、基础已知条件与核心参数
+
+### 题目给定条件
+
+1. 模型：MiniMax M3，MoE 混合专家架构，总参数 428B，单 Token 激活参数 23B，共 60 层 Transformer，原生 MSA 稀疏注意力，KV Cache 采用 BF16 精度存储
+2. 量化规则：全量权重执行 INT8 量化，单参数占用 1 字节
+3. 硬件配置：8 张 NVIDIA A6000 Pro，单卡显存 96GB，采用 TP8 张量并行部署
+4. 系统开销：总显存的 10% 预留为系统运行、算子激活、框架调度等固定开销
+5. 上下文基准：默认 128K，扩展目标为 1M
+
+### 模型架构补充参数（来自官方公开配置）
+
+| 参数项                 | 数值 | 说明                                 |
+| ---------------------- | ---- | ------------------------------------ |
+| 隐藏层维度 hidden\_size | 6144 | Transformer 层特征维度               |
+| 注意力查询头数         | 64   | Query 分支注意力头总数               |
+| KV 头数（GQA 架构）    | 4    | 分组查询注意力，仅 4 组 Key/Value 头 |
+| 单注意力头维度         | 96   | 由 6144 ÷ 64 推导得出                |
+| BF16 单元素字节数      | 2    | KV Cache 默认存储精度                |
+| INT8 单元素字节数      | 1    | 权重量化后单参数占用                 |
+
+### 核心计算公式
+
+1. 模型权重显存 = 总参数量 × 单参数字节数
+2. 单请求 KV Cache 显存 = 2（K 矩阵 + V 矩阵）× 层数 × KV 头数 × 单头维度 × 序列长度 × 单元素字节数
+3. 理论最大并发 = 可用 KV 总显存 ÷ 单请求 KV 显存
+
+***
+
+## 问题 1：INT8 权重视显存占用与 8 卡承载性判断
+
+### 计算过程
+
+1. **全量权重 INT8 显存占用**
+
+MoE 模型推理时所有专家权重均需驻留显存，因此按总参数 428B 计算：
+
+$$
+\begin{align\*}
+\text{权重显存} &= 428 \times 10^9 \text{ 参数} \times 1 \text{ Byte/参数} \\
+&= 428 \text{ GB}
+\end{align\*}
+$$
+
+（注：行业通用十进制估算规则，1GB = 10⁹ 字节，与硬件显存标称口径一致，误差在工程可接受范围内）
+
+2. **8 卡总可用显存**
+
+单卡 96GB，8 卡总显存：$8 \times 96 = 768 \text{ GB}$
+
+扣除 10% 系统预留开销后，有效可用显存：
+
+$$
+768 \times (1 - 10%) = 691.2 \text{ GB}
+$$
+
+### 结论
+
+INT8 全量权重占用 428GB 显存，小于 8 卡有效显存 691.2GB，**8 张 A6000 Pro 可以完整承载该模型**，剩余 263.2GB 显存可用于 KV Cache 存储。
+
+### 补充说明
+
+若仅计算单 Token 激活参数（23B）的 INT8 占用仅为 23GB，但 MoE 架构必须加载全部专家权重才能实现稀疏路由，因此需按全量 428B 参数核算。
+
+***
+
+## 问题 2：128K 上下文下单请求 KV Cache 显存（两种场景）
+
+MSA 稀疏注意力的核心作用是优化长上下文的计算复杂度与推理延迟，不改变 KV Cache 的存储总量；两种场景的核心差异在于是否采用 GQA 分组查询优化。
+
+### 场景一：标准稠密注意力（传统 MHA 架构，无 GQA 优化）
+
+传统稠密 Transformer 采用全量多头注意力，KV 头数与查询头数一致（64 个），无存储优化。
+
+单 Token KV 显存计算：
+
+$$
+\begin{align\*}
+\text{单 Token KV} &= 2 \times 60 \text{ 层} \times 64 \text{ 个 KV 头} \times 96 \text{ 头维度} \times 2 \text{ 字节} \\
+&= 1474560 \text{ 字节} \approx 1.44 \text{ MB}
+\end{align\*}
+$$
+
+128K 上下文总 KV 显存：
+
+$$
+1.44 \text{ MB/token} \times 128 \times 10^3 \text{ token} \approx 184.3 \text{ GB}
+$$
+
+### 场景二：M3 原生架构（GQA 分组查询 + MSA 稀疏注意力）
+
+M3 采用 GQA 分组查询架构，仅 4 个 KV 头，大幅压缩 KV Cache 体积；MSA 负责计算加速，KV 仍全量存储。
+
+单 Token KV 显存计算：
+
+$$
+\begin{align\*}
+\text{单 Token KV} &= 2 \times 60 \text{ 层} \times 4 \text{ 个 KV 头} \times 96 \text{ 头维度} \times 2 \text{ 字节} \\
+&= 92160 \text{ 字节} \approx 90 \text{ KB}
+\end{align\*}
+$$
+
+128K 上下文总 KV 显存：
+
+$$
+90 \text{ KB/token} \times 128 \times 10^3 \text{ token} \approx 11.5 \text{ GB}
+$$
+
+### 结论
+
+* 标准稠密 MHA 架构：128K 上下文单请求 KV 约 **184GB**，显存压力极大，单卡无法承载单个长上下文请求
+* M3 原生 GQA + MSA 架构：128K 上下文单请求 KV 约 **11.5GB**，仅为传统架构的 1/16，是长上下文可用的核心基础
+
+***
+
+## 问题 3：128K 上下文下理论最大并发数
+
+### 计算逻辑
+
+总有效显存扣除模型权重占用后，剩余空间全部用于 KV Cache 存储，除以单请求 KV 显存即可得到显存维度的理论最大并发。
+
+### 计算过程
+
+1. 可用于 KV Cache 的总显存 = 有效总显存 − 权重显存 = $691.2 - 428 = 263.2 \text{ GB}$
+2. 单请求 KV 显存（M3 原生架构，128K）= 11.5 GB
+3. 理论最大并发：
+
+$$
+\text{并发数} = \frac{263.2}{11.5} \approx 22.9
+$$
+
+### 结论
+
+开启 MSA 优化、128K 上下文场景下，该集群**理论最大支持约 22~23 个并发请求**。
+
+### 补充说明
+
+* 该数值为显存维度的极限值，未考虑计算延迟、网络开销、调度损耗与突发流量；生产环境通常预留 30%~50% 安全余量，实际可用并发约 11~15 个。
+* 若采用传统稠密 MHA 架构，单请求 KV 已远超单卡显存，无法正常部署服务。
+
+***
+
+## 问题 4：上下文扩展到 1M 后的并发变化
+
+### 核心原理
+
+KV Cache 显存与序列长度**严格线性正相关**：序列长度扩大 N 倍，单请求 KV 显存同步扩大 N 倍；总可用 KV 显存固定时，最大并发数同比缩小为原来的 $1/N$。
+
+### 计算过程
+
+1. 上下文长度缩放倍数：$\frac{1\text{M}}{128\text{K}} = 8$ 倍
+2. 1M 上下文单请求 KV 显存：$11.5 \times 8 = 92 \text{ GB}$
+3. 1M 上下文理论最大并发：
+
+$$
+\text{并发数} = \frac{263.2}{92} \approx 2.9
+$$
+
+4. 并发缩减比例：约为 128K 场景的 $\boldsymbol{\frac{1}{8}}$，并发数缩减 87.5%
+
+### 结论
+
+* 单请求 KV Cache 显存扩大 8 倍，理论最大并发缩减至原来的 1/8，约 **2~3 个并发请求**。
+* 实际生产中，1M 上下文的 Prefill（预填充）阶段耗时显著上升，计算瓶颈进一步凸显，实际可用并发会低于理论值；MSA 稀疏注意力可将解码速度提升 15 倍以上，保障长上下文的推理可用性，但不改变显存层面的并发上限。
+
+---
+
+---
+url: /zh/article/ozftpyls/index.md
+---
+# 自注意力手工实现的三个境界
+## 引言
+
+自注意力机制的实现过程中有很多细节，不同的面试对自注意力的实现有不同的要求。因此，我们需要学习各种实现自注意力的方式，以便向面试官展示我们对自注意力细节的深入理解。
+
+## 自注意力公式
+
+$$\text{Attention}(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d\_k}})V$$
+
+## 代码实现
+
+### 第一境界：简化版本
+
+```python
+import math
+import torch
+import torch.nn as nn
+
+class SelfAttentionV1(nn.Module):
+    def __init__(self, hidden_dim: int = 728) -> None:
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        # 初始化三个不同的线性层
+        self.query_proj = nn.Linear(hidden_dim, hidden_dim)
+        self.key_proj = nn.Linear(hidden_dim, hidden_dim)
+        self.value_proj = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, x):
+        # x 形状为: (batch_size, seq_len, hidden_dim)
+
+        # 获取不同的 Q、K、V
+        Q = self.query_proj(x)
+        K = self.key_proj(x)
+        V = self.value_proj(x)
+        # Q、K、V 形状: (batch_size, seq_len, hidden_dim)
+
+        # (batch_size, seq_len, hidden_dim) * (batch_size, hidden_dim, seq_len) = (batch_size, seq_len, seq_len)
+        attention_value = torch.matmul(
+            Q, K.transpose(-1, -2)
+        )
+
+        # 计算注意力权重
+        attention_weights = torch.softmax(attention_value / math.sqrt(self.hidden_dim), dim=-1)
+
+        # 计算结果: (batch_size, seq_len, hidden_dim)
+        output = torch.matmul(attention_weights, V)
+
+        return output
+```
+
+第一境界相对简单，完全按照公式实现即可。
+
+### 第二境界：效率优化
+
+将 Q、K、V 矩阵合并后再拆分。
+
+```python
+class SelfAttentionV2(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.hidden_dim = hidden_dim
+        self.proj = nn.Linear(hidden_dim, hidden_dim * 3)
+
+    def forward(self, x):
+        # x 形状: (batch_size, seq_len, hidden_dim)
+        # QKV 形状: (batch_size, seq_len, hidden_dim * 3)
+        QKV = self.proj(x)
+        Q, K, V = torch.split(QKV, self.hidden_dim, dim=-1)
+        attention_weight = torch.softmax(
+            torch.matmul(Q, K.transpose(-1, -2)) / math.sqrt(self.hidden_dim), dim=-1
+        )
+        output = attention_weight @ V
+        return output
+```
+
+### 第三境界：增加细节（面试风格实现）
+
+除了公式之外，还有一些额外的细节：
+
+* 添加 dropout
+* 考虑到每个句子长度不同，需要添加注意力掩码（attention mask）
+* 输出矩阵映射
+
+```python
+class SelfAttentionV3(nn.Module):
+    def __init__(self, hidden_dim, dropout_rate=0.1) -> None:
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        self.proj = nn.Linear(hidden_dim, hidden_dim * 3)
+        self.attention_dropout = nn.Dropout(dropout_rate)
+        self.output_proj = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, x, attention_mask=None):
+        # x 形状: (batch_size, seq_len, hidden_dim)
+        QKV = self.proj(x)
+        Q, K, V = torch.split(QKV, self.hidden_dim, dim=-1)
+
+        attention_weight = Q @ K.transpose(-1, -2) / math.sqrt(self.hidden_dim)
+
+        # 如果 attention_mask 不为空，需要将被掩码的位置赋一个极小值 —— 这样应用 Softmax 后它们的值将为 0
+        if attention_mask is not None:
+            attention_weight = attention_weight.masked_fill(
+                attention_mask == 0,
+                float("1e-20")
+            )
+
+        attention_weight = torch.softmax(
+            attention_weight, dim=-1
+        )
+
+        # 应用 dropout
+        attention_weight = self.attention_dropout(attention_weight)
+
+        attention_result = attention_weight @ V
+
+        output = self.output_proj(attention_result)
+
+        return output
+```
+
+## 从 V1 到 V3 的核心优化脉络
+
+1. **阶段一：工程效率优化（V1 -> V2）**
+   * **优化点**：将 3 个独立的线性层合并为 1 个组合线性层，然后拆分 QKV 矩阵。
+   * **核心逻辑**：数学上完全等价（仅是权重拼接），但减少了内核启动次数和内存碎片，同时提升了硬件并行效率（GPU 能更好地利用批量矩阵乘法算力）。
+   * **价值**：从"教学级冗余实现"过渡到"工程高效实现"——无性能损失，仅有效率提升。
+
+2. **阶段二：功能完整性优化（V2 -> V3）**
+   * **优化点 1**：添加 attention\_mask 支持
+   * **解决问题**：适配实际场景（NLP 中的 batch padding、生成任务中的因果掩码），屏蔽无效位置的干扰。
+   * **优化点 2**：添加注意力权重 Dropout
+   * **解决问题**：正则化——防止模型过度依赖少数关键位置，缓解过拟合。
+   * **优化点 3**：添加输出线性投影（output\_proj）
+   * **解决问题**：精炼注意力聚合后的特征，增强模型的表征能力，适应深层网络的堆叠。
+   * **价值**：从"以效率为中心"转向"生产级工业功能完备"，覆盖批量训练和更好泛化等关键需求。
+
+---
+
+---
+url: /zh/article/positional-encoding-guide/index.md
+---
+# 大模型位置编码最全拆解：绝对位置、相对位置、旋转位置，以及不用位置编码
+> **摘要**：Transformer 的 Self-Attention 本身不感知 Token 顺序——把"猫吃鱼"和"鱼吃猫"的 Token 打乱，Attention 输出完全一样。本文系统梳理 Positional Embedding 的完整技术演化：从 Sinusoidal 绝对位置编码的指针类比，到 ALiBi、T5 的相对位置偏置，再到 RoPE 旋转位置编码的数学原理，最后探讨 Train Short Test Long 的一系列扩展方法以及"不用位置编码"的 NoPE/DroPE 思路。
+
+> 用过 Transformer 的人都学过 Positional Embedding，但你真的理解它解决了什么问题、不同方案之间有什么本质区别吗？本文从最底层的问题出发，一步步拆解位置编码的完整技术树。
+
+Copyright Ownership: Kstheme, Contributors: Kstheme
+
+***
+
+## 01 一个基础问题：Transformer 怎么知道 Token 的顺序？
+
+原来的 Transformer 是没有办法考虑输入的顺序的。Transformer 是怎么处理输入 Token 的呢？
+
+输入的 Token 会变成 Embedding，然后这些 Embedding 会变成某一个 Layer 的输入。每个 Layer 里面都会有 Self-Attention，Self-Attention 会输出另外一排 Token。
+
+但是有一个问题：**Self-Attention 本身没有考虑 Token 输入的顺序。**
+
+![](/images/positional-encoding/pe-01.png)
+
+假设我把 Token A 跟 Token C 的位置对调，再去算 Self-Attention，你会发现对于 $O\_D$ 的输出是没有任何影响的。
+
+![](/images/positional-encoding/pe-02.png)
+
+所以我们必须想办法把位置信息"塞进"Transformer 里，这就是 Positional Embedding 要解决的问题。
+
+本文覆盖的内容如下：
+
+1. **Absolute Positional Embedding**（以 Sinusoidal 为代表）
+2. **Relative Positional Embedding**（ALiBi、T5）
+3. **RoPE**（Rotary Position Embedding）
+4. **Train Short, Test Long**（位置插值、频域方法、YaRN、Dynamic Scaling、LongRoPE）
+5. **No Positional Embedding**（NoPE、DroPE）
+
+***
+
+## 02 Absolute Positional Embedding
+
+最早的 Positional Embedding 想法很直接：**对每一个位置设置一个特别的 Embedding**。这个 Embedding 就代表了位置的信息。
+
+我们用 $P\_0$ 到 $P\_3$ 代表每一个位置的特别 Embedding，然后把这个特别的 Embedding **加到**我们的向量上面去。
+
+![](/images/positional-encoding/pe-03.png)
+
+这样的话，当 Token 调换顺序之后，它整个的 Embedding 就不一样了，最后算出来的 Self-Attention 的输出也就不一样。
+
+![](/images/positional-encoding/pe-04.png)
+
+### Sinusoidal Positional Embedding
+
+参考文献：<https://arxiv.org/abs/1706.03762>
+
+这个 Positional Embedding 是在 Transformer 诞生之初就存在的 Embedding。
+
+我们用 $d$ 来代表 Embedding 的长度（$d = 128 \text{ or } 256$）。
+
+![](/images/positional-encoding/pe-05.png)
+
+我们可以用 $\boldsymbol{p}\[i]$ 来代表它里面的数值。
+
+![](/images/positional-encoding/pe-06.png)
+
+那 Sinusoidal Position Embedding 是怎么构建所有的 Embedding 的？构建公式如下：
+
+$$
+\begin{align}
+\boldsymbol{p\_k}\[2i] &= \sin\left(\frac{k}{10000^{2i/d}}\right) \\
+\boldsymbol{p\_k}\[2i+1] &= \cos\left(\frac{k}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+#### 图像化理解
+
+我们把 $\boldsymbol{p\_0}\[0]$ 到 $\boldsymbol{p\_{49}}\[0]$ 都拿出来，会发现这个图像是一个 Sin 函数。
+
+![](/images/positional-encoding/pe-07.png)
+
+接下来我们来看 $\boldsymbol{p\_0}\[1]$ 到 $\boldsymbol{p\_{49}}\[1]$，这个图像是一个 Cos 函数。
+
+![](/images/positional-encoding/pe-08.png)
+
+接下来我们来看 $\boldsymbol{p\_0}\[10]$ 到 $\boldsymbol{p\_{49}}\[10]$，它也是一个 Sin 函数，只不过它的周期比 $\boldsymbol{p\_0}\[0]$ 到 $\boldsymbol{p\_{49}}\[0]$ 要大。
+
+![](/images/positional-encoding/pe-09.png)
+
+那如果把全部的 Position Embedding 画出来的话，就会像下图这样：
+
+![](/images/positional-encoding/pe-10.png)
+
+#### 指针类比：秒针、分针、时针
+
+我们现在用另外的方法来看 Sinusoidal Positional Embedding：它的偶数维度用 Sin 函数表示，奇数维度用 Cos 函数表示。所以我们可以把 $2i$ 和 $2i+1$ 的 Dimension 想象成一个**二维的向量**（二维平面上的一根指针）。这根指针会随着 $k$ 的数值来进行旋转——当 $k$ 上升时，指针开始往逆时针方向旋转。
+
+![](/images/positional-encoding/pe-11.png)
+
+旋转的周期如下：
+
+$$
+\frac{k}{10000^{2i/d}} = 2\pi
+$$
+
+那么指针走一圈大概需要多少 $k$ 呢？我们只需要把分母下面的数字移到右边，就可以知道 $k$ 等于多少：
+
+$$
+k = 2\pi \cdot 10000^{2i/d}
+$$
+
+假设 $d = 128$，那么 $i = 0, ..., \frac{d}{2} - 1 = 0, ..., 63$。
+
+下面我们看一下 $i$ 的数值不同，它的周期会有怎样的变化：
+
+| $i$ 取值                   | $k$ 值  |
+| -------------------------- | ------- |
+| $i = 0$（第 0, 1 维）      | 6.3     |
+| $i = 32$（第 64, 65 维）   | 628.3   |
+| $i = 63$（第 126, 127 维） | 54410.1 |
+
+Self-Attention 看到的跟时间有关的信息是这样变化的：这一排向量的**最前面两位走的是最快的**，大概 6.3 个 Token 就会转一圈。中间 10 到 11 维就转得比较慢。中间 100 到 101 位，如果我们只看前 6 个 Token，那它几乎是没有变化的。
+
+每两个 Dimension 合在一起就是一个指针。**转得最快的是秒针，转得稍微慢点的是分针，转得最慢的是时针**。接下来会有多少个指针呢？那就看你的 Dimension 有多少。比如我的 Dimension 是 128，那我就有 **64 个指针**。Transformer 就根据这 64 个指针、每一个指针的位置，来判断每个 Token 具体在哪个位置。
+
+![](/images/positional-encoding/pe-12.png)
+
+用指针表示位置听起来还是比较合理的，但是应该还有很多其他的方式来表示位置。那为什么当初会用秒针、时针、分针的概念来表示位置呢？这是因为 Transformer 的作者希望 Positional Embedding 可以考虑 **Relative Position（相对位置）**。
+
+***
+
+### Relative Positioning is Crucial!
+
+Relative Position 就是说，假设有一句话："猫吃了鱼"，猫跟鱼之间间隔了两个 Token。Transformer 在考虑鱼后面要接哪个 Token 的时候，它会往前面考虑猫。鱼对猫的注意力分数是 0.7。
+
+![](/images/positional-encoding/pe-13.png)
+
+假设我在猫前面塞了大量的 Token，可能猫前面有 1000 个 Token，但是**猫跟鱼之间的相对位置没有变**，所以我们希望鱼对猫的注意力也不会有所谓改变。哪怕鱼是在 1004 的位置，猫在 1001 的位置，但鱼对猫的注意力分数还是 0.7。
+
+![](/images/positional-encoding/pe-14.png)
+
+但如果今天鱼跟猫的位置距离非常远，猫在第 1 个 Token，而鱼在第 1004 个 Token，因为距离非常远，所以我们希望鱼对猫的注意力分数要变得比较小。
+
+![](/images/positional-encoding/pe-15.png)
+
+当时选择了 Sinusoidal Positional Embedding，就是因为它有一些特殊的性质，而这些特殊的性质好像对 Relative Position 有帮助。
+
+$$
+\boldsymbol{p\_{k+r}} = M\_r \boldsymbol{p\_k}
+$$
+
+其中，$\boldsymbol{p\_k}$ 代表第 $k$ 个位置的 Position，$\boldsymbol{p\_{k+r}}$ 代表 $k+r$ 位置的 Position。
+
+而这个公式是跟 $k$ 没有关系的，只跟 $k+r$ 和 $k$ 之间的**相对位置**有关系。具体如下：
+
+$$
+\begin{align}
+\boldsymbol{p\_{4}} &= M\_3 \boldsymbol{p\_{1}} \\
+\boldsymbol{p\_{14}} &= M\_3 \boldsymbol{p\_{11}} \\
+\boldsymbol{p\_{104}} &= M\_3 \boldsymbol{p\_{101}}
+\end{align}
+$$
+
+我们可以具体来看一下 Sinusoidal Positional Embedding 是怎样满足 Relative Position 的条件的。
+
+首先位置 $k$ 的公式为：
+
+$$
+\begin{align}
+\boldsymbol{p\_k}\[2i] &= \sin\left(\frac{k}{10000^{2i/d}}\right) \\
+\boldsymbol{p\_k}\[2i+1] &= \cos\left(\frac{k}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+位置 $k+r$ 的公式为：
+
+$$
+\begin{align}
+\boldsymbol{p\_{k+r}}\[2i] &= \sin\left(\frac{k+r}{10000^{2i/d}}\right) \\
+\boldsymbol{p\_{k+r}}\[2i+1] &= \cos\left(\frac{k+r}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+我们接下来会用到 Sin、Cos 的和角公式：
+
+$$
+\begin{align}
+\sin(a+b) &= \sin(a)\cos(b) + \cos(a)\sin(b) \\
+\cos(a+b) &= \cos(a)\cos(b) - \sin(a)\sin(b)
+\end{align}
+$$
+
+我们可以根据这个和角公式来展开 $\boldsymbol{p\_{k+r}}$ 的两项：
+
+$$
+\begin{align}
+\boldsymbol{p\_{k+r}}\[2i]
+&= \sin\left(\frac{k+r}{10000^{2i/d}}\right) \\
+&= \sin\left(\frac{k}{10000^{2i/d}}\right) \cos\left(\frac{r}{10000^{2i/d}}\right) + \cos\left(\frac{k}{10000^{2i/d}}\right) \sin\left(\frac{r}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+$$
+\begin{align}
+\boldsymbol{p\_{k+r}}\[2i+1] &= \cos\left(\frac{k+r}{10000^{2i/d}}\right) \\
+&= \cos\left(\frac{k}{10000^{2i/d}}\right) \cos\left(\frac{r}{10000^{2i/d}}\right) - \sin\left(\frac{k}{10000^{2i/d}}\right) \sin\left(\frac{r}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+我们把 $\boldsymbol{p\_k}\[2i]$ 和 $\boldsymbol{p\_k}\[2i+1]$ 代入进去得：
+
+$$
+\begin{align}
+\boldsymbol{p\_{k+r}}\[2i]
+&= \sin\left(\frac{k+r}{10000^{2i/d}}\right) \\
+&= \boldsymbol{p\_k}\[2i] \cos\left(\frac{r}{10000^{2i/d}}\right) + \boldsymbol{p\_k}\[2i+1] \sin\left(\frac{r}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+$$
+\begin{align}
+\boldsymbol{p\_{k+r}}\[2i+1] &= \cos\left(\frac{k+r}{10000^{2i/d}}\right) \\
+&= \boldsymbol{p\_k}\[2i+1] \cos\left(\frac{r}{10000^{2i/d}}\right) - \boldsymbol{p\_k}\[2i] \sin\left(\frac{r}{10000^{2i/d}}\right)
+\end{align}
+$$
+
+我们现在把 $\boldsymbol{p\_{k+r}}\[2i]$ 和 $\boldsymbol{p\_{k+r}}\[2i+1]$ 写成一个矩阵形式：
+
+$$
+\begin{bmatrix}
+\boldsymbol{p\_{k+r}}\[2i] \\
+\boldsymbol{p\_{k+r}}\[2i + 1]
+\end{bmatrix} =
+\begin{bmatrix}
+\cos\left(\frac{r}{10000^{2i/d}}\right) & \sin\left(\frac{r}{10000^{2i/d}}\right) \\
+-\sin\left(\frac{r}{10000^{2i/d}}\right) & \cos\left(\frac{r}{10000^{2i/d}}\right)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{p\_{k}}\[2i] \\
+\boldsymbol{p\_{k}}\[2i + 1]
+\end{bmatrix}
+$$
+
+中间这个旋转矩阵，我们用 $M\_{r,i}$ 来进行表示。
+
+![](/images/positional-encoding/pe-16.png)
+
+那么 Sinusoidal Position Embedding 这种设计对后面去计算 Self Attention 的时候会有什么影响呢？
+
+假设我们把 A 跟 B 的位置用 $p\_n$ 和 $p\_m$ 来表示，Attention 分数 $a$ 的计算公式如下：
+
+![](/images/positional-encoding/pe-17.png)
+
+$$
+\begin{align}
+a &= \boldsymbol{q\_B} \cdot \boldsymbol{k\_A} \\
+&= (\boldsymbol{q\_B})^T \boldsymbol{k\_A} \\
+&= (W\_q (\boldsymbol{x\_{B}} + \boldsymbol{p\_m}))^T W\_k (\boldsymbol{x\_A} + \boldsymbol{p\_n}) \\
+&= (\boldsymbol{x\_{B}} + \boldsymbol{p\_m})^T W\_q^T W\_k (\boldsymbol{x\_A} + \boldsymbol{p\_n}) \\
+&= \boldsymbol{x\_{B}} W\_q^T W\_k \boldsymbol{x\_A} + \boldsymbol{x\_{B}}^T W\_q^T W\_k \boldsymbol{p\_n} + \boldsymbol{p\_m}^T W\_q^T W\_k \boldsymbol{x\_A} + \boldsymbol{p\_m}^T W\_q^T W\_k \boldsymbol{p\_n}
+\end{align}
+$$
+
+其中，$\boldsymbol{x\_{B}} W\_q^T W\_k \boldsymbol{x\_A}$ 只跟内容有关，$\boldsymbol{x\_{B}}^T W\_q^T W\_k \boldsymbol{p\_n} + \boldsymbol{p\_m}^T W\_q^T W\_k \boldsymbol{x\_A}$ 跟内容、位置的交互影响有关，$\boldsymbol{p\_m}^T W\_q^T W\_k \boldsymbol{p\_n}$ 只跟位置有关。
+
+但是 $\boldsymbol{p\_m}^T W\_q^T W\_k \boldsymbol{p\_n}$ 显示的是**绝对位置**，所以我们要把它变成跟相对位置有关的公式：
+
+$$
+\begin{align}
+\boldsymbol{p\_m}^T W\_q^T W\_k \boldsymbol{p\_n} &= (M\_{m-n} \boldsymbol{p\_n})^T W\_q^T W\_k \boldsymbol{p\_n} \\
+&= (\boldsymbol{p\_n})^T M\_{m-n} W\_q^T W\_k \boldsymbol{p\_n}
+\end{align}
+$$
+
+其中 $(\boldsymbol{p\_n})^T M\_{m-n} W\_q^T W\_k \boldsymbol{p\_n}$ 里面的 $M\_{m-n}$ 只跟相对位置有关，但是整体的公式还是会存在绝对位置之间的关联。
+
+***
+
+## 03 Relative Positional Embedding
+
+既然用 Absolute Positional Embedding 来做相对位置这么迂回，一个自然的想法是：**能不能根据相对位置直接去改 Attention 计算？**
+
+### ALiBi（Attention with Linear Biases）
+
+参考文献：<https://arxiv.org/abs/2108.12409>
+
+ALiBi 的做法是：**丢掉 Positional Embedding**。在没有 Positional Embedding 的情况下先把 Attention 分数算出来，然后**减掉 $b(m-n)$**。这个公式就是说减掉 $m$ 和 $n$ 两个位置之间的相对距离。减掉相对距离就会达成一个效果——距离越远 Attention 越小。而常数 $b$ 是你手动设置的数值，你可以给不同的 Attention Head 设置不同的数值。在这篇论文里，并没有设置很复杂的方法来设置 $b$，就凭直觉来设置。
+
+![](/images/positional-encoding/pe-18.png)
+
+这个方法听起来很简单，那我们看一下它的效果怎么样。横轴是 Sequence 的长度，纵轴是 Perplexity，困惑度越小证明效果越好。下面的图片表明，在更长的 Sequence 上，ALiBi 的效果会表现得更好，而且 **ALiBi 全面碾压 Sinusoidal 方法**。
+
+![](/images/positional-encoding/pe-19.png)
+
+### T5 的可学习 Relative Bias
+
+参考文献：<https://arxiv.org/abs/1910.10683>
+
+讲到这边你可能会想说，这个 $b$ 都是人为设置的，如果直接用 **Learn 的方法** 会不会更好呢？其实早在 ALiBi 之前，就一定有人想过用 Learn 的方法来确定 $b$。
+
+对于 Learn 的方法有很多不同的版本，我们这边重点讨论 T5 的方法。它的大概做法就是 $A$ 减掉一个 Bias $b\_{m-n}$，这个 Bias 是跟相对距离 $m$，$n$ 有关系的，它是一个**可以被训练的参数**。比如说位置 0~5 是一个数值，5~10 是一个数值，20 之后可能又统一成为其他的数值。
+
+那这个效果怎么样呢？**这个效果是要比 ALiBi 还要差的**，所以 ALiBi 人手设置的数值，要比当时训练的数值结果还要好。
+
+![](/images/positional-encoding/pe-20.png)
+
+后来，ALiBi 也消失在了历史的洪流之中，逐渐被更强的 Positional Embedding 方法所取代。但是它给我们的启示就是：**Relative Position 真的很重要**。
+
+### RoPE：Rotary Position Embedding
+
+参考文献：<https://arxiv.org/abs/2104.09864>
+
+RoPE 是现在最流行的方法之一。它是怎么做的？我们先讲结论：
+
+今天在做 Attention 的 Dot Product 之前，先把 Position 加到 $k$ 上面，但是它加 Position 的方法并不是直接加入一个 Embedding，而是**通过旋转 $k$ 和 $q$ 这两个向量的方法来加入 Positional 的信息**。我们会得到包含信息位置的 $\boldsymbol{k^n\_A}$ 和 $\boldsymbol{q^m\_B}$。
+
+![](/images/positional-encoding/pe-21.png)
+
+然后再用含信息位置的 $q$ 和 $k$ 来算 Attention Weight：
+
+$$
+\begin{align}
+a &= (\boldsymbol{k^n\_A})^T \boldsymbol{q^m\_B} \\
+&= \boldsymbol{(k\_A)}^T R\_{m-n} \boldsymbol{q\_B}
+\end{align}
+$$
+
+其中，$R\_{m-n}$ 只跟 A、B 之间的**相对位置**有关，这样的话我们就可以把相对位置矩阵很直接地塞入到 A 跟 B 之间。
+
+这个方法很重要的一点是：**它不会影响 Attention 计算的过程**。像 ALiBi 的话，它会在做 Attention 过程当中多做一个操作。但是 RoPE 基本上完全没有影响到原来 Attention 的操作，只是 $q$ 跟 $k$ 变得跟原来有些不同而已，而且可以把变换的 $K$ 放到 KV Cache 里面。
+
+那我们现在来看看在 RoPE 这个方法里面是怎么去加 Position 的。
+
+#### Rotation as Position
+
+我们现在只考虑 $k$ 跟 $q$ 这两个向量的**前两位**。
+
+![](/images/positional-encoding/pe-22.png)
+
+把前两位拿出来，它就是一个二维平面上的向量。
+
+![](/images/positional-encoding/pe-23.png)
+
+当我们把位置信息加进去的时候，其实就是对这个向量做了一个**旋转**。如果你今天要把位置 $n$ 的信息加进去，那就把原来的 $k$ 前两位旋转 $n\theta$ 这个角度，然后就会得到 $\boldsymbol{k^n\_A}\[0]$ 和 $\boldsymbol{k^n\_A}\[1]$。
+
+![](/images/positional-encoding/pe-24.png)
+
+![](/images/positional-encoding/pe-25.png)
+
+同理，$q$ 也做同样的运算。当我们把位置加进去之后，就相当于旋转 $m\theta$ 个角度。
+
+![](/images/positional-encoding/pe-26.png)
+
+所以对 RoPE 来说，它就是把旋转的角度当做 Position 的信息。
+
+在刚才举例的时候，举例的是前两位，因为只有前两位才可以放到二维平面里面。但是 RoPE 是**每两个维度**来进行考虑的。
+
+![](/images/positional-encoding/pe-27.png)
+
+第三、第四个维度，我们就会用另外的角度来进行旋转。我们会把 $\boldsymbol{k\_A}\[2]$ 和 $\boldsymbol{k\_A}\[3]$ 旋转 $n\theta'$ 的角度，得到 $\boldsymbol{k^n\_A}\[2]$ 和 $\boldsymbol{k^n\_A}\[3]$，$q$ 也同理。
+
+#### 旋转角度怎么设定？
+
+因为每两个维度都会旋转不同的角度 $n\theta\_i$，$n\theta\_i$ 的公式如下：
+
+$$
+\theta\_i = \frac{1}{10000^{2i/d}}
+$$
+
+其中，$i = 0, 1, ..., \frac{d}{2} - 1$。
+
+![](/images/positional-encoding/pe-28.png)
+
+#### RoPE 的核心性质：相对位置不变性
+
+我们看看 RoPE 可以达到什么样的效果。假如说有一个 $k$ 在 $n$ 的位置，有一个 $q$ 在 $m$ 的位置，我们对它做 Attention。如果我们现在把 $k$ 移到 $n+r$ 的位置，把 $q$ 移到 $m+r$ 的位置，它们之间的**相对位置不变**，那么 Attention 的数值也是不会改变的。
+
+$$
+\boldsymbol{k^n\_A} \cdot \boldsymbol{q^m\_B} = \boldsymbol{k^{n+r}\_A} \cdot \boldsymbol{q^{m+r}\_B}
+$$
+
+假设猫的 Position 是 1，鱼的 Position 是 3，我们会把猫的 $k$ 加上 Position 1 的信息，把鱼的 $k$ 加上 Position 3 的信息。鱼这个 Token 得到它的 Query，再把位置加上去得到 $\boldsymbol{q^3\_B}$，然后通过和猫的 $k$ 进行计算，得到了 Attention $a$。
+
+![](/images/positional-encoding/pe-29.png)
+
+现在在猫跟鱼前面加了大量其他的 Token，也不会影响猫跟鱼这两个 Token 算出来的 Embedding。假设猫的 Token 在 101，鱼的 Token 位置在 103，它们两个之间算出来的 Attention 数值，跟猫的 Token 在位置 1、鱼的 Token 在位置 3 算出来的 Attention 数值是一样的。
+
+![](/images/positional-encoding/pe-30.png)
+
+下面再进一步说明为什么 RoPE 可以达到这个效果。下图中，原来的 $k$ 跟加上位置 $n$ 之后的 $k$ 的对比：
+
+![](/images/positional-encoding/pe-31.png)
+
+假设 $k$ 又被放到 $n+r$ 的位置，那就相当于把它旋转 $(n+r)\theta$，获得了一个新的位置。
+
+![](/images/positional-encoding/pe-32.png)
+
+那么 $\begin{bmatrix} \boldsymbol{k^n\_A}\[0] \ \boldsymbol{k^n\_A}\[1] \end{bmatrix}$ 和 $\begin{bmatrix} \boldsymbol{k^{n+r}\_A}\[0] \ \boldsymbol{k^{n+r}\_A}\[1] \end{bmatrix}$ 之间的夹角是 $r\theta$，对 $\boldsymbol{q\_B}$ 来说也是一样的。
+
+![](/images/positional-encoding/pe-33.png)
+
+所以 $\begin{bmatrix} \boldsymbol{k^n\_A}\[0] \ \boldsymbol{k^n\_A}\[1] \end{bmatrix}$ 和 $\begin{bmatrix} \boldsymbol{q^m\_B}\[0] \ \boldsymbol{q^m\_B}\[1] \end{bmatrix}$ 的内积，与 $\begin{bmatrix} \boldsymbol{k^{n+r}\_A}\[0] \ \boldsymbol{k^{n+r}\_A}\[1] \end{bmatrix}$ 和 $\begin{bmatrix} \boldsymbol{q^{m+r}\_B}\[0] \ \boldsymbol{q^{m+r}\_B}\[1] \end{bmatrix}$ 是一样的，因为只是把向量做了等量同样角度的旋转，所以不会改变它的内积。
+
+#### RoPE 的数学推导
+
+接下来我们来探讨一下使用 RoPE 为什么只跟 $k$ 和 $q$ 的相对位置有关。
+
+我们还是只拿前两个维度来举例。不带位置的 $k$ 是如何加上位置的？假设旋转了 $n\theta$ 角度，公式如下：
+
+$$
+\begin{bmatrix}
+\boldsymbol{k^n\_A}\[0] \\
+\boldsymbol{k^n\_A}\[1]
+\end{bmatrix}=
+\begin{bmatrix}
+\cos(n\theta) & -\sin(n\theta) \\
+\sin(n\theta) & \cos(n\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{k\_A}\[0] \\
+\boldsymbol{k\_A}\[1]
+\end{bmatrix}
+$$
+
+![](/images/positional-encoding/pe-34.png)
+
+同理，$q$ 要旋转 $m\theta$ 公式如下：
+
+$$
+\begin{bmatrix}
+\boldsymbol{q^m\_B}\[0] \\
+\boldsymbol{q^m\_B}\[1]
+\end{bmatrix}=
+\begin{bmatrix}
+\cos(m\theta) & -\sin(m\theta) \\
+\sin(m\theta) & \cos(m\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{q\_B}\[0] \\
+\boldsymbol{q\_B}\[1]
+\end{bmatrix}
+$$
+
+![](/images/positional-encoding/pe-35.png)
+
+接下来我们要让 $k$ 跟 $q$ 做 Dot Product：
+
+$$
+\begin{align}
+\begin{bmatrix}
+\boldsymbol{k^n\_A}\[0] \\
+\boldsymbol{k^n\_A}\[1]
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+\boldsymbol{q^m\_B}\[0] \\
+\boldsymbol{q^m\_B}\[1]
+\end{bmatrix}
+&=
+\begin{bmatrix}
+\boldsymbol{k^n\_A}\[0] \\
+\boldsymbol{k^n\_A}\[1]
+\end{bmatrix}^{!T}
+\begin{bmatrix}
+\boldsymbol{q^m\_B}\[0] \\
+\boldsymbol{q^m\_B}\[1]
+\end{bmatrix} \\\[1em]
+&=
+\left(
+\begin{bmatrix}
+\cos(n\theta) & -\sin(n\theta) \\
+\sin(n\theta) & \cos(n\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{k\_A}\[0] \\
+\boldsymbol{k\_A}\[1]
+\end{bmatrix}
+\right)^{!T}
+\begin{bmatrix}
+\cos(m\theta) & -\sin(m\theta) \\
+\sin(m\theta) & \cos(m\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{q\_B}\[0] \\
+\boldsymbol{q\_B}\[1]
+\end{bmatrix} \\\[1em]
+&=
+\begin{bmatrix}
+\boldsymbol{k\_A}\[0] \\
+\boldsymbol{k\_A}\[1]
+\end{bmatrix}^{!T}
+\begin{bmatrix}
+\cos(n\theta) & -\sin(n\theta) \\
+\sin(n\theta) & \cos(n\theta)
+\end{bmatrix}^{!T}
+\begin{bmatrix}
+\cos(m\theta) & -\sin(m\theta) \\
+\sin(m\theta) & \cos(m\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{q\_B}\[0] \\
+\boldsymbol{q\_B}\[1]
+\end{bmatrix} \\\[1em]
+&=
+\begin{bmatrix}
+\boldsymbol{k\_A}\[0] \\
+\boldsymbol{k\_A}\[1]
+\end{bmatrix}^{!T}
+\begin{bmatrix}
+\cos((m-n)\theta) & -\sin((m-n)\theta) \\
+\sin((m-n)\theta) & \cos((m-n)\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{q\_B}\[0] \\
+\boldsymbol{q\_B}\[1]
+\end{bmatrix}
+\end{align}
+$$
+
+其中，$\begin{bmatrix} \cos(n\theta) & -\sin(n\theta) \ \sin(n\theta) & \cos(n\theta) \end{bmatrix}^T$ 代表旋转 $-n\theta$，$\begin{bmatrix} \cos(m\theta) & -\sin(m\theta) \ \sin(m\theta) & \cos(m\theta) \end{bmatrix}$ 代表旋转 $m\theta$，合起来就是 $\begin{bmatrix} \cos((m-n)\theta) & -\sin((m-n)\theta) \ \sin((m-n)\theta) & \cos((m-n)\theta) \end{bmatrix}$ 代表旋转 $(m-n)\theta$。
+
+如果是把 $\boldsymbol{k^n\_A}$ 换成 $\boldsymbol{k^{n+r}\_A}$，把 $\boldsymbol{q^m\_B}$ 换成 $\boldsymbol{q^{m+r}\_B}$，会有什么不同？
+
+$$
+\begin{align}
+\begin{bmatrix}
+\boldsymbol{k^{n+r}\_A}\[0] \\
+\boldsymbol{k^{n+r}\_A}\[1]
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+\boldsymbol{q^{m+r}\_B}\[0] \\
+\boldsymbol{q^{m+r}\_B}\[1]
+\end{bmatrix} \\\[1em]
+&=
+\begin{bmatrix}
+\boldsymbol{k\_A}\[0] \\
+\boldsymbol{k\_A}\[1]
+\end{bmatrix}^{!T}
+\begin{bmatrix}
+\cos(((m+r)-(n+r))\theta) & -\sin(((m+r)-(n+r))\theta) \\
+\sin(((m+r)-(n+r))\theta) & \cos(((m+r)-(n+r))\theta)
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{q\_B}\[0] \\
+\boldsymbol{q\_B}\[1]
+\end{bmatrix}
+\end{align}
+$$
+
+其中，$\begin{bmatrix} \cos(((m+r)-(n+r))\theta) & -\sin(((m+r)-(n+r))\theta) \ \sin(((m+r)-(n+r))\theta) & \cos(((m+r)-(n+r))\theta) \end{bmatrix}$ 代表旋转 $((m+r)-(n+r))\theta = (m-n)\theta$。
+
+所以结果与没有加 $r$ 时完全相同，验证了相对位置不变性。
+
+#### RoPE 的实现细节
+
+刚才说 RoPE 采取的方法是，把 $k$ 跟 $q$ 分别做旋转，再去做 Attention。
+
+![](/images/positional-encoding/pe-36.png)
+
+其实这也等价于把 $q$ 乘上 $R\_{m-n}$，也就是说 $q$ 自己做旋转，然后再去跟 $k$ 做相乘，相当于只在 $q$ 上做计算。
+
+![](/images/positional-encoding/pe-37.png)
+
+虽然这两个方法计算起来是等价的，实际上会去采用**前一种方式**。因为在我们存 KV Cache 的时候，如果用前一种方式，可以把带位置的 $k$ 跟 $q$ 都存下来。但如果我们用后一种方式，那 $q$ 每次和 $k$ 去做 Attention 的时候都需要乘上不同的 $R\_{m-n}$，效率很低。所以 RoPE 能流行起来的主要原因，就是它可以很好地跟别的方法做搭配。
+
+#### RoPE vs ALiBi：一个重要的区别
+
+很多人对 RoPE 有一个误解——它可能像 ALiBi 一样，当 $k$ 跟 $q$ 的距离越远，算出来的 Attention Weight 就越小。但事实是：**RoPE 并没有保证 $q$ 跟 $k$ 距离越远的话，它们的 Attention Weight 就越小。**
+
+但是 RoPE 没有"越远越小"不一定是一件坏事，它可以做到原来 ALiBi 做不到的事情。假设我们现在有一个 Token，它想跳过前一个 Token 直接注意到前面的位置。对于 ALiBi 来说，如果这个 Token 离原来的 Token 越远，注意力就越小。但对于 RoPE 来说，它可以完成一件事：**直接忽略中间的 Token，直接注意到前面的 Token**。
+
+![](/images/positional-encoding/pe-38.png)
+
+有的时候，这个方式对于模型理解句子是很有帮助的。比如说"我的猫"和"他的狗"这两个句子——"猫"应该注意到"我"上面，"狗"应该注意到"他"上面，而不是注意到中间的"的"上面。所以 RoPE 可以做到比 ALiBi 更细致的 Attention。
+
+假设 $q$ 跟 $k$ 中间差了 $2\theta$，但是 $n+1$ 位置的 $q$ 跟 $n$ 位置的 $k$ 可能就差了一个 $\theta$，$n+2$ 位置的 $q$ 跟 $n$ 位置的 $k$ 它们的角度可能就是一样的。那么这就恰恰证明了，中间隔了一个 Token，但是注意力分数却可以往上涨，它就可以忽略掉中间的 Token。
+
+![](/images/positional-encoding/pe-39.png)
+
+***
+
+## 04 Train Short, Test Long
+
+参考文献：<https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html>
+
+我们能不能在训练的时候，虽然 Transformer 在训练阶段只能看见比较短的 Sequence，但是让它在**测试的时候看到非常长的 Sequence 也不要坏掉**？
+
+![](/images/positional-encoding/pe-40.png)
+
+因为我们在训练的过程中，可能没办法找到非常长的语料来进行训练。而且在今天的 Agent 当中，我们希望 Agent 可以永无止境地运行下去，所以说它需要吃非常长的 Sequence，要有非常大的 Context Window。所以我们期待有什么样的 Positional Embedding 可以做到 Train Short Test Long。
+
+怎么做 Train Short Test Long？一个很直觉的想法就是，我们训练的时候最多只见过 $N$ 个 Token，我的位置也是 $1, 2, ..., N$。
+
+![](/images/positional-encoding/pe-41.png)
+
+![](/images/positional-encoding/pe-42.png)
+
+假设测试的时候模型需要处理 $LN$ 个 Token，我们能不能就直接给它我们需要的编号？
+
+![](/images/positional-encoding/pe-43.png)
+
+RoPE 可以处理这样的状况吗？看样子是不行的。
+
+（下图来自文献：<https://arxiv.org/abs/2108.12409>）
+
+![](/images/positional-encoding/pe-44.png)
+
+下图就是测试的时候给模型不同长度的 Sequence，然后看它的 Perplexity 效果如何。假如测试的时候给他们非常长的 Input Sequence：
+
+* 对于 **Sinusoidal** 来说，只要测试 Sequence 一长，它就直接坏掉。
+* 对于 **RoPE** 来说，它会比 Sinusoidal 稍微好一点点，但是随着 Sequence 越长它也会坏掉。
+* 事实上，只有 **ALiBi** 是能够支撑得住的，因为它不是通过学习得到的参数，而是通过人为设置得到的。看起来这种人为设置是非常 Robust 的，它可以处理比较长的 Sequence。
+
+但是 ALiBi 比较简单，所以后人想的是，能不能**通过调整 RoPE**，让它能够做到 Train Short Test Long。
+
+### 为什么 RoPE 在长序列上会失败？
+
+假设我们在训练的时候，旋转最大的角度就是 $N\theta$，超过这个角度的向量它都没有见过。假如说你在测试的时候给它的角度是 $2N\theta$。对 RoPE 来说，它从来没有看到过一个向量被转到过这个地步，它就会"发疯"，完全不知道要怎么做。
+
+![](/images/positional-encoding/pe-45.png)
+
+### Position Interpolation
+
+参考文献：
+
+* <https://arxiv.org/pdf/2306.15595>
+* <https://kaiokendev.github.io/context#a-bigger-problem>
+
+那么要怎么办呢？那就是**不要给它超过 $N$ 的旋转角度**。
+
+比如现在有 $LN$ 个 Token，我们的编号不一定要从 $1$ 到 $LN$，我们可以让它从 $\frac{1}{L}$ 到 $N$——从来没有规定过 Position 的编号一定要是整数。
+
+![](/images/positional-encoding/pe-46.png)
+
+![](/images/positional-encoding/pe-47.png)
+
+这个方法叫做 **Position Interpolation（位置插值）**。但是使用这个方法之前，模型还是要针对这种非整数的旋转角度进行**微调**，否则效果还是很差。
+
+不过 Position Interpolation 不一定能够带给我们很好的表现，所以又有各种新方法。
+
+### Frequency-Based Approach
+
+有一个新的方法叫做 **Frequency-Based Approach**。
+
+刚才我们在做 RoPE 的时候，是两个维度两个维度考虑的，而 Position Interpolation 的方法是对不同的维度做同样的处理。Frequency-Based Approach 的想法是：**能不能在不同的维度做不同的处理？**
+
+比方说，我们在测试的时候要把 $N$ 扩展到 $LN$，我们能不能乘上一个特别的函数？这个函数一方面跟我们要拓展多少位有关，同时也会跟现在在哪一个维度有关。
+
+![](/images/positional-encoding/pe-48.png)
+
+那么 Frequency-Based Approach 是怎么设计的呢？它的原则是：$\theta\_0$ 是比较高频的向量，$i$ 的编号越大就代表越低频。对于高频向量，可以不动，不用改它的 Position；对于低频向量，则需要进行压缩。
+
+![](/images/positional-encoding/pe-49.png)
+
+对于 RoPE 而言，它每两个 Dimension 合起来也是一个指针。这个指针也是在二维的平面上来旋转。对于前两个维度而言，它的指针旋转速度是非常快的。假设 $N=128$，那么对于 $\theta\_0$ 来说，它可能已经把整个平面上的维度全部看了一遍甚至几遍；而对于 $\theta\_{32}$ 来说，它可能看了连 1/4 都没有。
+
+![](/images/positional-encoding/pe-50.png)
+
+所以对于 $\theta\_0$ 来说，你就算给它大于 $N$ 的 Position 也是没有关系的，因为它已经全部看过了。但如果在 $\theta\_{32}$ 这个维度上面，你如果把 $N$ 提高到 256 的话，那 256 旋转的那个角度它是没有看过的。
+
+![](/images/positional-encoding/pe-51.png)
+
+#### NTK-aware Scaling
+
+Frequency-Based Approach 有很多不同的变体，其中比较知名的变体叫 **NTK-aware Scaling**。
+
+NTK-aware Scaling 的公式如下：
+
+$$
+f(L, i) = \left(\frac{1}{L}\right)^{\frac{2i}{d-2}}
+$$
+
+这个公式的设计是有意义的：
+
+* 假设 $i=0$，那么 $f(L, 0) = 1$，在最高频的 $\theta\_0$ 上面是不需要做任何压缩的。
+* 假设 $i = \frac{d}{2} - 1$，处在最低频的状态，那么 $f\left(L, \frac{d}{2} - 1\right) = \frac{1}{L}$，它会把最低频的 $\theta\_{\frac{d}{2}-1}$ 压缩到 $\frac{1}{L}$。
+
+不过 NTK-aware Scaling 的方法并没有一篇对应的 Paper，它是出现在 Reddit 的文章里面。
+
+参考文献：<https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/>
+
+![](/images/positional-encoding/pe-52.png)
+
+### YaRN
+
+另外一种知名的变体叫做 **YaRN**（Yet another RoPE extensionN method）。
+
+参考文献：<https://arxiv.org/abs/2309.00071>
+
+YaRN 的思想是：保留一些低频维度的 Scaling 不变，保留一些高频维度的 Scaling 不变，**只变中间的**。
+
+![](/images/positional-encoding/pe-53.png)
+
+### Dynamic Scaling
+
+还有一种另外的想法叫做 **Dynamic Scaling**。它的核心思想是：之前的方法可能长的序列都能做，但是对于短的 Sequence 来说，可能它的效果会变得更差。
+
+参考文献：<https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/>
+
+![](/images/positional-encoding/pe-54.png)
+
+所以 Dynamic Scaling 的想法就是，对于不同长度的 Sequence 用不同的处理方式。比如我们要输入 5 个 Token，那我们的 Token 数量就要乘 $\frac{4}{5}$。但如果 Sequence 小于 Training 的 Sequence，那我们就不需要做任何改动，这样的话你在短序列上的效果也不会差，因为在 Training 的时候见过这些小的 Sequence。
+
+![](/images/positional-encoding/pe-55.png)
+
+这个想法很简单，但是你会发现它会破坏 KV Cache。
+
+还有一种 Dynamic Scaling 的变体方法：在一定比例的 Sequence 上不做任何 Position 改动，过一定比例后再做 Position 改动，没有必要压缩最前面的 Position。
+
+![](/images/positional-encoding/pe-56.png)
+
+那 Dynamic Scaling 的方法好不好呢？如果我们使用 Dynamic Scaling 加上 Position Interpolation 或者加上 NTK 方法，它的效果会比不加 Dynamic Scaling 更好。
+
+![](/images/positional-encoding/pe-57.png)
+
+### Frequency-Based + Dynamic：LongRoPE
+
+Frequency-Based 方法是决定后面的压缩函数，Dynamic Scaling 来决定在哪个地方开始压缩。具体要怎么决定呢？有一篇论文叫做 **LongRoPE**，用了一个 **Evolutionary Search** 的方法，去找出最好的 Frequency-Based 方法和最好的 Dynamic Scaling 方法。
+
+参考文献：<https://arxiv.org/abs/2402.13753>
+
+![](/images/positional-encoding/pe-58.png)
+
+这个方法可以得到一个非常惊人的结果——它可以让模型的输入长度处理到 **2048K**。
+
+![](/images/positional-encoding/pe-59.png)
+
+***
+
+## 05 No Positional Embedding？！
+
+有一个灵魂的发问：**真的需要 Positional Embedding 吗？**
+
+### Self-Attention 真的没有位置信息吗？
+
+如果我们只考虑第一层的 Self-Attention，那它确实是没有位置信息。但如果我们考虑**第二层**的 Self-Attention，那结论就不太一样了。
+
+我们看第一层 Attention 可以发现猫跟"吃"的关系，还有鱼跟"吃"的关系。对于下一层的 Attention，它看到第二个位置的时候，会看到一个猫跟吃有关的东西，还有一个鱼跟吃有关的东西。所以"猫吃鱼"和"鱼吃猫"最后得到的 Embedding 是不一样的。所以**就算没有 Positional Embedding，Self-Attention 在多层的情况下也是具有 Positional 信息的**。
+
+![](/images/positional-encoding/pe-60.png)
+
+### NoPE：没有 Positional Embedding
+
+这篇论文提出了一个方法叫做 **NoPE**，就是没有 Positional Embedding。
+
+参考文献：<https://arxiv.org/pdf/2305.19466>
+
+这篇论文训练了一些 Transformer 来做任务，发现其实**不加 Position Embedding 也没关系**。下图是一些结论，横轴代表做的任务长度，纵轴代表准确率，准确率越高越好。
+
+我们会发现在 Copy 这个任务里面，加上 Positional Embedding 以后，很多模型在 Sequence 长到一定程度时就下降了。可是在没有加 Positional Embedding 的情况下，它的准确率非常高。
+
+![](/images/positional-encoding/pe-61.png)
+
+如果根据上面的结论，那我们在大模型训练时不应该加 Position Embedding。但为什么现在的大模型都会加 Position Embedding 呢？
+
+有一篇文章有一些相关的讨论。下面这张图比较了 **RoPE** 跟 **NoPE** 训练的过程。横轴是训练的 Step（做了几次训练参数的更新），纵轴是 Loss，Loss 越小越好。结论显而易见——**NoPE 在训练的时候效果就不如 RoPE 好**。
+
+所以我们为什么需要 Positional Embedding？是因为我们在 **训练** 的时候需要它。
+
+![](/images/positional-encoding/pe-62.png)
+
+### DroPE：训练后期扔掉 Positional Embedding
+
+那我们能不能在训练到一定程度之后就把 Positional Embedding 扔掉呢？现在有一个方法叫做 **DroPE**。它的想法是：一开始的训练是有 Positional Embedding 的，训练到快结束的时候，把 Positional Embedding 拔掉。Loss 就会突然冲上去，但是很快 Loss 就可以下降下来。在没有 Position Embedding 的情况下，它的训练效果是可以跟 RoPE 一样低的。
+
+那 DroPE 这个方法表现怎么样呢？它是可以比 **RoPE + YaRN** 表现还要好的。比如我们训练的 Context 是 2K，如果说我们一直在用 Positional Embedding 的话，那当我们在做 Inference 的时候，Context 超过训练的 Context，它的效果就会下降。但是因为我们用 DroPE 的时候会把它的 Positional Embedding 在后面拔掉，它也会在没有 Positional Embedding 的情况下进行学习。那么这个时候，在我们的 Inference Context 超过 Training Context 的时候，它的效果依旧很好。
+
+![](/images/positional-encoding/pe-63.png)
+
+参考文献：<https://arxiv.org/pdf/2512.12167>
+
+***
+
+## 参考资料
+
+1. [**Sinusoidal Positional Embedding（原始 Transformer）**](https://arxiv.org/abs/1706.03762)
+2. [**ALiBi（Attention with Linear Biases）**](https://arxiv.org/abs/2108.12409)
+3. [**T5（Text-to-Text Transfer Transformer）**](https://arxiv.org/abs/1910.10683)
+4. [**RoPE（Rotary Position Embedding）**](https://arxiv.org/abs/2104.09864)
+5. [**Train Short Test Long（RoPE Context Extension 综述）**](https://amaarora.github.io/posts/2025-09-21-rope-context-extension.html)
+6. [**Position Interpolation**](https://arxiv.org/pdf/2306.15595)
+7. [**Position Interpolation（Kaiokendev 博客）**](https://kaiokendev.github.io/context#a-bigger-problem)
+8. [**NTK-aware Scaling（Reddit 帖）**](https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/)
+9. [**YaRN（Yet another RoPE extensionN method）**](https://arxiv.org/abs/2309.00071)
+10. [**Dynamic Scaling（Reddit 帖）**](https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_scaled_rope_further_increases/)
+11. [**LongRoPE**](https://arxiv.org/abs/2402.13753)
+12. [**NoPE（No Positional Embedding）**](https://arxiv.org/pdf/2305.19466)
+13. [**DroPE**](https://arxiv.org/pdf/2512.12167)
+
+---
+
+---
+url: /zh/article/pri-tpg-structural-priors/index.md
+---
+> 从内容检索到结构检索，一种 Training-free 的长程推理方案
+
+大语言模型做数学证明时，有一个很反常的现象：
+
+**问题一旦变长，模型的表现往往不是缓慢下降，而是迅速崩溃。**
+
+在 FormalGeo7K 几何推理基准上，Vanilla ICL 在浅层问题 L1 上还能达到 52.19% 的准确率，但到了 L3，只剩下 7.89%；在更长的 L5 和 L6 推理任务上，准确率直接降到 0。
+
+而加入结构先验之后，Pri-TPG 在同样使用 GPT-5 mini 的情况下，整体准确率从 26.29% 提升到了 84.42%。使用 GPT-5.2 时，最终达到 89.29%。
+
+论文将这种普通 ICL 随推理深度增加而快速失效的现象称为：
+
+> **Structural Drift，结构漂移。**
+
+这个概念揭示了一个重要问题：
+
+> LLM 可能知道每一个定理是什么意思，却不知道这些定理应该按照什么顺序被组织起来。
+
+于是，一个比"如何训练出更强模型"更具体的问题出现了：
+
+> 能不能不更新模型参数，而是给 LLM 提供一套外部结构，让它只在更可能正确的证明路径中进行搜索？
+
+这就是论文 **Non-Parametric Structural Priors for Geometry Theorem Prediction** 想解决的问题。
+
+![](/images/pri-tpg/structural-drift.png)
+
+# 论文信息卡
+
+| 项目       | 内容                                                                       |
+| ---------- | -------------------------------------------------------------------------- |
+| 论文标题   | Non-Parametric Structural Priors for Geometry Theorem Prediction           |
+| 核心方法   | Pri-TPG                                                                    |
+| 研究任务   | 多步几何定理预测                                                           |
+| 技术路线   | RAG + Theorem Precedence Graph + Symbolic Execution                        |
+| 核心特点   | Training-free，无需针对定理预测任务进行梯度训练                            |
+| 主要数据集 | FormalGeo7K、Geometry3K、GeoQA                                             |
+| 主要结果   | FormalGeo7K 上达到 89.29%                                                  |
+| 核心关键词 | Structural Drift、Structural Prior、LLM Planner、Neural-Symbolic Reasoning |
+
+一句话概括：
+
+> Pri-TPG 不直接检索答案，而是检索相似问题的证明结构，再用这些结构约束 LLM 的下一步动作。
+
+## 01. 几何证明为什么本质上是一个搜索问题？
+
+一道人类看来并不复杂的几何题，对自动推理系统来说，往往不是单步问答，而是一个连续决策过程。
+
+例如，一条完整证明可能需要依次完成：
+
+```text
+证明两条边相等
+↓
+判断三角形全等
+↓
+得到对应角相等
+↓
+构造相似三角形
+↓
+推出目标比例
+```
+
+这里的关键不只是"选择一个正确的定理"。
+
+更重要的是：
+
+**当前选择的定理，必须建立在此前已经得到的事实之上。**
+
+如果某个定理的前置条件还没有满足，那么即使它在语义上与目标相关，也不能被执行。
+
+从形式上看，一道几何题可以被描述成：
+
+```text
+初始状态 S₀
+↓ 使用定理 a₁
+状态 S₁
+↓ 使用定理 a₂
+状态 S₂
+↓
+……
+↓
+最终状态 Sₜ 满足目标 g
+```
+
+符号执行器能够检查每一步是否合法，但它无法自动告诉模型：
+
+> 在数百条定理中，下一步最应该选哪一条？
+
+假设定理库中有 300 条定理，一条证明需要 H 步，那么在最朴素的情况下，搜索空间会接近：
+
+```text
+300ᴴ
+```
+
+推理链越长，错误分支越多。
+
+因此，几何证明的难点不只是知识不足，而是：
+
+> **如何在指数级增长的候选路径中，持续找到有效的下一步。**
+
+![](/images/pri-tpg/state-transition.png)
+
+## 02. Structural Drift：知道定理，却不知道证明结构
+
+最直接的想法，是使用 In-Context Learning。
+
+给 LLM 几个历史证明示例，让它模仿示例，逐步选择定理。
+
+但论文发现，Vanilla ICL 在浅层问题上尚且有效，随着证明长度增加，性能会快速坍塌。
+
+作者认为，原因在于普通 ICL 获得的是"内容示例"，却没有获得显式的"结构约束"。
+
+| LLM 可能知道的内容       | LLM 未必掌握的结构             |
+| ------------------------ | ------------------------------ |
+| 勾股定理是什么           | 当前是否满足勾股定理的前置条件 |
+| 三角形全等有哪些判定方式 | 哪一种判定应该先使用           |
+| 哪些定理与角度、长度相关 | 哪些定理在当前状态下不可执行   |
+| 某条定理与目标语义相近   | 这条定理是否位于正确证明路径上 |
+| 如何生成下一步解释       | 失败后应切换到哪条分支         |
+
+可以把问题进一步压缩成两句话：
+
+> **定理语义相关，不等于当前状态可执行。**
+> **选对局部步骤，不等于维护全局证明结构。**
+
+普通 ICL 更像是在整个定理库上进行平坦选择。
+
+每一步都面对大量候选，越往后走，早期的小错误越容易不断放大，最终使整条证明偏离正确路径。
+
+这就是 Structural Drift。
+
+![](/images/pri-tpg/flat-vs-structured.png)
+
+## 03. Pri-TPG：检索的不是知识，而是证明结构
+
+传统 RAG 通常在做什么？
+
+```text
+输入问题
+↓
+检索相关文本或知识
+↓
+放入 Prompt
+↓
+让 LLM 生成答案
+```
+
+它解决的是：
+
+> 模型应该知道什么？
+
+Pri-TPG 的做法不同。
+
+它检索的是与当前问题相似的历史几何题，再从这些题的证明轨迹中提取：
+
+* 哪些定理经常出现；
+* 哪些定理通常先出现；
+* 哪些定理通常在另一些定理之后使用；
+* 哪些局部推理结构可能适用于当前问题。
+
+因此，Pri-TPG 更接近：
+
+```text
+输入问题
+↓
+检索相似证明
+↓
+提取定理使用顺序
+↓
+构建定理优先图
+↓
+约束下一步推理
+```
+
+两者的区别可以概括为：
+
+| 传统 RAG                  | Pri-TPG                      |
+| ------------------------- | ---------------------------- |
+| 检索事实、段落、文档      | 检索历史证明轨迹             |
+| 回答"应该知道什么"        | 回答"应该先做什么、后做什么" |
+| 结果以文本形式加入 Prompt | 结果被转化为图结构           |
+| 主要增强内容              | 主要约束行动空间             |
+| Content-Augmented         | Structure-Augmented          |
+
+所以，Pri-TPG 的关键并不是简单增加检索，而是：
+
+> **把检索结果从"内容上下文"进一步转化为"推理结构"。**
+
+## 04. 什么是 Theorem Precedence Graph？
+
+Pri-TPG 的核心结构叫作：
+
+> **Theorem Precedence Graph，定理优先关系图。**
+
+它是一张有向图。
+
+| 图元素                 | 含义                                        |
+| ---------------------- | ------------------------------------------- |
+| 节点 (v)               | 一条定理                                    |
+| 边 ($u \rightarrow v$) | 定理 (u) 产生的结果，可支持后续使用定理 (v) |
+| 边权重                 | 该定理转移在相似历史证明中出现的频率        |
+| START 节点             | 表示证明开始时更可能优先使用的定理          |
+
+例如，一条局部路径可能是：
+
+```text
+等腰三角形判定
+↓
+等腰三角形性质
+↓
+角相等
+↓
+相似三角形判定
+```
+
+相比直接从 300 条定理中任意选择，TPG 会告诉模型：
+
+> 你刚刚使用了某个定理，那么接下来更合理的候选，通常位于它在图中的后继节点。
+
+TPG 并不是一条固定证明链。
+
+它更像一个局部导航图：
+
+| 固定证明链         | TPG                     |
+| ------------------ | ----------------------- |
+| 只能沿一条路径执行 | 可以保留多个可行后继    |
+| 接近模板复制       | 更接近结构约束          |
+| 对变化较敏感       | 允许 LLM 在局部图中选择 |
+| 缺乏灵活性         | 保留一定规划自由度      |
+
+论文指出，在 FormalGeo7K 的实验中，经过候选过滤后，每一步的定理数量大约可以从 300 条缩小到 30 条，相当于单步缩减约 90% 的搜索空间。
+
+## 05. Pri-TPG 并不是只使用一张静态图
+
+如果只是统计所有历史证明中的定理顺序，再构建一张全局图，会有一个明显问题：
+
+> 不同题目需要的定理结构并不一样。
+
+圆、三角形、平行四边形、长度计算、角度证明，对应的证明路线差别很大。
+
+因此，Pri-TPG 对结构先验进行了逐层细化。
+
+![](/images/pri-tpg/workflow.png)
+
+*系统从全局定理库出发，通过检索、图构建和符号验证，逐步将搜索空间缩小到当前状态下最可能有效的一小组定理。*
+
+### 三层结构先验
+
+| 层级                 | 输入                     | 主要操作                     | 解决的问题                         |
+| -------------------- | ------------------------ | ---------------------------- | ---------------------------------- |
+| Global Prior         | 所有历史证明轨迹         | 统计全局定理先后关系         | 建立领域级结构                     |
+| Query-Adaptive Prior | 当前问题及相似历史题     | 构建问题相关候选池与局部 TPG | 排除与当前题目无关的定理           |
+| State-Aware Prior    | 当前符号状态和上一步动作 | 符号剪枝、结构定位、候选排序 | 排除当前不可执行或结构不合理的动作 |
+
+### 第一层：Global Prior
+
+全局先验来自所有历史证明轨迹。
+
+它回答的是：
+
+> 在整个数据集中，哪些定理之间经常存在先后关系？
+
+这一层提供的是领域级结构。
+
+但它过于宽泛，因为全局图中包含大量与当前问题无关的定理。
+
+### 第二层：Query-Adaptive Prior
+
+Pri-TPG 会根据当前问题检索相似历史题。
+
+检索条件包括：
+
+| 输入模态       | 作用                   |
+| -------------- | ---------------------- |
+| 题目文本       | 捕捉语义和目标类型     |
+| 几何图像       | 捕捉图形结构           |
+| 初始形式化状态 | 捕捉已经成立的符号事实 |
+
+系统使用多模态编码器将这些信息映射到统一向量空间，再从训练集中检索 Top-K 个相似问题。
+
+接着，它会提取这些相似问题使用过的定理，并合并对应的 TPG，形成当前问题专属的：
+
+```text
+候选定理集合 Lq
+
+查询相关图 Gq
+```
+
+这一层回答的是：
+
+> 对这道题来说，哪些定理和哪些定理顺序更可能有用？
+
+如果某个必须使用的定理没有被检索出来，那么无论 LLM 推理能力多强，后续都不可能完成证明。
+
+论文中不同检索规模的结果如下：
+
+| Top-K | Total | Easy  | Medium | Hard  |
+| ----- | ----- | ----- | ------ | ----- |
+| 15    | 71.86 | 83.37 | 52.96  | 28.69 |
+| 30    | 79.00 | 94.39 | 61.64  | 30.33 |
+| 100   | 80.29 | 95.32 | 64.30  | 30.33 |
+| 200   | 84.42 | 96.14 | 73.05  | 40.98 |
+
+随着 K 增大，整体性能持续提升，尤其是中高难度问题。原因是长链证明需要召回更多专门定理，一旦漏掉关键定理，后续规划便无法完成。
+
+### 第三层：State-Aware Prior
+
+即使某条定理出现在相似题中，也不代表它现在可以使用。
+
+因此，Pri-TPG 会根据每一步的当前状态继续剪枝。
+
+| 机制                     | 做法                               | 作用                     |
+| ------------------------ | ---------------------------------- | ------------------------ |
+| Symbolic Pruning         | 检查候选定理的前置条件是否满足     | 排除数学上不可执行的动作 |
+| Structural Localization  | 优先保留上一步定理在图中的后继节点 | 保持局部推理连贯         |
+| Candidate Prioritization | 根据目标、图结构和历史进行排序     | 将高价值候选优先交给 LLM |
+
+最终，系统会从：
+
+```text
+全局定理库
+↓
+问题相关定理集合
+↓
+当前状态可执行的定理
+↓
+当前图位置合理的定理
+```
+
+不断缩小搜索空间。
+
+![](/images/pri-tpg/three-layer-prior.png)
+
+## 06. LLM、图和符号执行器分别负责什么？
+
+Pri-TPG 不是纯 LLM 系统，也不是纯符号搜索系统。
+
+它是一套神经—符号闭环。
+
+| 组件             | 角色                | 主要职责                         |
+| ---------------- | ------------------- | -------------------------------- |
+| LLM              | Planner             | 从候选定理中选择下一步           |
+| TPG              | Structural Prior    | 提供定理先后关系，缩小动作空间   |
+| Symbolic Solver  | Executor / Verifier | 检查前置条件、执行定理、更新状态 |
+| Retrieval Module | Retriever           | 从历史题中召回相关证明结构       |
+| Current State    | Environment State   | 记录当前已知事实和新增事实       |
+
+整个循环是：
+
+```text
+LLM 选择定理
+↓
+符号执行器验证并执行
+↓
+更新当前状态
+↓
+根据新状态重新过滤图和候选
+↓
+LLM 再次选择
+```
+
+这与典型 Agent 的工作方式高度相似：
+
+| Agent 范式           | Pri-TPG 对应组件   |
+| -------------------- | ------------------ |
+| Think                | LLM 分析候选       |
+| Act                  | 选择一条定理       |
+| Environment Feedback | 符号执行器返回结果 |
+| Update State         | 更新符号事实       |
+| Replan               | 根据新状态重新选择 |
+
+所以，虽然论文的任务是几何证明，但它研究的其实也是一个更一般的 Agent 问题：
+
+> 如何让 LLM 在动作空间很大、规则严格、反馈明确的环境中进行长程规划？
+
+## 07. 候选定理不是简单按相似度排序
+
+Pri-TPG 不只是把检索到的定理列出来。
+
+它还会依据三类信息进行候选排序：
+
+| 评分项       | 含义                           | 直觉                   |
+| ------------ | ------------------------------ | ---------------------- |
+| (s\_{goal})  | 候选定理与最终目标的相关性     | 更接近目标的定理优先   |
+| (s\_{graph}) | 候选定理与当前图位置的结构关系 | 上一步定理的后继优先   |
+| (s\_{hist})  | 历史重复和失败惩罚             | 避免循环和重复无效尝试 |
+
+整体形式为：
+
+```text
+候选得分 = 目标相关性 + 图结构相关性 - 历史重复惩罚
+```
+
+这套评分不会替代 LLM 做最终决策，而是把更可能有效的候选排到前面，再让 LLM 结合题目、状态和历史轨迹进行判断。
+
+## 08. 为什么必须是闭环，而不能一次生成完整证明？
+
+作者还设计了一个 Single-pass 版本。
+
+这个版本仍然拥有 query-adaptive TPG，但要求 LLM 一次性生成完整定理序列，符号执行器只在最后验证。
+
+结果如下：
+
+| 方法        | Overall | Easy | Medium | Hard |
+| ----------- | ------- | ---- | ------ | ---- |
+| Vanilla ICL | 26.3    | 39.7 | 6.9    | 0.0  |
+| Single-pass | 34.3    | 53.3 | 5.7    | 0.0  |
+| Pri-TPG     | 84.3    | 96.1 | 73.0   | 41.0 |
+
+即使已经有了结构先验，Single-pass 在 Hard 任务上仍然为 0。
+
+这说明，仅靠一次性规划无法应对长链证明中的中途错误。
+
+| Single-pass        | Iterative Pri-TPG    |
+| ------------------ | -------------------- |
+| 一次生成完整序列   | 每次只选择一步       |
+| 最后统一验证       | 每一步立即验证       |
+| 中途无法修正       | 可以根据反馈重规划   |
+| 错误会沿整条链累积 | 错误能被及时截断     |
+| 长程任务容易崩溃   | 中长程任务明显更稳定 |
+
+形式推理必须是闭环的：
+
+```text
+规划
+↓
+执行
+↓
+反馈
+↓
+修正
+```
+
+![](/images/pri-tpg/singlepass-vs-iterative.png)
+
+*Single-pass 即使拥有 query-adaptive prior，在 Hard 任务上仍然为 0；逐步符号反馈对于中长链证明至关重要。*
+
+一句话总结：
+
+> **图结构解决"往哪里走"，符号反馈解决"走错以后怎么办"。**
+
+## 09. 实验到底证明了什么？
+
+真正精读实验，不应该只看谁的分数更高。
+
+更重要的是：
+
+> 每个实验在验证哪一个研究假设？
+
+Pri-TPG 的实验可以组成一条清晰的证据链。
+
+### 主实验结果
+
+| 方法                      | 是否训练 | Total | L1    | L2    | L3    | L4    | L5    | L6    |
+| ------------------------- | -------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| Vanilla ICL（GPT-5 mini） | 否       | 26.29 | 52.19 | 23.67 | 7.89  | 5.10  | 0.00  | 0.00  |
+| Pri-TPG（GPT-5 mini）     | 否       | 84.42 | 98.54 | 93.09 | 78.20 | 64.33 | 58.06 | 23.33 |
+| Pri-TPG（GPT-5.2）        | 否       | 89.29 | 99.16 | 96.28 | 87.92 | 77.07 | 66.13 | 30.00 |
+| FGeo-HyperGNet            | 是       | 88.36 | 96.24 | 91.76 | 87.59 | 82.17 | 56.45 | 56.67 |
+
+从表中可以看到：
+
+* Pri-TPG 在 L1 至 L5 上表现很强；
+* Vanilla ICL 随深度增加快速崩溃；
+* Pri-TPG 在 L6 上仍有明显下降；
+* 训练式专门模型在极长链推理上仍保有优势。
+
+### 证据链一：RAG 与 TPG 分别做了什么？
+
+| 设置        | Iterative | RAG | TPG | Total | Hard  |
+| ----------- | --------- | --- | --- | ----- | ----- |
+| Vanilla ICL | ✓         | ✗   | ✗   | 26.29 | 0.00  |
+| w/o TPG     | ✓         | ✓   | ✗   | 72.64 | 22.95 |
+| Pri-TPG     | ✓         | ✓   | ✓   | 84.42 | 40.98 |
+
+这组实验说明：
+
+| 模块               | 主要贡献         |
+| ------------------ | ---------------- |
+| RAG                | 缩小候选定理范围 |
+| TPG                | 组织定理先后关系 |
+| Iterative Feedback | 支持中途纠错     |
+
+RAG 将性能从 26.29% 提升到 72.64%，说明候选缩小非常重要。
+
+TPG 又将性能从 72.64% 提升到 84.42%，说明：
+
+> 找到相关定理，不等于知道这些定理该如何组织。
+
+### 证据链二：结构先验越精确，效果越好
+
+| 设置                 | Total | Easy  | Medium | Hard  |
+| -------------------- | ----- | ----- | ------ | ----- |
+| Vanilla ICL          | 26.29 | 39.65 | 6.86   | 0.00  |
+| Global Prior         | 29.71 | 40.70 | 14.89  | 4.10  |
+| Query-Adaptive Prior | 58.43 | 72.40 | 41.61  | 18.85 |
+| State-Aware Pri-TPG  | 84.42 | 96.14 | 73.05  | 40.98 |
+
+这组结果说明，单纯使用全局图帮助有限。
+
+真正明显的提升来自：
+
+1. 让结构与当前问题相关；
+2. 让结构与当前状态相关。
+
+因此，结构先验不是越大越好，而是：
+
+> **越贴近当前问题和当前推理状态越好。**
+
+### 证据链三：方法是否依赖特定 LLM？
+
+| Backbone          | Total | Easy  | Medium | Hard  |
+| ----------------- | ----- | ----- | ------ | ----- |
+| DeepSeek v3.2     | 83.57 | 95.56 | 72.10  | 39.34 |
+| GPT-5 mini        | 84.42 | 96.14 | 73.00  | 40.98 |
+| Claude 4.5 Sonnet | 87.07 | 97.31 | 77.54  | 48.36 |
+| Gemini 3.0 Pro    | 88.43 | 97.54 | 81.56  | 48.36 |
+| GPT-5.2           | 89.29 | 97.89 | 83.92  | 48.36 |
+
+不同模型的绝对成绩存在差异，但接入 Pri-TPG 后都取得了较强表现。
+
+这意味着 Pri-TPG 更像一个可插拔的外部推理脚手架，而不是某个模型专属技巧。
+
+![](/images/pri-tpg/experiment-chain.png)
+
+**总结卡：**
+
+> RAG 解决"候选有哪些"，TPG 解决"候选如何组织"，Symbolic Feedback 解决"错误如何被及时发现"。
+
+## 10. 89.29% 应该如何正确理解？
+
+89.29% 是一个很强的结果，但需要注意它的评估边界。
+
+| 评估条件               | 具体设置                        |
+| ---------------------- | ------------------------------- |
+| 输入形式               | 使用 ground-truth formal inputs |
+| 主要评估内容           | 定理规划与符号搜索              |
+| 是否包含完整自动形式化 | 否                              |
+| 每题时间限制           | 600 秒                          |
+| 最大推理步数           | 20                              |
+| Top-K 检索规模         | 200                             |
+| 最大恢复尝试           | 3                               |
+| 是否多次调用 LLM       | 是                              |
+
+论文为了隔离"推理与搜索能力"，直接向所有方法提供了正确的形式化输入。
+
+也就是说，系统并不是从完全原始的自然语言和几何图片开始，独立完成全部形式化过程。
+
+更准确地说：
+
+> 89.29% 主要衡量的是在正确形式化表示已经给定的情况下，系统进行定理规划和符号搜索的能力。
+
+因此：
+
+> **Training-free 不等于没有成本，也不等于端到端系统已经完全解决。**
+
+这里的"非参数"也不是指整个系统没有参数模型。
+
+| 系统仍然依赖               | 是否存在 |
+| -------------------------- | -------- |
+| 预训练 LLM                 | 是       |
+| 多模态 Embedding 模型      | 是       |
+| 历史证明数据库             | 是       |
+| 针对定理预测的额外梯度训练 | 否       |
+
+所谓 non-parametric，主要是指：
+
+> 定理预测策略没有被重新训练进模型权重，而是以外部检索图和结构先验的形式在推理时提供。
+
+## 11. 论文明确承认了哪些局限？
+
+| 局限               | 具体表现                                  |
+| ------------------ | ----------------------------------------- |
+| 推理效率较低       | 多步规划需要反复调用 LLM                  |
+| 极长链任务仍然困难 | L6 上准确率明显下降                       |
+| TPG 偏局部         | 主要编码局部 precedence，而非完整全局深度 |
+| 单步错误影响大     | 某一步失败可能破坏后续整个证明链          |
+| 仍依赖基础模型能力 | 更强 backbone 通常带来更高绝对性能        |
+
+这些局限说明：
+
+> Pri-TPG 很好地缓解了局部无结构搜索，但没有彻底解决全局长程一致性。
+
+## 12. 我的进一步判断
+
+下面这些问题并非论文全部明确提出，而是基于其方法设计和实验结果进一步延伸出的判断。
+
+### 1. TPG 是逻辑依赖图，还是经验顺序图？
+
+论文将边 (u \rightarrow v) 描述为定理之间的前置依赖。
+
+但图主要从历史解题轨迹中构建。
+
+| 严格逻辑依赖      | 历史经验顺序        |
+| ----------------- | ------------------- |
+| A 是 B 的必要前提 | A 经常在 B 之前出现 |
+| 具有较强因果含义  | 可能只是数据偏好    |
+| 跨数据集更稳定    | 可能受证明风格影响  |
+| 可以形式化验证    | 可能只是统计共现    |
+
+历史轨迹中 A 在 B 前面出现，不一定意味着 A 是 B 的严格必要条件。
+
+也可能只是：
+
+* 这是数据集中常见的证明习惯；
+* 训练集更偏好某条证明路线；
+* 还存在其他合法顺序；
+* 两条定理只是高频共现。
+
+因此，一个值得继续验证的问题是：
+
+> TPG 学到的究竟是因果依赖，还是高频路径模板？
+
+### 2. 局部结构一致，不等于全局证明一致
+
+Pri-TPG 主要根据上一步定理的后继节点进行结构定位。
+
+| 局部优势         | 潜在问题             |
+| ---------------- | -------------------- |
+| 保持连续步骤连贯 | 可能限制跨分支跳转   |
+| 减少无效后继     | 可能错过替代证明路线 |
+| 降低短程搜索难度 | 不保证最终可达目标   |
+| 利用历史局部规律 | 可能难以处理回溯     |
+
+局部合理的连续步骤，不一定最终通向目标。
+
+这也是 L6 等极长链任务仍然困难的重要原因之一。
+
+### 3. 失败会影响排序，但不会真正更新图
+
+Pri-TPG 会对重复和失败定理施加 history penalty。
+
+但这种机制主要是在当前推理过程中调整候选排序。
+
+| 当前机制       | 更进一步的结构学习     |
+| -------------- | ---------------------- |
+| 对失败定理降权 | 定位导致失败的节点或边 |
+| 避免重复尝试   | 更新图结构本身         |
+| 当前任务内生效 | 可以跨任务积累经验     |
+| 局部排序调整   | 全局信用分配           |
+
+它还没有真正做到：
+
+> 根据一次失败，反向定位图中哪一个节点或哪一条边有问题，并更新整体结构。
+
+### 4. 高召回率与推理成本之间仍有矛盾
+
+实验显示，K 越大，准确率越高，尤其是在中高难度任务中。
+
+| 更大的 K             | 更小的 K           |
+| -------------------- | ------------------ |
+| 关键定理更不容易遗漏 | 检索成本更低       |
+| 候选覆盖率更高       | 候选集合更紧凑     |
+| 长链任务更有保障     | 更容易漏掉关键定理 |
+| 后续排序压力更大     | 对检索质量要求更高 |
+
+如何在：
+
+* 更小检索规模；
+* 更低调用成本；
+* 更高关键定理召回率
+
+之间取得平衡，仍然是一个工程与研究问题。
+
+## 13. 从 Pri-TPG 到 Dynamic Self-Evolving TPG
+
+Pri-TPG 当前解决的是：
+
+> 如何从历史成功轨迹中提取局部结构先验，帮助 LLM 缩小搜索空间。
+
+但它还没有充分解决：
+
+> 推理失败之后，如何定位错误，并更新整张图的全局结构？
+
+一个自然的后续方向是：
+
+### Dynamic Self-Evolving TPG
+
+即：
+
+> 利用成功与失败轨迹，让定理优先图在推理过程中持续更新。
+
+### Pri-TPG 与 Dynamic TPG 的区别
+
+| 维度         | Pri-TPG                        | Dynamic Self-Evolving TPG      |
+| ------------ | ------------------------------ | ------------------------------ |
+| 主要数据来源 | 历史成功轨迹                   | 成功轨迹 + 失败轨迹            |
+| 图的状态     | 推理时构建，但结构主要来自历史 | 在当前推理中持续更新           |
+| 失败处理     | 对失败动作降权                 | 对节点、边和子路径进行信用分配 |
+| 搜索方式     | 局部结构引导                   | 局部引导 + 全局回溯            |
+| 学习目标     | 避免无结构探索                 | 学会修正错误结构               |
+| 全局一致性   | 有限                           | 作为核心优化目标               |
+
+一个可能的流程是：
+
+```text
+LLM 按照当前 TPG 推理
+↓
+符号执行器发现路径失败或目标不可达
+↓
+定位最早导致后续不可完成的节点或边
+↓
+对相关局部结构进行反向信用分配
+↓
+降低错误边权重，提升替代路径权重
+↓
+更新 TPG
+↓
+重新规划
+```
+
+对应的研究问题可以写成：
+
+> Can an LLM agent use failed reasoning trajectories to perform backward credit assignment over a theorem precedence graph, thereby improving global consistency in long-horizon theorem proving?
+
+中文表达为：
+
+> 能否利用失败推理轨迹，对定理优先图进行反向信用分配，从而提升长程定理证明中的全局一致性？
+
+进一步可以探索：
+
+| 方向                 | 可能作用                         |
+| -------------------- | -------------------------------- |
+| 基于树搜索的全局回溯 | 在失败后切换到替代分支           |
+| 图上的价值传播       | 把最终结果反向传播到节点和边     |
+| 节点级信用分配       | 判断哪个定理选择产生关键影响     |
+| 边级信用分配         | 判断哪种定理转移不可靠           |
+| 成败轨迹联合建模     | 同时学习应该做什么和不应该做什么 |
+| 不确定性驱动扩展     | 在高不确定位置扩大搜索           |
+| 层级图或超图         | 表达更复杂的多定理依赖关系       |
+
+![](/images/pri-tpg/self-evolving.png)
+
+*真正的下一步，也许不是构建更大的静态推理图，而是让图能够从失败中自我修正。*
+
+## 14. 总结：从内容增强走向结构增强
+
+Pri-TPG 表面上是一篇几何定理预测论文。
+
+但它真正传递的思想是：
+
+> LLM 推理失败，有时并不是因为模型不知道答案，而是因为它面对的行动空间过大，缺少稳定的结构导航。
+
+这篇论文通过三层机制解决这个问题：
+
+| 模块              | 解决的问题                         |
+| ----------------- | ---------------------------------- |
+| RAG               | 找到与当前题目相关的定理           |
+| TPG               | 组织这些定理之间的先后关系         |
+| Symbolic Feedback | 在每一步执行后验证、更新并重新规划 |
+
+它把 LLM 从一个自由生成器，变成了一个受结构约束的高层规划器。
+
+其核心转变可以概括为：
+
+| 过去             | Pri-TPG 所代表的方向   |
+| ---------------- | ---------------------- |
+| 检索知识         | 检索结构               |
+| 一次生成         | 闭环执行               |
+| 无约束推理       | 结构化搜索             |
+| 只利用成功示例   | 未来进一步利用成败反馈 |
+| 模型内部记忆策略 | 外部可解释结构先验     |
+
+当然，Pri-TPG 仍然主要解决局部定理顺序问题。
+
+在极长证明中，它依然面临：
+
+| 仍未解决的问题     | 表现                      |
+| ------------------ | ------------------------- |
+| 全局一致性不足     | L6 性能明显下降           |
+| 回溯能力有限       | 主要依赖局部后继          |
+| 失败信息利用不充分 | 只降权，不更新图          |
+| 推理成本较高       | 多次 LLM 调用和大规模检索 |
+
+但这恰恰说明，这篇论文不是研究终点，而是一个很好的起点。
+
+未来的长程 Agent，可能不仅需要更强的模型、更大的上下文和更多工具，还需要一种能够：
+
+> **从历史中提取结构，在执行中验证结构，并从失败中更新结构的自进化推理系统。**
+
+而这，可能才是 Pri-TPG 留给 Agent 研究最值得继续追问的问题。
+
+---
+
+---
+url: /zh/article/repo-system-design-skills/index.md
+---
+# 把任何 GitHub 仓库变成系统设计课：这个开源项目做到了
+> 你是不是也这样：接手一个项目先跑起来再说，遇到 Bug 就加日志，看到新 PR 就 merge，但一年下来问你这个项目架构怎么设计的，你答不上来？
+>
+> 不只是你。**大多数程序员对系统设计的理解，是"用过"而不是"学过"。**
+
+***
+
+## 01 一个问题：为什么学了那么多，系统设计还是没入门？
+
+很多人学系统设计的方法是：
+
+* 刷《系统设计面试》；
+* 背几个经典案例（设计 Twitter、设计 Uber）；
+* 面试前看几篇架构博客。
+
+结果呢？
+
+面试官问"你当前项目里用的是什么消息队列，为什么选它？"，你只能说"别人选的"。
+
+**真正的问题不是你没有系统设计知识，而是你从来没有用源码证据去理解过一个真实系统的架构。**
+
+你写的代码、你改的 Bug、你加的 Feature，都是系统设计的素材——但你缺一个帮你把它们串起来的方法。
+
+***
+
+## 02 这个项目是什么？一句话讲清楚
+
+这个项目叫 **Repo System Design Skills**，是一套给 AI 编程助手（Codex / Claude Code）用的 Skills。
+
+它的目标不是让 Agent 帮你写代码，而是让 Agent 成为一个**源码证据驱动的系统设计导师**。
+
+![](/images/repo-system-design/skill-overview.png)
+
+> **一句话：它把任意一个 GitHub 仓库，变成一门系统设计课。**
+
+***
+
+## 03 它解决了什么老问题？
+
+我们先看看在没有它之前，用 Agent 学项目是什么体验。
+
+### 你可能会这样问 Agent
+
+```
+帮我看一下这个项目的架构。
+```
+
+Agent 会给你一段看起来很有道理的话：
+
+* "本项目采用分层架构……"
+* "前端使用 React……"
+* "后端使用 Spring Boot……"
+
+听着都对，但**它没有引用任何源码**。你不知道它是在读代码还是在编。
+
+### 更糟糕的是
+
+| 问题         | 普通 Agent 回答 | 这个 Skill 的回答                         |
+| ------------ | --------------- | ----------------------------------------- |
+| 架构怎么分层 | 模板化回答      | 引用具体的文件和目录                      |
+| 核心链路     | 泛泛概括        | 从入口追到数据库，每一步有源码            |
+| 设计取舍     | 只给结论        | 区分 Evidence / Inference / Open Question |
+| 优化建议     | 可能推倒重来    | 先出验证方案，用 branch 安全实验          |
+| 学习效果     | 听完就忘        | 反向出题、纠错、复习卡                    |
+
+**这个项目的核心创新不是"帮你看代码"，而是建立了 Agent 教你学系统设计的完整方法论。**
+
+***
+
+## 04 五个 Skill，一条完整学习闭环
+
+项目包含 5 个 Skill，正好对应系统设计学习的 5 个层次。
+
+```
+                   ┌──────────────────┐
+                   │  repo-system-    │
+                   │  design-lab      │  ← 总控：规划学习路线
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-           │
+                   │  architecture-   │  ← 架构图：模块边界、依赖、数据流
+                   │  mapper          │
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-flow-      │
+                   │  tracer          │  ← 链路追踪：从 UI 到 DB 追溯完整路径
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-design-    │
+                   │  optimizer       │  ← 优化评审：找瓶颈、设计实验
+                   └────────┬─────────┘
+                            │
+                   ┌────────▼─────────┐
+                   │  repo-design-    │
+                   │  coach           │  ← 教练模式：反向提问、面试训练
+                   └──────────────────┘
+```
+
+### Skill 1：repo-system-design-lab（总控实验室）
+
+这是入口。它不直接做分析，而是制定学习计划。
+
+你告诉它"我想学这个项目"，它会：
+
+1. 先读 README、配置、目录结构，输出**项目定位**；
+2. 找到运行入口、核心模块、外部依赖；
+3. 推荐**最值得深入学习的 3-5 条核心链路**；
+4. 在你确认之前，**绝不改一行代码**。
+
+### Skill 2：repo-architecture-mapper（架构地图绘制）
+
+这个 Skill 会把你的项目"画"出来。
+
+* 分层架构图
+* 运行时 / 部署图
+* 数据所有权图
+* 依赖图
+* Fake / Real 模式切换图
+
+**每个图都有源码引用证据。** 不只是画个框，而是告诉你"这个模块对应的代码文件夹是 src/services/，入口是 main.go:42"。
+
+### Skill 3：repo-flow-tracer（链路追踪）
+
+这是我觉得最实用的一个。
+
+假设你想理解"用户登录 -> 鉴权 -> Token 颁发"这条链路：
+
+```
+Streamlit 页面 (app.py:120)
+  → 调用 LoginUseCase (application/auth.py:45)
+    → UserRepository 查询用户 (domain/models.py:200)
+      → Postgres 或 InMemory 适配器 (infrastructure/repositories.py:88)
+        → JWT Token 生成 (infrastructure/auth.py:30)
+          → 返回结果给页面
+```
+
+**每一步都告诉你文件位置和行号。** 你可以在编辑器里对照着学。
+
+### Skill 4：repo-design-optimizer（设计优化师）
+
+当你想优化项目时，这个 Skill 会：
+
+1. 从 **6 个维度**（性能、可靠性、扩展性、可维护性、可观测性、安全性）全面扫描；
+2. 每个问题都附上**源码证据、影响程度、优先级、优化方案**；
+3. **先设计验证方案，再改代码**；
+4. 自动建议 branch 或 worktree 方案，做好回滚准备。
+
+真正改代码前要有验证计划，这个习惯能救你很多次。
+
+### Skill 5：repo-design-coach（学习教练）
+
+这是最特别的一个——它反过来考你。
+
+* 一次只问一个问题；
+* 你回答后，它用**源码证据纠正你**；
+* 从 Level 1 到 Level 5 逐步加深；
+* 帮你形成**面试式的表达方式**。
+
+***
+
+## 05 技术架构：这个项目是怎么工作的？
+
+这个项目本身也值得学习。它面向的不是"人类读者"，而是 **AI Agent**。
+
+```
+repo-system-design-skills/
+  codex/
+    skills/                 # Codex 格式，包含 agents/openai.yaml
+      repo-system-design-lab/
+      repo-architecture-mapper/
+      repo-flow-tracer/
+      repo-design-optimizer/
+      repo-design-coach/
+  claude/
+    skills/                 # Claude Code 格式，SKILL.md + references
+      repo-system-design-lab/
+      repo-architecture-mapper/
+      repo-flow-tracer/
+      repo-design-optimizer/
+      repo-design-coach/
+```
+
+### 值得注意的设计亮点
+
+**亮点 1：双平台兼容**
+
+同一套方法论同时兼容 Codex（OpenAI）和 Claude Code。两个版本的 Skill 逻辑相同，只是格式不同（Codex 需要 agents/openai.yaml 元数据，Claude 用 SKILL.md）。
+
+**亮点 2：Skill 分层设计**
+
+采用"总控 + 专用执行 + 反向教学"三层，每层用途明确：
+
+* 总控负责编排学习流程；
+* 专用 Skill 负责单领域深度分析；
+* 教练 Skill 验证学习效果。
+
+**亮点 3：引用驱动的证据链**
+
+每条架构结论都必须引用源码文件。这是这套 Skill 最有价值的设计——它强迫 Agent 读代码而不是编结论。
+
+**亮点 4：区分 Evidence / Inference / Open Question**
+
+这是最值得面试时讲的设计细节。不是所有结论都能从源码确定，区分这三种状态才是系统设计的成熟思维。
+
+***
+
+## 06 核心难点：做一个让 Agent 教人的 Skill 难在哪？
+
+### 难点 1：Agent 很容易编造
+
+Agent 的天性是生成看起来合理的文本，而不是严谨推理。
+
+这个项目的解法是：**强制要求每个架构结论都引用源码文件和行号。** 如果 Agent 不能引用源码，就不算 Evidence，只能算 Inference。
+
+### 难点 2：Agent 很难把握"只读"边界
+
+Agent 被问到项目问题时总想写代码。
+
+这个项目的解法是：**在 Skill 文档中明确声明"Non-Negotiables"（不可妥协原则）**，包括"学习阶段不修改代码"。
+
+### 难点 3：学习效果很难验证
+
+传统的"让 Agent 讲给你听"方式，学完就忘。
+
+这个项目的解法是：**用教练 Skill 做反向教学**，让 Agent 出题考你。
+
+***
+
+## 07 怎么用？手把手带你走完 10 轮学习
+
+项目附带了一个完整的示例教程，用 **Kstheme/Study-Planner** 这个真实的开源项目做案例。
+
+![](/images/repo-system-design/study-planner.png)
+
+> Study-Planner 是一个 AI 学习计划生成工具，包含 Streamlit UI、Application Use Case、Domain Model、Agent Workflow、RAG、持久化，以及 Real/Fake 基础设施适配——本身就是非常适合练手的中等复杂度项目。
+
+教程一共 **10 轮**，每一轮使用不同的 Skill，解决一个层次的问题。下面带你走一遍。
+
+***
+
+### 第 1 轮：仓库总览（repo-system-design-lab）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-system-design-lab 带我逐步学习 Kstheme/Study-Planner 的 system design。
+这一轮只读分析，不要优化，也不要改代码。
+请验证 README 和 docs/system-design.md 是否与源码一致，并输出：
+1. 项目一句话定位
+2. 主要模块和职责
+3. 运行入口
+4. 外部依赖
+5. 最值得深入的 5 条核心链路
+所有结论都必须引用源码文件。
+```
+
+**你得到的输出：**
+
+Agent 会从 README 开始读，然后扫描目录结构，找到入口文件 `study_planner/interfaces/streamlit/app.py`，逐层了解：
+
+* **应用层**（`study_planner/application/`）—— 用例编排
+* **领域层**（`study_planner/domain/models.py`）—— 数据模型
+* **Agent 层**（`study_planner/agents/planner_workflow.py`）—— Agent 工作流
+* **基础设施层**（`study_planner/infrastructure/`）—— LLM、RAG、数据库适配器
+
+输出中会明确标注哪些结论来自源码（Evidence）、哪些是推理（Inference）、哪些还不确定（Open Question）。
+
+**✅ 这一轮你学到的是：** 从宏观上理解项目在做什么、用了什么技术栈、去哪里看核心代码。
+
+***
+
+### 第 2 轮：架构地图（repo-architecture-mapper）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-architecture-mapper 分析 Kstheme/Study-Planner。
+请基于源码输出：
+1. 分层架构图
+2. 运行时 / 部署图
+3. 数据所有权图
+4. Fake 模式和 Real 模式切换图
+并用源码证据解释每个模块边界。
+```
+
+**你得到的输出：**
+
+Agent 会扫描整个项目，然后输出多个架构图（文字描述形式）：
+
+**分层架构图：**
+
+```
+┌──────────────────────────────────┐
+│  interfaces/streamlit/app.py     │  ← 页面渲染和用户交互
+├──────────────────────────────────┤
+│  application/                    │  ← 用例编排（GeneratePlanUseCase 等）
+├──────────────────────────────────┤
+│  domain/models.py                │  ← 数据模型，尽量无外部依赖
+├──────────────────────────────────┤
+│  agents/planner_workflow.py      │  ← Agent 工作流（profile→resource→planner→critic）
+├──────────────────────────────────┤
+│  infrastructure/                 │  ← LLM、RAG、DB、Fake/Real 切换
+│   ├─ llm/   ├─ rag/   ├─ db/    │
+│   └─ settings/                   │
+└──────────────────────────────────┘
+```
+
+Agent 还会标注每个分层的源码位置，比如：
+
+* `infrastructure/db/postgres/repositories.py` 里的 PostgresStudyPlanRepository 实现了 domain 定义的接口
+* `infrastructure/llm/fake.py` 里的 FakeLLM 让你可以在不调用真实 API 的情况下测试
+
+**✅ 这一轮你学到的是：** 项目的骨架和模块边界，知道每一层代码放哪里、为什么这样放。
+
+***
+
+### 第 3 轮：学习计划生成链路（repo-flow-tracer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer trace "配置学习目标 -> 生成学习计划 -> 保存计划"。
+请从 Streamlit 页面开始，一直追到 GenerateStudyPlanUseCase、PlannerWorkflow、
+Domain Model、校验逻辑和持久化。
+输出调用链表、sequence diagram、可靠性说明和有源码依据的设计取舍。
+```
+
+**你得到的输出：**
+
+Agent 会从 `app.py` 里的 Streamlit 按钮事件开始，一步步追踪：
+
+```
+Streamlit 页面 (app.py:85) — 用户点击"生成计划"
+  → GenerateStudyPlanUseCase (application/use_cases.py:42)
+    → PlannerWorkflow.run() (agents/planner_workflow.py:30)
+      → Profile 节点收集学习目标
+      → Planner 节点生成计划草稿
+      → Critic 节点校验并修复
+      → Output 节点格式化结果
+    → 校验 StudyPlan domain model 完整性 (domain/models.py:120)
+  → StorageService 保存 (infrastructure/storage.py:55)
+    → PostgresStudyPlanRepository 持久化
+```
+
+**每一步都带文件和行号引用。**
+
+你不仅能读懂流程，还能看到设计取舍——比如 PlannerWorkflow 内部有个 **repair loop**：如果 Critic 节点发现计划有问题，会自动触发重试，最多 3 次。这是典型的 Agent 可靠性设计。
+
+**✅ 这一轮你学到的是：** 一条完整功能链路从 UI 到数据库的全貌，以及沿途的工程决策。
+
+***
+
+### 第 4 轮：Agent Workflow 深度分析（repo-flow-tracer）
+
+这是对上一轮的补充——不再看链路宽度，而是深入一个模块。
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer 深入分析 PlannerWorkflow。
+重点解释 profile、knowledge、resource、planner、critic、output 这些节点如何协作。
+请说明 repair loop、Fake/Real LLM 切换、错误处理和 debug trace 的设计。
+最后问我 5 个问题检查理解。
+```
+
+**你得到的输出：**
+
+Agent 会深入 `agents/planner_workflow.py`，逐一拆解每个节点的输入输出：
+
+| 节点      | 职责                           | 源码位置              |
+| --------- | ------------------------------ | --------------------- |
+| Profile   | 收集学习目标、时间、水平       | `agents/nodes.py:20`  |
+| Knowledge | 检索相关领域知识               | `agents/nodes.py:50`  |
+| Resource  | 推荐学习资源                   | `agents/nodes.py:80`  |
+| Planner   | 生成学习计划草稿               | `agents/nodes.py:110` |
+| Critic    | 校验计划质量，触发 repair loop | `agents/nodes.py:140` |
+| Output    | 格式化最终输出                 | `agents/nodes.py:170` |
+
+你还会学到：
+
+* **Repair loop 如何工作**：Critic 发现计划缺少前置知识标注 → 通知 Planner 修正 → 重新校验，循环最多 3 次。如果第 3 次仍不合格，返回最后一次结果并标记 warning。
+* **Fake/Real 切换**：通过配置开关，不调用真实 LLM 也能测试整个 Workflow。
+* **错误处理**：每个节点都有超时控制，单个节点失败不会让整个 Workflow 崩溃。
+
+最后 Agent 会问你 5 个问题，检查你是不是真的理解了。
+
+**✅ 这一轮你学到的是：** 一个生产级别的 Agent Workflow 工程实现，包括容错、重试和可观测性设计。
+
+***
+
+### 第 5 轮：RAG 链路（repo-flow-tracer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer trace "资料上传 -> 解析 -> chunk -> embedding/index -> 检索 -> LLM 回答 -> citation"。
+请解释 local services 和 real services 的边界，
+以及 Milvus、PostgreSQL、LLM 分别承担什么角色。
+```
+
+**你得到的输出：**
+
+Agent 会带你走完完整的 RAG 链路：
+
+```
+用户上传 PDF/文档
+  → 文件解析 (infrastructure/parsers/)
+    → 文本分块 Chunking (infrastructure/rag/chunking.py:30)
+      → Embedding 向量化 (infrastructure/llm/embeddings.py:45)
+        → 向量写入 Milvus (infrastructure/rag/vector_store.py:60)
+          → 用户提问后向量检索 (infrastructure/rag/retriever.py:80)
+            → LLM 生成回答 + 引用标注 (agents/rag_workflow.py:100)
+```
+
+**三种存储各司其职：**
+
+* **Milvus**：向量数据库，存储文档 Embedding，做相似度检索
+* **PostgreSQL**：关系数据库，存储用户信息、学习计划、任务状态
+* **LLM**（本地或云端）：负责生成回答和引用
+
+你还能看到 **Fake 模式下的替换方案**——本地测试时用简单的向量相似度替代 Milvus，用 MockLLM 替代真实模型调用。
+
+**✅ 这一轮你学到的是：** RAG 系统的完整数据流和组件职责拆分。
+
+***
+
+### 第 6 轮：持久化和状态设计（repo-flow-tracer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-flow-tracer 分析 Study-Planner 的状态和持久化设计。
+重点看 Streamlit session_state、StorageService、InMemory repositories、Postgres repositories。
+请回答：谁是 source of truth？哪些情况下状态可能不一致？应该如何优化？
+```
+
+**你得到的输出：**
+
+这是最有"系统设计"味的一轮。Agent 会分析：
+
+* **Streamlit session\_state**：前端临时状态，页面刷新即丢失
+* **InMemory repositories**：测试用，重启后数据消失
+* **Postgres repositories**：生产环境的 source of truth
+
+Agent 会指出一个 **值得注意的设计问题**：session\_state 中的数据与数据库之间存在短暂不一致窗口——用户看到页面上的计划是 session\_state 缓存的，但数据库可能已经被其他操作更新了。
+
+**这是典型的系统设计面试话题——缓存一致性问题。**
+
+Agent 还会给出优化方向：引入版本号机制或 WebSocket 实时同步。
+
+**✅ 这一轮你学到的是：** 真实项目中的状态管理和一致性权衡——这是面试必考的内容。
+
+***
+
+### 第 7 轮：复盘与重排（repo-flow-tracer）
+
+```
+使用 $repo-flow-tracer trace "任务完成情况 -> 生成复盘 -> 判断是否需要重排 -> 生成调整计划 -> 保存"。
+重点解释如何保护已完成任务、如何校验调整后的计划、哪些失败场景需要处理。
+```
+
+Agent 会分析 Study-Planner 的计划更新机制，重点解释：
+
+* **已完成任务保护**：重排时已标记为完成的任务不会被覆盖或删除
+* **计划调整校验**：新计划需要经过 Critic 验证，确保不遗漏前置知识
+* **失败场景处理**：部分任务失败时，标记为"受阻"而不是"完成"，保留上下文
+
+**✅ 这一轮你学到的是：** 增量更新的设计思路——不是每次修改都全量重算。
+
+***
+
+### 第 8 轮：系统设计评审（repo-design-optimizer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-design-optimizer 对 Study-Planner 做系统设计评审。
+先不要改代码。
+请从性能、可靠性、扩展性、可维护性、可观测性、安全性 6 个维度找问题。
+每个问题都要包含源码证据、影响、优先级、优化方案和验证方法。
+```
+
+**你得到的输出：**
+
+Agent 会从 6 个维度逐个扫描，输出一个完整的评审表（每个问题都带源码行号）：
+
+| 维度     | 问题                       | 源码证据                             | 影响                 | 优先级 |
+| -------- | -------------------------- | ------------------------------------ | -------------------- | ------ |
+| 性能     | RAG 检索无缓存             | `infrastructure/rag/retriever.py:45` | 相同问题重复调用 LLM | 高     |
+| 可靠性   | Repair loop 无最大轮次限制 | `agents/planner_workflow.py:85`      | 极端情况可能死循环   | 高     |
+| 可观测性 | 缺少结构化日志             | `infrastructure/llm/real.py:22`      | 线上问题排查困难     | 中     |
+| 安全性   | API Key 硬编码风险         | `infrastructure/settings.py:10`      | 密钥泄露             | 高     |
+
+每个问题都有具体的验证方案——比如"为 RAG 添加 LRU Cache，通过命中率 benchmark 验证"。
+
+**✅ 这一轮你学到的是：** 怎么系统性地评审一个项目的架构质量——不只是找 Bug，而是从工程维度全面扫描。
+
+***
+
+### 第 9 轮：安全优化实验（repo-design-optimizer）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-design-optimizer 为排名最高的 1 个优化点设计安全实验。
+请先检查 git 状态。
+然后建议 branch 或 worktree 方案，并输出涉及文件、最小有效改动、测试命令、
+benchmark/verification 和回滚方式。
+先不要实现，等我确认。
+```
+
+Agent 会：
+
+1. 先检查你的 git 状态，确保工作区干净
+2. 设计一个安全实验方案——比如用新 branch 修复 Repair loop 的无限重试问题
+3. 列出涉及的文件、最小改动量、测试方法、验证指标和回滚步骤
+4. **等你确认后才开始改代码**
+
+这是最重要的习惯：**先有验证计划，再动手改代码。**
+
+**✅ 这一轮你学到的是：** 安全地进行架构优化实验的方法论——不是莽改，而是有计划、有验证、有回滚。
+
+***
+
+### 第 10 轮：反向教学（repo-design-coach）
+
+**你要输入的 Prompt：**
+
+```
+使用 $repo-design-coach 考我 Study-Planner 的 system design。
+一次只问一个问题。
+我回答后，你用源码证据纠正我。
+从 Level 1 开始，逐步到 Level 5。
+```
+
+**你得到的体验：**
+
+Agent 会从最简单的 Level 1 开始问：
+
+> **Level 1 问题：** Study-Planner 的运行时入口在哪里？它是什么类型的应用？
+
+你回答后，Agent 会对照源码纠正你的理解偏差：
+
+> **你的回答：** 入口在 app.py，是一个 Web 应用。
+>
+> **Agent 纠正：** 更准确地说，入口在 `study_planner/interfaces/streamlit/app.py:85`，是一个 **Streamlit 单页应用**（SSP），不是传统的前后端分离 Web 应用。Streamlit 的特点是页面状态由 `session_state` 管理，不需要手动写前端路由。这是选择 Streamlit 作为 Prototyping 工具的关键设计决策。
+
+问题会逐步深入，一直到 Level 5：
+
+> **Level 5 问题：** 如果 Study-Planner 要支持 1000 个并发用户，你觉得当前架构中最大的瓶颈是什么？你至少需要引用 3 个源码位置来支持你的判断。
+
+**✅ 这一轮你学到的是：** 通过被考来发现自己的知识盲区——这是最有效的学习方式之一。
+
+***
+
+### 3 步开启你的学习之旅
+
+以上 10 轮不需要一天做完。**建议一周 2-3 轮，每轮 30-45 分钟。**
+
+**第 1 步：安装 Skills 到目标项目**
+
+```bash
+cd your-project
+mkdir -p .claude
+cp -R path/to/repo-system-design-skills/claude/skills .claude/
+```
+
+**第 2 步：在 Claude Code 中输入**
+
+```
+使用 $repo-system-design-lab 学习这个项目的 system design。
+先只读分析，输出架构地图，推荐 3 条核心链路。
+所有结论必须引用源码文件。
+```
+
+**第 3 步：开始第一轮学习**
+
+Agent 会从 README 开始，逐步扫描配置文件、目录结构、代码入口，然后输出有源码依据的架构分析。
+
+***
+
+## 08 总结
+
+很多人在学系统设计时，都会掉进同一个坑：
+
+**你读了书、背了题、看了别人的架构图，但你没有系统性地分析过自己写的代码。**
+
+Repo System Design Skills 的价值不在于它有多智能，而在于它建立了一套可以重复使用的、有方法论支撑的**学习框架**。
+
+* 它让 Agent 从"帮你写代码"变成"教你理解代码"；
+* 它让学习从"听了就忘"变成"有据可查、有练有考"；
+* 它让系统设计能力从"面试突击"变成"日常积累"。
+
+**下次接手一个新项目，别急着写代码。**
+
+先用这套 Skill 花 30 分钟理解它的架构。你学到的不仅是这个项目，而是理解任何项目的能力。
+
+***
+
+## 互动问题
+
+> 你在学习系统设计时，最大的困难是看不懂源码、找不到学习主线，还是面试不知道怎么说？
+
+***
+
+## 参考资料
+
+* Repo System Design Skills（GitHub）：项目地址，详见当前仓库
+* Kstheme/Study-Planner：https://github.com/Kstheme/Study-Planner
+
+---
+
+---
+url: /zh/article/transformer-self-attention/index.md
+---
+# Transformer 面试必考：自注意力机制详细拆解 + 为什么它比 RNN 更适合长序列？
+> 面试官："请详细解释 Transformer 模型中的自注意力机制是如何工作的？它为什么比 RNN 更适合处理长序列？"
+> 如果你能流畅答出下面这些内容，这一题就是满分。
+
+***
+
+## 一、自注意力机制如何工作？
+
+### 1. 直观理解：让每个词看到整个句子
+
+假设输入一句话：
+**"The cat sat on the mat because it was tired."**
+我们希望模型理解"it"指代的是"cat"。
+
+* **RNN**：需要从第一个词一步步读到最后一个词，把信息压缩在一个隐状态里，距离越远越容易丢失。
+* **自注意力**：让"it"直接看到句子中所有其他词，并自动分配注意力权重——对"cat"权重很高，对"mat"权重很低。
+
+这就是自注意力的核心思想：**每个词与序列中所有词计算相关性，再汇总信息**。
+
+***
+
+### 2. 核心计算：缩放点积注意力（带形状推导）
+
+每个输入词被投影为三个向量：
+
+* **Query（Q）**：代表"我当前在找什么"。
+* **Key（K）**：代表"我手里有什么信息标签"。
+* **Value（V）**：代表"我实际要贡献的信息内容"。
+
+> 设输入序列长度为 $n$，每个词的嵌入维度为 $d\_{model}$。
+> 注意力运算中 Q、K 的维度为 $d\_k$，V 的维度为 $d\_v$（通常 $d\_k = d\_v$）。
+
+#### 步骤 1：线性投影
+
+* 输入矩阵 $X$ 的形状：$(n, d\_{model})$
+* 可学习的权重矩阵：
+  * $W^Q$ 形状：$(d\_{model}, d\_k)$
+  * $W^K$ 形状：$(d\_{model}, d\_k)$
+  * $W^V$ 形状：$(d\_{model}, d\_v)$
+* 得到三个矩阵：
+  $$
+  Q = XW^Q \quad \text{形状} (n, d\_k) \\
+  K = XW^K \quad \text{形状} (n, d\_k) \\
+  V = XW^V \quad \text{形状} (n, d\_v)
+  $$
+
+#### 步骤 2：计算注意力分数
+
+用 Query 和所有位置的 Key 做点积：
+$$
+\text{Scores} = QK^T
+$$
+
+* $Q$ 形状 $(n, d\_k)$，$K^T$ 形状 $(d\_k, n)$ → 结果形状 $(n, n)$
+* 每个元素 $\text{score}\_{ij}$ 表示位置 $i$ 对位置 $j$ 的原始关注程度。
+
+#### 步骤 3：缩放
+
+除以 $\sqrt{d\_k}$ 防止点积过大：
+$$
+\text{Scaled Scores} = \frac{QK^T}{\sqrt{d\_k}}
+$$
+
+形状仍为 $(n, n)$。
+
+#### 步骤 4：Softmax 归一化
+
+对每一行做 softmax，得到注意力权重矩阵 $A$：
+$$
+A\_{ij} = \frac{\exp(\text{score}*{ij}/\sqrt{d\_k})}{\sum*{k=1}^n \exp(\text{score}\_{ik}/\sqrt{d\_k})}
+$$
+
+形状仍为 $(n, n)$，每一行的权重之和为 1。
+此时 $A\_{ij}$ 表示位置 $i$ 从位置 $j$ 获取信息的比例。
+
+#### 步骤 5：加权求和
+
+用注意力权重对所有 Value 向量加权求和：
+$$
+\text{Attention}(Q, K, V) = A \cdot V
+$$
+
+* $A$ 形状 $(n, n)$，$V$ 形状 $(n, d\_v)$ → 结果形状 $(n, d\_v)$
+
+**每个位置的输出都动态融合了整个序列的上下文信息。**
+
+***
+
+### 3. 多头注意力：不同子空间的同时关注（带形状推导）
+
+单头只能捕捉一种关系。Transformer 使用**多头注意力**，让模型从多个角度同时学习。
+
+* 设定头数 $h$，每个头的 Q、K 维度 $d\_k = d\_{model} / h$，V 维度 $d\_v = d\_{model} / h$。
+
+* 对每个头 $i$，有独立的投影权重：
+  * $W\_i^Q$ 形状：$(d\_{model}, d\_k)$
+  * $W\_i^K$ 形状：$(d\_{model}, d\_k)$
+  * $W\_i^V$ 形状：$(d\_{model}, d\_v)$
+
+* 计算每个头的注意力：
+  $$
+  \text{head}\_i = \text{Attention}(QW\_i^Q, KW\_i^K, VW\_i^V)
+  $$
+  每个 $\text{head}\_i$ 的形状为 $(n, d\_v)$。
+
+* 将所有头的结果拼接：
+  $$
+  \text{Concat}(\text{head}*1, \dots, \text{head}*h)
+  $$
+  由于 $h \times d\_v = d*{model}$，拼接后形状恢复为 $(n, d*{model})$。
+
+* 最后经过一个线性投影矩阵 $W^O$（形状 $(d\_{model}, d\_{model})$）：
+  $$
+  \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}\_1, \dots, \text{head}*h) W^O
+  $$
+  输出形状仍为 $(n, d*{model})$。
+
+> 这保证了多头注意力在变换维度的同时，能与后续的残差连接和层归一化无缝衔接。
+
+***
+
+### 4. 弥补位置信息的缺失：位置编码
+
+自注意力本身是**排列等变**的——打乱输入顺序，输出只是同等打乱。
+为了注入序列顺序，Transformer 在输入词向量上叠加**位置编码** $P$，$P$ 的形状也是 $(n, d\_{model})$，通过正弦/余弦函数或可学习的嵌入得到。
+
+叠加后输入变为 $X + P$，使模型能够区分"A 在 B 前面"这种位置关系。
+
+***
+
+## 二、为什么自注意力比 RNN 更适合长序列？
+
+| 对比维度 | RNN | Transformer 自注意力 |
+|---------|-----|----------------------|
+| **信息流动路径长度** | O(n)，长程依赖衰减严重 | **O(1)**，任意两个词直接连接 |
+| **并行能力** | 必须按时间步顺序计算 | 矩阵乘法，整个序列一次性并行 |
+| **梯度稳定性** | BPTT 连乘，易消失/爆炸 | 梯度只穿过 Softmax 和线性层，路径极短 |
+| **记忆瓶颈** | 压缩在固定大小的隐状态中，信息被稀释 | 每个输出可直接访问完整 Value 矩阵 |
+| **可解释性** | 较难 | 注意力权重矩阵 $n \times n$ 可直接可视化 |
+| **复杂度** | O(n·d²) 但顺序依赖 | 标准 O(n²·d)，但高度并行，实际快于 RNN |
+
+### 详细解释
+
+1. **信息流动路径长度是 O(1)**
+   RNN 从第一个词传信息到第 $n$ 个词需 $n$ 步递归，长程依赖衰减严重。自注意力通过一次矩阵乘法建立任意两位置的直接连接，路径恒为 1。
+
+2. **完全并行化，训练效率飞跃**
+   RNN 必须按时间步顺序计算，无法在序列维度上并行。自注意力本质是矩阵乘法，整个序列可一次性并行处理，GPU 利用率极高，训练速度快几十倍。
+
+3. **梯度传播更稳定**
+   RNN 的 BPTT 涉及连乘，易梯度消失/爆炸。自注意力的梯度仅穿过 Softmax 和线性映射，路径极短，梯度稳定，远距离依赖信号更易学习。
+
+4. **无固定大小的记忆瓶颈**
+   RNN 将全部历史压缩在一个固定维度的隐状态中，长序列信息被稀释。自注意力中每个输出可直接访问完整 Value 矩阵，记忆容量随序列长度自然扩展。
+
+5. **可解释性更强**
+   注意力权重矩阵 $A$（$n \times n$）可直接可视化，清晰展示词与词之间的依赖关系，便于调试和分析。
+
+6. **复杂度对比与前沿方案**
+   标准自注意力时间复杂度 $O(n^2)$，但矩阵乘法高度并行，在几千长度内实际快于 RNN 的顺序计算。对极长序列，已有稀疏注意力、线性注意力、状态空间模型等变体降至 $O(n)$ 或 $O(n\log n)$，并保留全局感受野，依然优于 RNN。
+
+***
+
+## 三、面试回答模板（简洁版）
+
+面试时被问到这个，你可以这样简洁地回答：
+
+### 自注意力怎么工作？
+
+> 想象每个词都在开圆桌会议，能直接跟任何词对话，而不是像 RNN 那样只能传话。
+>
+> 具体计算很直接：
+> 输入序列 X，形状 `[n, d_model]`。
+> 用三个矩阵把 X 分别投影成 Q（查询）、K（键）、V（值），形状分别为 `[n, d_k]`、`[n, d_k]`、`[n, d_v]`。
+> 在标准多头注意力里 `d_k = d_v = d_model / h`。
+>
+> 然后：
+>
+> 1. **算分数**：`S = QKᵀ` → 形状 `[n, n]`。
+> 2. **缩放**：`S / √d_k`。
+> 3. **Softmax**：对每行做，得到权重矩阵 A（`[n, n]`，每行和为 1）。
+> 4. **加权求和**：`A V` → 输出 `[n, d_v]`，每个词都融合了全局上下文。
+>
+> 多头就是并行做 h 次上述过程，每个头学不同关系，最后把所有头结果拼成 `[n, d_model]` 再线性映射。
+> 因为自注意力对顺序无感，我们要给输入加上**位置编码**，告诉模型词的位置。
+
+### 为什么比 RNN 更适合长序列？
+
+> 核心就四点：
+>
+> 1. **路径极短**：任意两个词直接连接（O(1)），长程依赖不会丢失。
+> 2. **彻底并行**：全是矩阵乘法，整个句子一次丢进 GPU，训练快几十倍。
+> 3. **梯度稳定**：只穿过 Softmax 和线性层，没有连乘，优化稳定得多。
+> 4. **没有记忆瓶颈**：能直接取用任意位置的 V，信息无损，无需"遗忘"。
+>
+> 一句话：自注意力用**全局直接交互**替代了 RNN 的**逐步递归压缩**，从根本上解决了长序列建模的核心痛点。
+
+***
+
+## 四、总结
+
+* **自注意力**：Q、K、V 点积缩放 + Softmax + 加权求和 → 每个词聚合全局信息。
+* **多头注意力**：多个子空间并行学习，拼接后线性变换。
+* **相比 RNN**：路径 O(1)、完全并行、梯度稳定、无记忆瓶颈、可解释性强。
+
+**面试时如果能讲清楚 QKV 的形状变化、为什么除 $\sqrt{d\_k}$、多头如何拼接，再对比 RNN 的四点优势，面试官会非常认可。**
+
+***
+
+**如果觉得有用，欢迎点赞、在看、转发给正在刷题的朋友～**
+
+---
+
+---
+url: /zh/demo/index.md
+---
+# Demo
+* [bar](./bar.md)
+* [foo](./foo.md)
+
+---
+
+---
+url: /zh/demo/89e8wbux/index.md
+---
+# bar
+[foo](./foo.md)
+
+---
+
+---
+url: /zh/demo/pk670uy1/index.md
+---
+# foo
+[bar](./bar.md)
+
+---
+
+---
+url: /zh/project/index.md
+---
+# 项目
+一个我构建和维护的开源项目集合。
+
+智能学习规划工具，帮助组织学习计划并跟踪进度。专注于高效和易用性。
+
+**[GitHub →](https://github.com/Kstheme/Study-Planner)**
+
+用于认知任务自动化的智能代理框架。旨在通过自适应推理简化复杂工作流。
+
+**[GitHub →](https://github.com/Kstheme/Cognify-Agent)**
+
+教育诊断代理，分析学习模式并提供个性化的改进建议。
+
+**[GitHub →](https://github.com/Kstheme/EduDiag-Agent)**
+
+轻量级 RSS 阅读器，从多个来源聚合和消费内容。
+
+**[GitHub →](https://github.com/Kstheme/RSSFeedReader)**
+
+书生第四期实训营的学习笔记和练习，涵盖 LLM 基础和实践项目。
+
+**[GitHub →](https://github.com/Kstheme/InternLM_notebook)**
+
+个人博客和作品集网站，基于 VuePress 构建，配有自定义主题设计。
+
+**[GitHub →](https://github.com/Kstheme/Kstheme.github.io)**
