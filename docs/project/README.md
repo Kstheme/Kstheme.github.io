@@ -8,60 +8,41 @@ A collection of open-source projects I've built and maintained.
 
 <VPCard title="Study-Planner" icon="material-symbols:calendar-clock-outline">
 
-A smart study planning tool that helps organize learning schedules and track progress. Built with a focus on efficiency and ease of use.
+An AI-powered learning operating system that turns goals into structured study plans. Features RAG-based Q&A over your materials, daily task tracking, automated review reports, and intelligent replanning.
 
 <Badge type="tip" text="Python" />
-<Badge type="info" text="⭐ 5" />
+<Badge type="info" text="⭐ 6" />
 
 **[GitHub →](https://github.com/Kstheme/Study-Planner)**
 
 </VPCard>
 
-<VPCard title="Cognify-Agent" icon="material-symbols:psychology-outline">
+<VPCard title="repo-system-design-skills" icon="material-symbols:code-blocks-outline">
 
-An intelligent agent framework for cognitive task automation. Designed to streamline complex workflows with adaptive reasoning.
+Reusable skill modules for learning system design from real codebases. Maps architecture, traces data flow, and coaches design decisions — works with both Claude Code and Codex.
 
-<Badge type="tip" text="Python" />
+<Badge type="tip" text="Markdown" />
 
-**[GitHub →](https://github.com/Kstheme/Cognify-Agent)**
-
-</VPCard>
-
-<VPCard title="EduDiag-Agent" icon="material-symbols:diagnosis-outline">
-
-An educational diagnosis agent that analyzes learning patterns and provides personalized recommendations for improvement.
-
-<Badge type="tip" text="Python" />
-
-**[GitHub →](https://github.com/Kstheme/EduDiag-Agent)**
+**[GitHub →](https://github.com/Kstheme/repo-system-design-skills)**
 
 </VPCard>
 
-<VPCard title="RSSFeedReader" icon="material-symbols:rss-feed-outline">
+<VPCard title="nature-skills" icon="material-symbols:auto-stories-outline">
 
-A lightweight RSS feed reader for aggregating and consuming content from multiple sources in one place.
+A collection of reusable AI-agent skills for scientific research, targeting Nature-style academic writing and figure creation. I contributed the **Nature-Paper-Card** skill — it generates source-constrained, in-depth Paper Cards (sections 01–16) covering method logic, evidence chains, conclusion boundaries, and critical analysis, helping researchers deeply understand papers and discover new research ideas.
 
-<Badge type="tip" text="PowerShell" />
+<Badge type="tip" text="Markdown" />
+<Badge type="info" text="Fork" />
 
-**[GitHub →](https://github.com/Kstheme/RSSFeedReader)**
-
-</VPCard>
-
-<VPCard title="InternLM Notebook" icon="material-symbols:school-outline">
-
-Study notes and exercises from the InternLM practical training camp, covering LLM fundamentals and hands-on projects.
-
-<Badge type="tip" text="Jupyter Notebook" />
-
-**[GitHub →](https://github.com/Kstheme/InternLM_notebook)**
+**[GitHub →](https://github.com/Yuan1z0825/nature-skills)**
 
 </VPCard>
 
 <VPCard title="Kstheme.github.io" icon="material-symbols:globe-outline">
 
-Personal blog and portfolio site, built with VuePress and themed with custom design.
+Personal blog and portfolio built with VuePress & vuepress-theme-plume. Sharing insights on AI, LLMs, and software engineering.
 
-<Badge type="tip" text="HTML" />
+<Badge type="tip" text="TypeScript" />
 
 **[GitHub →](https://github.com/Kstheme/Kstheme.github.io)**
 
