@@ -10,7 +10,7 @@ tags:
   - 李宏毅
 title: "从 Flash Attention 到 Speculative Decoding：大模型推理加速最全解读"
 createTime: 2026/07/01 18:16:40
-permalink: /zh/blog/inference-acceleration/
+permalink: /zh/article/inference-acceleration/
 ---
 
 > 用过 ChatGPT 的人都知道，模型生成回答需要等几秒甚至几十秒。这背后的瓶颈在哪？有没有办法让大模型"说快一点"？本文从底层原理出发，拆解 6 大类加速方案，帮你建立起完整的推理加速知识框架。

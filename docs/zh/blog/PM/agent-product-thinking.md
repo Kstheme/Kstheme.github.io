@@ -10,7 +10,7 @@ tags:
   - 需求分析
 title: '会技术，但不知道做什么 Agent 产品？我从这 3 个案例里找到了一套办法'
 createTime: 2026/07/04 15:18:20
-permalink: /zh/blog/agent-product-thinking/
+permalink: /zh/article/agent-product-thinking/
 ---
 
 我之前一直有个挺现实的困惑。

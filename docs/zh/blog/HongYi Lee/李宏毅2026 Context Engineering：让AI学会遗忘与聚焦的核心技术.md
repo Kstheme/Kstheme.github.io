@@ -9,7 +9,7 @@ tags:
   - 李宏毅
 title: '李宏毅2026 Context Engineering：让AI学会"遗忘"与"聚焦"的核心技术'
 createTime: 2026/06/16 15:18:20
-permalink: /zh/blog/context-engineering/
+permalink: /zh/article/context-engineering/
 ---
 
 ## 一、 为什么大语言模型需要上下文管理？

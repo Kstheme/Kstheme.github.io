@@ -1,4 +1,4 @@
-﻿---
+---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -9,9 +9,9 @@ tags:
   - geometry
   - paper
   - aaai
-title: "Why Can a 13B Small Model Solve Geometry Problems That GPT Gets Wrong? 鈥?A Close Reading of AAAI-25 GNS"
+title: "Why Can a 13B Small Model Solve Geometry Problems That GPT Gets Wrong? — A Close Reading of AAAI-25 GNS"
 createTime: 2026/07/29 17:27:20
-permalink: /blog/gns-neural-symbolic-geometry/
+permalink: /article/gns-neural-symbolic-geometry/
 copyright: Kstheme
 ---
 
@@ -21,13 +21,13 @@ copyright: Kstheme
 
 The problem was simple: triangle ABC is bisected perpendicularly by DE. The area of triangle ABC is 8.0. Find the area of triangle ADE.
 
-GPT-4o wrote a seemingly correct chain of reasoning 鈥?it correctly identified DE as the perpendicular bisector of BC, correctly noted that triangles ADE and ABC are similar, but tripped on the ratio and gave the wrong answer. Gemini-1.5-Flash directly wrote the wrong proportional relationship.
+GPT-4o wrote a seemingly correct chain of reasoning — it correctly identified DE as the perpendicular bisector of BC, correctly noted that triangles ADE and ABC are similar, but tripped on the ratio and gave the wrong answer. Gemini-1.5-Flash directly wrote the wrong proportional relationship.
 
-Yet a small 7B model, specially fine-tuned, used a clean pipeline of "Pythagorean theorem 鈫?ratio calculation 鈫?symbolic program" and arrived at the correct answer.
+Yet a small 7B model, specially fine-tuned, used a clean pipeline of "Pythagorean theorem → ratio calculation → symbolic program" and arrived at the correct answer.
 
-This is not an isolated case. When OpenAI released GPT-4o in May 2024, it achieved 60.6% accuracy on the geometry problem-solving subtask of MathVista 鈥?impressive for a ~1.8 trillion parameter model costing billions to train. Yet just months later, a AAAI-25 paper pushed this number to **63.9%** using a model with only 4.2B parameters, surpassing GPT-4o and Gemini Ultra to top the leaderboard.
+This is not an isolated case. When OpenAI released GPT-4o in May 2024, it achieved 60.6% accuracy on the geometry problem-solving subtask of MathVista — impressive for a ~1.8 trillion parameter model costing billions to train. Yet just months later, a AAAI-25 paper pushed this number to **63.9%** using a model with only 4.2B parameters, surpassing GPT-4o and Gemini Ultra to top the leaderboard.
 
-The method is not a bigger model, more data, or longer training. It's an idea discussed for years but rarely successfully implemented 鈥?**bringing symbolic reasoning back into neural networks.**
+The method is not a bigger model, more data, or longer training. It's an idea discussed for years but rarely successfully implemented — **bringing symbolic reasoning back into neural networks.**
 
 **Abstract: This paper proposes GNS (Geometry Neural-Symbolic), a framework that explicitly parses visual information from plane geometry problems into symbolic clauses, enabling MLLMs to first "read" geometry diagrams, then use symbolic solvers for precise computation. GNS achieves superior PGP performance across multiple benchmarks with models far smaller than GPT-4o.**
 
@@ -44,7 +44,7 @@ _Accuracy comparison of different MLLM backbones on MathVista geometry tasks, be
 | **Research Task**      | Plane Geometry Problem (PGP) Solving                                                                                              |
 | **Core Method**        | Neural-Symbolic MLLM framework with four modules: Knowledge Prediction, Symbolic Parsing, Problem Reasoning, Symbolic Computation |
 | **Technical Approach** | MLLM full-parameter fine-tuning + structured prompt pipeline + SymPy symbolic solving                                             |
-| **Training**           | Yes 鈥?full-parameter fine-tuning                                                                                                  |
+| **Training**           | Yes — full-parameter fine-tuning                                                                                                  |
 | **Dataset**            | GNS-260K (built from PGPS9K, GeoQA+, Geo170K; 9,426 unique diagrams, expanded to 260K samples)                                    |
 | **Key Results**        | MathVista GPS 63.9% (#1, surpassing GPT-4o 60.6%); GeoQA new SOTA; MathVerse significant improvement                              |
 | **Keywords**           | Plane Geometry Solving, Neural-Symbolic Reasoning, MLLM, Symbolic Parsing, GNS-260K                                               |
@@ -69,12 +69,12 @@ _Three essential difficulties of plane geometry problem solving: cross-modal inf
 
 ## 04 Why Existing Methods Fall Short
 
-| Approach                     | Representative Work          | Key Limitation                                                   |
-| ---------------------------- | ---------------------------- | ---------------------------------------------------------------- |
-| **Early Rule-Based**         | Seo et al. (2014, 2015)[^1]  | Small datasets, rigid rules                                      |
-| **Neural Methods**           | NGS, UniGeo[^2][^3]          | Coarse geometry understanding                                    |
+| Approach                     | Representative Work     | Key Limitation                                                   |
+| ---------------------------- | ----------------------- | ---------------------------------------------------------------- |
+| **Early Rule-Based**         | Seo et al. (2014, 2015)[^1] | Small datasets, rigid rules                                      |
+| **Neural Methods**           | NGS, UniGeo[^2][^3]        | Coarse geometry understanding                                    |
 | **Symbolic Methods**         | Inter-GPS, FormalGeo[^4][^5] | Limited data, predefined rules                                   |
-| **MLLM + Data Augmentation** | G-LLaVA + Geo170K[^6]        | Treats PGP as generic QA, lacks explicit geometric understanding |
+| **MLLM + Data Augmentation** | G-LLaVA + Geo170K[^6]     | Treats PGP as generic QA, lacks explicit geometric understanding |
 
 The core problem: **none of these approaches simultaneously combine the flexibility of neural networks for understanding with the precision of symbolic systems for reasoning.**
 
@@ -90,11 +90,16 @@ GNS is a four-module pipeline. Given a plane geometry problem $P = [Q, I]$ ($Q$:
 
 ```text
 Text Question(Q) + Diagram(I)
-      鈹?      鈹溾攢鈹€鈫?[Knowledge Prediction] 鈥?determine required theorem categories
-      鈹?      鈹溾攢鈹€鈫?[Symbolic Parsing]     鈥?parse diagram/text into symbolic clauses
-      鈹?      鈹斺攢鈹€鈫?[Problem Reasoning]    鈥?reason with diagram, knowledge, and clauses
-                    鈹?               [Symbolic Computation] 鈥?solve precisely with SymPy
-                    鈹?                Final numerical answer
+      │
+      ├──→ [Knowledge Prediction] — determine required theorem categories
+      │
+      ├──→ [Symbolic Parsing]     — parse diagram/text into symbolic clauses
+      │
+      └──→ [Problem Reasoning]    — reason with diagram, knowledge, and clauses
+                    │
+               [Symbolic Computation] — solve precisely with SymPy
+                    │
+                Final numerical answer
 ```
 
 | Module                   | Input                                      | Output                                   | Problem Solved                                    |
@@ -107,7 +112,7 @@ Text Question(Q) + Diagram(I)
 Two key design choices:
 
 1. Knowledge Prediction and Symbolic Parsing run **in parallel**, avoiding sequential error propagation.
-2. Symbolic Computation is **not optional** 鈥?without it, accuracy drops 3.4-4.8% even when geometry relations are correctly understood[^7].
+2. Symbolic Computation is **not optional** — without it, accuracy drops 3.4-4.8% even when geometry relations are correctly understood[^7].
 
 ![](/images/gns/framework.png)
 
@@ -160,7 +165,7 @@ GNS chooses a single-pass pipeline because **geometry problem-solving is natural
 | **GNS-Phi3-Vision**     | **4.2B**   | **63.9%** |
 | **GNS-LLaVA-13B**       | **13B**    | **63.9%** |
 | G-LLaVA-13B (prev SOTA) | 13B        | 56.7%     |
-| Human baseline          | 鈥?         | 48.4%     |
+| Human baseline          | —          | 48.4%     |
 
 All 5 GNS-MLLMs surpass human baseline. The smallest (DeepSeek-VL-1.3B at 55.3%) already reaches 95%+ of G-LLaVA-13B's level.
 
@@ -170,15 +175,15 @@ All 5 GNS-MLLMs surpass human baseline. The smallest (DeepSeek-VL-1.3B at 55.3%)
 
 | Setting | Knowledge Prediction | Symbolic Parsing | Symbolic Computation | Accuracy |
 | ------- | -------------------- | ---------------- | -------------------- | -------- |
-| 鈶?      | 鉁?                   | 鉁?               | 鉁?                   | 52.4%    |
-| 鈶?      | 鉁?                   | 鉁?               | 鉁?                   | 55.8%    |
-| 鈶?      | 鉁?                   | 鉁?               | 鉁?                   | 60.6%    |
-| 鈶?      | 鉁?                   | 鉁?               | 鉁?                   | 57.2%    |
-| 鈶?      | 鉁?                   | 鉁?               | 鉁?                   | 62.0%    |
+| ①       | ✗                    | ✗                | ✗                    | 52.4%    |
+| ②       | ✗                    | ✗                | ✓                    | 55.8%    |
+| ③       | ✗                    | ✓                | ✓                    | 60.6%    |
+| ④       | ✓                    | ✗                | ✗                    | 57.2%    |
+| ⑤       | ✓                    | ✓                | ✓                    | 62.0%    |
 
-- **Symbolic Computation**: largest contribution (+3.4% from 鈶犫啋鈶? +4.8% from 鈶ｂ啋鈶?
-- **Symbolic Parsing**: medium contribution (+4.8% from 鈶♀啋鈶?
-- **Knowledge Prediction**: smallest contribution (+1.4% from 鈶⑩啋鈶?
+- **Symbolic Computation**: largest contribution (+3.4% from ①→②, +4.8% from ④→⑤)
+- **Symbolic Parsing**: medium contribution (+4.8% from ②→③)
+- **Knowledge Prediction**: smallest contribution (+1.4% from ③→⑤)
 
 ![](/images/gns/ablation.png)
 
@@ -244,11 +249,11 @@ All 5 GNS-MLLMs surpass human baseline. The smallest (DeepSeek-VL-1.3B at 55.3%)
 | Dataset-specific formats     | Unified symbolic solving system                        |
 | Volume-driven                | Structure-driven                                       |
 
-The true insight: **when neural networks hit a bottleneck on a task, the most effective improvement may not be scaling up the model, but designing a suitable "structural interface" 鈥?letting models do what they're good at (understanding, reasoning) while delegating what they're not (precise computation, symbolic operations) to specialized tools.**
+The true insight: **when neural networks hit a bottleneck on a task, the most effective improvement may not be scaling up the model, but designing a suitable "structural interface" — letting models do what they're good at (understanding, reasoning) while delegating what they're not (precise computation, symbolic operations) to specialized tools.**
 
 ![](/images/gns/paradigm-shift.png)
 
-_GNS's core paradigm shift: from "implicit encoding 鈫?NL reasoning" single channel to "explicit symbolic parsing 鈫?neural reasoning + symbolic computation" dual channel._
+_GNS's core paradigm shift: from "implicit encoding → NL reasoning" single channel to "explicit symbolic parsing → neural reasoning + symbolic computation" dual channel._
 
 ---
 
@@ -257,15 +262,11 @@ _Based on Ning et al. (AAAI-25) "GNS: Solving Plane Geometry Problems by Neural-
 ## References
 
 [^1]: Seo M, Hajishirzi H, Farhadi A, et al. Solving geometry problems: Combining text and diagram interpretation[C]//Proceedings of the 2015 conference on empirical methods in natural language processing. 2015: 1466-1476.
-
 [^2]: Chen J, Tang J, Qin J, et al. Geoqa: A geometric question answering benchmark towards multimodal numerical reasoning[C]//Findings of the Association for Computational Linguistics: ACL-IJCNLP 2021. 2021: 513-523.
-
 [^3]: Chen J, Li T, Qin J, et al. Unigeo: Unifying geometry logical reasoning via reformulating mathematical expression[C]//Proceedings of the 2022 conference on empirical methods in natural language processing. 2022: 3313-3323.
-
 [^4]: Lu P, Gong R, Jiang S, et al. Inter-gps: Interpretable geometry problem solving with formal language and symbolic reasoning[C]//Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers). 2021: 6774-6786.
-
 [^5]: Zhang X, Zhu N, He Y, et al. Formalgeo: The first step toward human-like imo-level geometric automated reasoning[J]. arXiv preprint arXiv:2310.18021, 2023.
-
 [^6]: Gao J, Pi R, Zhang J, et al. G-llava: Solving geometric problem with multi-modal large language model[C]//International Conference on Learning Representations. 2025, 2025: 3490-3511.
-
 [^7]: Gao L, Madaan A, Zhou S, et al. Pal: Program-aided language models[C]//International conference on machine learning. PMLR, 2023: 10764-10799.
+
+Copyright Ownership: Kstheme, Contributors: Kstheme

@@ -9,7 +9,7 @@ tags:
   - agent
 title: "把任何 GitHub 仓库变成系统设计课：这个开源项目做到了"
 createTime: 2026/06/21 23:26:20
-permalink: /zh/blog/repo-system-design-skills/
+permalink: /zh/article/repo-system-design-skills/
 ---
 
 > 你是不是也这样：接手一个项目先跑起来再说，遇到 Bug 就加日志，看到新 PR 就 merge，但一年下来问你这个项目架构怎么设计的，你答不上来？

@@ -9,7 +9,7 @@ tags:
   - 李宏毅
 title: '三个实验，回答一个核心问题：AI Agent 之间到底能不能「真正对话」？'
 createTime: 2026/06/16 15:18:20
-permalink: /zh/blog/agent-interaction-experiments/
+permalink: /zh/article/agent-interaction-experiments/
 ---
 
 > 一个 AI 创立了宗教，有五大教义。

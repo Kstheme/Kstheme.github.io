@@ -1,4 +1,4 @@
-﻿---
+---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -10,11 +10,13 @@ tags:
   - hung-yi-lee
 title: "The Most Complete Breakdown of LLM Positional Encoding: Absolute, Relative, Rotary, and No Positional Encoding at All"
 createTime: 2026/07/22 17:53:20
-permalink: /blog/positional-encoding-guide/
+permalink: /article/positional-encoding-guide/
 copyright: Kstheme
 ---
 
-> **Abstract**: Transformer's Self-Attention itself does not perceive token order 鈥?shuffling the tokens of "the cat ate the fish" produces exactly the same Attention output. This article systematically traces the complete technical evolution of Positional Embedding: from the clock-hand analogy of Sinusoidal absolute positional encoding, to ALiBi and T5 relative positional biases, to the mathematical principles of RoPE (Rotary Position Embedding), and finally exploring Train Short Test Long extension methods and the "no positional encoding" NoPE/DroPE approaches.
+> **Abstract**: Transformer's Self-Attention itself does not perceive token order — shuffling the tokens of "the cat ate the fish" produces exactly the same Attention output. This article systematically traces the complete technical evolution of Positional Embedding: from the clock-hand analogy of Sinusoidal absolute positional encoding, to ALiBi and T5 relative positional biases, to the mathematical principles of RoPE (Rotary Position Embedding), and finally exploring Train Short Test Long extension methods and the "no positional encoding" NoPE/DroPE approaches.
+
+Copyright Ownership: Kstheme, Contributors: Kstheme
 
 ---
 
@@ -99,7 +101,7 @@ Plotting all Position Embeddings would look like this:
 
 #### Clock Hand Analogy: Second Hand, Minute Hand, Hour Hand
 
-We can view Sinusoidal Positional Embedding differently: even dimensions use Sine, odd dimensions use Cosine. So we can imagine each pair $2i$ and $2i+1$ as a **2D vector** (a clock hand on a 2D plane). This hand rotates as $k$ increases 鈥?when $k$ rises, the hand rotates counterclockwise.
+We can view Sinusoidal Positional Embedding differently: even dimensions use Sine, odd dimensions use Cosine. So we can imagine each pair $2i$ and $2i+1$ as a **2D vector** (a clock hand on a 2D plane). This hand rotates as $k$ increases — when $k$ rises, the hand rotates counterclockwise.
 
 ![](/images/positional-encoding/pe-11.png)
 
@@ -125,7 +127,7 @@ Different $i$ values have different periods:
 | $i = 32$ (dimensions 64, 65)   | 628.3     |
 | $i = 63$ (dimensions 126, 127) | 54410.1   |
 
-The first two dimensions rotate fastest 鈥?about 6.3 tokens per cycle. Dimensions 10-11 rotate more slowly. Dimensions 100-101 barely change within the first 6 tokens.
+The first two dimensions rotate fastest — about 6.3 tokens per cycle. Dimensions 10-11 rotate more slowly. Dimensions 100-101 barely change within the first 6 tokens.
 
 Every two dimensions form a hand. The fastest is the **second hand**, slower is the **minute hand**, slowest is the **hour hand**. With dimension 128, we have **64 hands**. The Transformer uses these 64 hands and their positions to determine each token's location.
 
@@ -141,11 +143,11 @@ Relative Position means: in the sentence "the cat ate the fish," cat and fish ar
 
 ![](/images/positional-encoding/pe-13.png)
 
-If I insert many tokens before cat 鈥?say 1000 tokens 鈥?but **the relative position between cat and fish remains unchanged**, we want fish's attention on cat to remain unchanged. Even if fish is at position 1004 and cat at 1001, fish's attention score for cat remains 0.7.
+If I insert many tokens before cat — say 1000 tokens — but **the relative position between cat and fish remains unchanged**, we want fish's attention on cat to remain unchanged. Even if fish is at position 1004 and cat at 1001, fish's attention score for cat remains 0.7.
 
 ![](/images/positional-encoding/pe-14.png)
 
-But if cat is at position 1 and fish at position 1004 鈥?very far apart 鈥?we want fish's attention score for cat to be small.
+But if cat is at position 1 and fish at position 1004 — very far apart — we want fish's attention score for cat to be small.
 
 ![](/images/positional-encoding/pe-15.png)
 
@@ -157,7 +159,7 @@ $$
 
 Where $\boldsymbol{p_k}$ represents position $k$ and $\boldsymbol{p_{k+r}}$ represents position $k+r$.
 
-This formula is independent of $k$ 鈥?it only depends on the **relative position** between $k+r$ and $k$:
+This formula is independent of $k$ — it only depends on the **relative position** between $k+r$ and $k$:
 
 $$
 \begin{align}
@@ -267,7 +269,7 @@ Since using Absolute Positional Embedding to achieve relative positioning is cir
 
 Reference: [https://arxiv.org/abs/2108.12409](https://arxiv.org/abs/2108.12409)
 
-ALiBi's approach: **discard Positional Embedding entirely**. Compute Attention scores without positional information, then **subtract $b(m-n)$** 鈥?the relative distance between positions $m$ and $n$. This makes Attention smaller for distant tokens. The constant $b$ is manually set and can differ per Attention Head.
+ALiBi's approach: **discard Positional Embedding entirely**. Compute Attention scores without positional information, then **subtract $b(m-n)$** — the relative distance between positions $m$ and $n$. This makes Attention smaller for distant tokens. The constant $b$ is manually set and can differ per Attention Head.
 
 ![](/images/positional-encoding/pe-18.png)
 
@@ -301,7 +303,7 @@ $$
 
 $R_{m-n}$ only depends on the **relative position** between A and B, directly encoding relative position into the attention computation.
 
-Key advantage: **It doesn't affect the Attention computation process itself** 鈥?only $q$ and $k$ are modified, and the transformed $k$ can be stored in KV Cache.
+Key advantage: **It doesn't affect the Attention computation process itself** — only $q$ and $k$ are modified, and the transformed $k$ can be stored in KV Cache.
 
 #### Rotation as Position
 
@@ -485,7 +487,7 @@ $$
 \end{align}
 $$
 
-Since $((m+r)-(n+r))\theta = (m-n)\theta$, the result is identical 鈥?confirming relative position invariance.
+Since $((m+r)-(n+r))\theta = (m-n)\theta$, the result is identical — confirming relative position invariance.
 
 #### RoPE Implementation Details
 
@@ -501,15 +503,15 @@ In practice, the **first approach** is preferred. With the first method, both po
 
 #### RoPE vs ALiBi: An Important Distinction
 
-Many misunderstand RoPE 鈥?thinking like ALiBi, farther $k$ and $q$ have smaller Attention weights. But **RoPE does not guarantee this**.
+Many misunderstand RoPE — thinking like ALiBi, farther $k$ and $q$ have smaller Attention weights. But **RoPE does not guarantee this**.
 
 This isn't necessarily a weakness. RoPE can do something ALiBi cannot: **skip intermediate tokens to attend directly to earlier ones**. In ALiBi, farther tokens always have smaller attention. With RoPE, rotation angles can bring certain positions into alignment regardless of distance.
 
 ![](/images/positional-encoding/pe-38.png)
 
-For example, "my cat" and "his dog" 鈥?"cat" should attend to "my" and "dog" to "his," not to the middle word "the." RoPE enables this nuanced attention.
+For example, "my cat" and "his dog" — "cat" should attend to "my" and "dog" to "his," not to the middle word "the." RoPE enables this nuanced attention.
 
-If $q$ and $k$ differ by $2\theta$, but $q$ at $n+1$ and $k$ at $n$ differ by just $\theta$, and $q$ at $n+2$ and $k$ at $n$ might have the same angle 鈥?attention scores can actually increase despite greater distance, allowing the model to skip intermediate tokens.
+If $q$ and $k$ differ by $2\theta$, but $q$ at $n+1$ and $k$ at $n$ differ by just $\theta$, and $q$ at $n+2$ and $k$ at $n$ might have the same angle — attention scores can actually increase despite greater distance, allowing the model to skip intermediate tokens.
 
 ![](/images/positional-encoding/pe-39.png)
 
@@ -547,7 +549,7 @@ When testing with very long sequences:
 
 - **Sinusoidal**: fails immediately on longer sequences.
 - **RoPE**: slightly better than Sinusoidal, but also degrades with length.
-- **ALiBi**: the only one that holds up, because it uses hand-crafted rather than learned parameters 鈥?proving surprisingly robust.
+- **ALiBi**: the only one that holds up, because it uses hand-crafted rather than learned parameters — proving surprisingly robust.
 
 ### Why Does RoPE Fail on Long Sequences?
 
@@ -564,7 +566,7 @@ References:
 
 Solution: **don't assign rotation angles beyond $N$**.
 
-With $LN$ tokens, position numbers don't have to be $1$ to $LN$ 鈥?they can be $\frac{1}{L}$ to $N$:
+With $LN$ tokens, position numbers don't have to be $1$ to $LN$ — they can be $\frac{1}{L}$ to $N$:
 
 ![](/images/positional-encoding/pe-46.png)
 
@@ -588,7 +590,7 @@ Every two dimensions form a rotating pointer. For the first two dimensions, the 
 
 ![](/images/positional-encoding/pe-50.png)
 
-For $\theta_0$, positions beyond $N$ are fine 鈥?it's seen it all. But for $\theta_{32}$, extending $N$ to 256 means encountering an unseen rotation angle.
+For $\theta_0$, positions beyond $N$ are fine — it's seen it all. But for $\theta_{32}$, extending $N$ to 256 means encountering an unseen rotation angle.
 
 ![](/images/positional-encoding/pe-51.png)
 
@@ -623,7 +625,7 @@ Reference: [https://www.reddit.com/r/LocalLLaMA/comments/14mrgpr/dynamically_sca
 
 ![](/images/positional-encoding/pe-54.png)
 
-Dynamic Scaling: use different treatments for different sequence lengths. For short sequences, don't modify 鈥?performance stays good since training saw these lengths.
+Dynamic Scaling: use different treatments for different sequence lengths. For short sequences, don't modify — performance stays good since training saw these lengths.
 
 ![](/images/positional-encoding/pe-55.png)
 
@@ -643,7 +645,7 @@ Reference: [https://arxiv.org/abs/2402.13753](https://arxiv.org/abs/2402.13753)
 
 ![](/images/positional-encoding/pe-58.png)
 
-This achieves remarkable results 鈥?models handling up to **2048K** input length.
+This achieves remarkable results — models handling up to **2048K** input length.
 
 ![](/images/positional-encoding/pe-59.png)
 
@@ -655,7 +657,7 @@ This achieves remarkable results 鈥?models handling up to **2048K** input lengt
 
 Single-layer Self-Attention has no positional information. But **multi-layer** Self-Attention is different.
 
-The first layer captures relationships between tokens. The second layer sees these relationships embedded 鈥?"cat relates to 'ate'" and "fish relates to 'ate'" produce different representations. So "cat ate fish" and "fish ate cat" yield different final Embeddings **even without Positional Embedding**.
+The first layer captures relationships between tokens. The second layer sees these relationships embedded — "cat relates to 'ate'" and "fish relates to 'ate'" produce different representations. So "cat ate fish" and "fish ate cat" yield different final Embeddings **even without Positional Embedding**.
 
 ![](/images/positional-encoding/pe-60.png)
 
@@ -667,7 +669,7 @@ Experiments show that **No Position Embedding works surprisingly well**. On Copy
 
 ![](/images/positional-encoding/pe-61.png)
 
-However, comparing RoPE vs NoPE during training 鈥?NoPE underperforms RoPE.
+However, comparing RoPE vs NoPE during training — NoPE underperforms RoPE.
 
 ![](/images/positional-encoding/pe-62.png)
 

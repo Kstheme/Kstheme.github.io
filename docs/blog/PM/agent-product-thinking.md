@@ -1,4 +1,4 @@
-﻿---
+---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -10,12 +10,12 @@ tags:
   - requirements
 title: "You Know the Tech, but Don't Know What Agent Product to Build? I Found a Framework from 3 Case Studies"
 createTime: 2026/07/04 15:18:20
-permalink: /blog/agent-product-thinking/
+permalink: /article/agent-product-thinking/
 ---
 
 I used to have a very real dilemma.
 
-I knew some tech 鈥?could call models, write prompts, and understood concepts like RAG, Agents, and workflows. But when it came to actually building a product or starting an open-source project, I got stuck.
+I knew some tech — could call models, write prompts, and understood concepts like RAG, Agents, and workflows. But when it came to actually building a product or starting an open-source project, I got stuck.
 
 Not because I couldn't write code, but because I didn't know what to build.
 
@@ -53,11 +53,11 @@ For example:
 - A PM has to extract requirements from comments, tickets, and interviews;
 - An operations person has to monitor competitors and user feedback;
 - An open-source maintainer faces the same repetitive Issues every day;
-- Team knowledge is scattered across Feishu, Notion, GitHub, Slack 鈥?nobody can find it all.
+- Team knowledge is scattered across Feishu, Notion, GitHub, Slack — nobody can find it all.
 
 These are the places where it makes sense to ask: Can an Agent help?
 
-Not "I have Agent technology, so let me find somewhere to use it," but "This task is inherently tedious 鈥?can an Agent make it simpler?"
+Not "I have Agent technology, so let me find somewhere to use it," but "This task is inherently tedious — can an Agent make it simpler?"
 
 I think this is the first line that separates an AI Demo from an AI Product.
 
@@ -83,15 +83,15 @@ Combined, they form four types of opportunities:
 | Life + Instant Gratification | Entertainment, companionship, creation, role-playing | Easy to spread, but monetization may be unstable |
 | Life + Slow Accumulation | Health, habits, growth, long-term companionship | High trust barrier, high product experience requirements |
 
-If you're like me 鈥?technically inclined and wanting to do an open-source project 鈥?I'd suggest starting with the "Work + Instant Gratification" quadrant.
+If you're like me — technically inclined and wanting to do an open-source project — I'd suggest starting with the "Work + Instant Gratification" quadrant.
 
 The reason is straightforward.
 
-Pain points in work scenarios are easier to observe. How the user currently does things, where they're slow, where they make mistakes, where they resort to copy-paste 鈥?these can usually be uncovered through questions. And whether the outcome is good is also easier to judge.
+Pain points in work scenarios are easier to observe. How the user currently does things, where they're slow, where they make mistakes, where they resort to copy-paste — these can usually be uncovered through questions. And whether the outcome is good is also easier to judge.
 
-For example, an Agent that helps developers analyze API documentation 鈥?users can immediately tell if it found the right endpoints.
+For example, an Agent that helps developers analyze API documentation — users can immediately tell if it found the right endpoints.
 
-An Agent that helps PMs organize user feedback 鈥?whether it accurately surfaces real楂橀 issues can be validated relatively quickly.
+An Agent that helps PMs organize user feedback — whether it accurately surfaces real高频 issues can be validated relatively quickly.
 
 These scenarios may not be the sexiest, but they're better for building that first useful thing.
 
@@ -113,7 +113,7 @@ The user's problem isn't grand:
 
 These needs seem small, but that doesn't mean they're unimportant.
 
-Many ToC products come from these kinds of "small situations." The user isn't looking to buy a complex system 鈥?they just want something to help them in a specific moment.
+Many ToC products come from these kinds of "small situations." The user isn't looking to buy a complex system — they just want something to help them in a specific moment.
 
 This is a reminder for building Agent products:
 
@@ -127,7 +127,7 @@ You should look at:
 - What scenarios are younger users asking for help in?
 - Which old products could be rebuilt with AI?
 - Which previous-generation tools solved things awkwardly?
-- Which needs couldn't be addressed before, but current model capabilities鍒氬ソ suffice?
+- Which needs couldn't be addressed before, but current model capabilities刚好 suffice?
 
 The document summarizes several approaches:
 
@@ -142,7 +142,7 @@ Instead, start from a very narrow moment.
 
 Help users write the first sentence. Help them fix an awkward expression. Help them simulate an interview. Help them practice a language. Help them handle a specific type of high-frequency social scenario.
 
-The point here isn't how smart the AI is 鈥?it's whether it saves the user trouble in that specific moment.
+The point here isn't how smart the AI is — it's whether it saves the user trouble in that specific moment.
 
 ## 04 Chat2API: Agents Are Best Suited for "Goal-Oriented, Information-Rich, Multi-Step" Tasks
 
@@ -163,7 +163,7 @@ There's a complete task chain inside:
 3. Retrieves from a large body of API documentation;
 4. Finds potentially relevant interfaces;
 5. Judges how these interfaces work together;
-6. Provides call order and缂栨帓 suggestions;
+6. Provides call order and编排 suggestions;
 7. User then develops and validates based on the suggestions.
 
 See, this is very different from a regular Chatbot.
@@ -214,7 +214,7 @@ Otherwise, you have no idea whether the product is getting better or just findin
 
 ![](/images/agent-product/product-evaluation.png)
 
-## 05 Cursor: Don't Make Your Agent an Island 鈥?Embed It in the User's Workflow
+## 05 Cursor: Don't Make Your Agent an Island — Embed It in the User's Workflow
 
 The third case study is Cursor.
 
@@ -246,13 +246,13 @@ So when building a product, first ask:
 - Where do researchers work? Papers, notes, knowledge bases.
 - Where do open-source maintainers work? GitHub Issues, PRs, Releases.
 
-Put the Agent in these places 鈥?that's more practical than building a new "big platform."
+Put the Agent in these places — that's more practical than building a new "big platform."
 
 There's another very practical point: Agent products don't need to wait until they're 100 points in the early stage.
 
 The PDF has a line, roughly meaning "let a 60-point product swim in the shallow water." I agree.
 
-The鍓嶆彁 is that the scenario you choose is small enough, the risk is鍙帶, and users are willing to try.
+The前提 is that the scenario you choose is small enough, the risk is可控, and users are willing to try.
 
 Let real users start using it, then iterate based on feedback. That's more reliable than polishing behind closed doors for three months.
 
@@ -328,7 +328,7 @@ Evidence can come from:
 - Search trends;
 - Competitor feature gaps;
 - User's existing workflow;
--浠樿垂 behavior.
+-付费 behavior.
 
 For ToC, look at:
 
@@ -348,7 +348,8 @@ For ToB or developer tools, look at:
 
 These tools help you find signals, but they can't understand users for you.
 
-Ultimately, you need to come back to those simple questions: Who is using it? What are they trying to accomplish? How do they do it now? Where does it hurt? Is it significantly better after an Agent浠嬪叆锛?
+Ultimately, you need to come back to those simple questions: Who is using it? What are they trying to accomplish? How do they do it now? Where does it hurt? Is it significantly better after an Agent介入？
+
 ### Step 4: In Interviews, Don't Ask "Would You Use This?"
 
 I used to make this mistake too.
@@ -412,7 +413,7 @@ Otherwise, it's too easy to end up with "add one more summary, add one more expo
 
 One annoying thing about Agent products: the output is unstable.
 
-With regular software, as long as the logic is fixed, testing is relatively straightforward. Agents are different 鈥?they might answer well today, then go off track with a different input tomorrow.
+With regular software, as long as the logic is fixed, testing is relatively straightforward. Agents are different — they might answer well today, then go off track with a different input tomorrow.
 
 So you need to build Evaluation from the early stages.
 
@@ -459,7 +460,7 @@ For example: developers, open-source maintainers, AI application teams, PMs, ope
 
 Second, find their high-frequency tasks.
 
-Developers: reference documentation,淇敼 code, debug bugs.
+Developers: reference documentation,修改 code, debug bugs.
 
 Maintainers: process Issues, write Release Notes.
 
@@ -471,23 +472,23 @@ AI application teams: run evaluations, tune prompts, investigate Agent failures.
 
 Third, look at where existing solutions are uncomfortable.
 
-Too expensive, too heavy, not open-source, hard to deploy, hard to integrate, poor documentation, no localization support, no private data support, or requiring澶ч噺 manual work.
+Too expensive, too heavy, not open-source, hard to deploy, hard to integrate, poor documentation, no localization support, no private data support, or requiring大量 manual work.
 
 Fourth, build the smallest MVP.
 
 Don't build a complete platform from the start.
 
-CLI, browser extension, single-scenario workflow, Feishu/Slack/Discord bot, README + Demo, Prompt Demo 鈥?all viable options.
+CLI, browser extension, single-scenario workflow, Feishu/Slack/Discord bot, README + Demo, Prompt Demo — all viable options.
 
 What you need to validate isn't whether the feature set is comprehensive, but whether users will bring real tasks to try it.
 
 ## 08 A GitHub Issue Analysis Agent, Just as an Example
 
-Here's an example, but it's not the涓昏.
+Here's an example, but it's not the主角.
 
 Suppose the target users are open-source maintainers, or indie developers looking for an open-source project direction.
 
-They have a real task:鎵惧嚭楂橀 pain points and product opportunities from澶ч噺 GitHub Issues.
+They have a real task:找出高频 pain points and product opportunities from大量 GitHub Issues.
 
 How do they do it now?
 
@@ -503,7 +504,7 @@ The problems are obvious:
 
 So you could build a small Agent:
 
-Input a GitHub repository URL, automatically analyze Issues, output user pain points,闇€姹?classification, evidence excerpts, and potential project opportunities.
+Input a GitHub repository URL, automatically analyze Issues, output user pain points,需求 classification, evidence excerpts, and potential project opportunities.
 
 The first version doesn't even need a web UI.
 
@@ -564,7 +565,7 @@ First, pick a group I know well, like developers or PMs.
 
 Then, continuously look at their real feedback for a week: GitHub Issues, G2 negative reviews, Product Hunt comments, Reddit discussions, complaints in group chats.
 
-Don't rush to鍐?code. First record 50 pain points.
+Don't rush to写 code. First record 50 pain points.
 
 Write each one clearly:
 
@@ -574,12 +575,12 @@ Write each one clearly:
 - Where is the trouble;
 - How frequent is it;
 - Is there an existing alternative;
-- Can an Agent鏄庢樉 improve it;
+- Can an Agent明显 improve it;
 - Can you build a very small MVP.
 
 Only if a certain type of pain point appears 5+ times would I consider starting.
 
-And when I start, I don't build a complete product 鈥?I build the smallest version first. It could be a CLI, a browser extension, or even just a semi-automated script.
+And when I start, I don't build a complete product — I build the smallest version first. It could be a CLI, a browser extension, or even just a semi-automated script.
 
 Then find 5 real users to try it.
 
@@ -587,15 +588,15 @@ If they're willing to bring real tasks to use it, then it's worth pursuing.
 
 ## 10 Final Thoughts
 
-Knowing tech but not knowing what product to build 鈥?that's not something to be ashamed of.
+Knowing tech but not knowing what product to build — that's not something to be ashamed of.
 
-Many times, it's not that you don't have enough technical skill 鈥?it's that you haven't placed your tech into real tasks yet.
+Many times, it's not that you don't have enough technical skill — it's that you haven't placed your tech into real tasks yet.
 
 Agent products especially can't stop at "model + chat box."
 
-A better understanding is: an Agent is a task system鍥寸粫鐢ㄦ埛鐩爣, performing planning, tool use, action, and memory.
+A better understanding is: an Agent is a task system围绕用户目标, performing planning, tool use, action, and memory.
 
-So when looking for鏂瑰悜, don't first ask:
+So when looking for方向, don't first ask:
 
 > What technology do I know, so what can I build?
 
@@ -609,7 +610,7 @@ Chat2API reminds us that Agents are suited for goal-oriented, information-rich, 
 
 Cursor reminds us that products should embed themselves in the workflows users already use.
 
-Connect these three points, and your鏂瑰悜 becomes much clearer.
+Connect these three points, and your方向 becomes much clearer.
 
 Not through inspiration, not through stacking technology.
 

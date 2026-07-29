@@ -1,4 +1,4 @@
-﻿---
+---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -8,14 +8,14 @@ tags:
   - python
   - llm
   - openai
-title: "Learn Claude Code (Part 1): Write an Agent Loop from Scratch 鈥?Less Than 200 Lines to Run the Full Model + Tools Pipeline"
+title: "Learn Claude Code (Part 1): Write an Agent Loop from Scratch — Less Than 200 Lines to Run the Full Model + Tools Pipeline"
 createTime: 2026/07/14 13:44:40
-permalink: /blog/agent-loop-handwritten/
+permalink: /article/agent-loop-handwritten/
 ---
 
 > Many people talk about Agents every day, but they don't actually understand how the core "loop" really works.
 >
-> This article walks you through writing a minimal working Agent Loop from scratch. No LangChain, no CrewAI 鈥?just the OpenAI SDK + a while True, running the complete cycle of "model thinks 鈫?calls a tool 鈫?gets the result 鈫?continues reasoning."
+> This article walks you through writing a minimal working Agent Loop from scratch. No LangChain, no CrewAI — just the OpenAI SDK + a while True, running the complete cycle of "model thinks → calls a tool → gets the result → continues reasoning."
 
 ---
 
@@ -49,7 +49,7 @@ When the model receives the question:
 4. **Continues reasoning** based on the command output to give a human-readable answer
 5. **Streams** the answer token by token
 
-The entire loop is fully automated. You just input questions 鈥?the model decides:
+The entire loop is fully automated. You just input questions — the model decides:
 
 - Whether to call a tool
 - Which tool to call
@@ -83,7 +83,7 @@ DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
 DEEPSEEK_MODEL=deepseek-chat
 ```
 
-> Using other models is the same 鈥?just change the base_url and model name.
+> Using other models is the same — just change the base_url and model name.
 
 ---
 
@@ -93,11 +93,11 @@ The entire script is a single file, but we can break it into 5 modules:
 
 ```text
 agent_loop.py
-鈹溾攢鈹€ 鈶?Custom input function  my_input()       # Handle terminal input (backspace, Ctrl+C)
-鈹溾攢鈹€ 鈶?Environment & client    OpenAI client    # API configuration
-鈹溾攢鈹€ 鈶?Tool definitions        TOOLS            # Tell the model what it can call
-鈹溾攢鈹€ 鈶?Tool execution          run_bash()       # Where commands actually run
-鈹斺攢鈹€ 鈶?Agent loop              agent_loop()     # Core: streaming reasoning + auto tool calling
+├── ① Custom input function  my_input()       # Handle terminal input (backspace, Ctrl+C)
+├── ② Environment & client    OpenAI client    # API configuration
+├── ③ Tool definitions        TOOLS            # Tell the model what it can call
+├── ④ Tool execution          run_bash()       # Where commands actually run
+└── ⑤ Agent loop              agent_loop()     # Core: streaming reasoning + auto tool calling
 ```
 
 Let's break them down one by one.
@@ -110,7 +110,7 @@ Let's break them down one by one.
 
 Why is this needed?
 
-Python's built-in `input()` function doesn't handle the Backspace key properly in the terminal 鈥?pressing backspace shows `^H` instead of deleting the character.
+Python's built-in `input()` function doesn't handle the Backspace key properly in the terminal — pressing backspace shows `^H` instead of deleting the character.
 
 So we implement our own `my_input()`:
 
@@ -155,13 +155,13 @@ MODEL = os.getenv("DEEPSEEK_MODEL")
 SYSTEM = f"You are a coding agent at {os.getcwd()}. Use bash to solve tasks. Act, don't explain."
 ```
 
-This is key 鈥?`Act, don't explain` biases the model toward calling tools directly rather than producing lengthy explanations.
+This is key — `Act, don't explain` biases the model toward calling tools directly rather than producing lengthy explanations.
 
 ---
 
 ## 07 Step 3: Tell the Model What Tools It Can Use
 
-This step defines the Agent's "capability boundary." We give the model just one tool 鈥?running Shell commands:
+This step defines the Agent's "capability boundary." We give the model just one tool — running Shell commands:
 
 ```python
 TOOLS = [{
@@ -211,14 +211,14 @@ return out[:50000] if out else "No output."
 
 Key details:
 
-- `timeout=120` 鈥?prevents commands from hanging
-- Output truncated to 50000 characters 鈥?prevents the model from being overwhelmed by excessively long output
+- `timeout=120` — prevents commands from hanging
+- Output truncated to 50000 characters — prevents the model from being overwhelmed by excessively long output
 
 ![](/images/agent-loop/run-bash.png)
 
 ---
 
-## 09 Step 5: The Core 鈥?Agent Loop
+## 09 Step 5: The Core — Agent Loop
 
 This is the **soul** of the entire article.
 
@@ -233,11 +233,13 @@ This function is only about 50 lines, but it's a complete **ReAct loop**.
 The entire process can be broken into four steps:
 
 ```
-鈶?Send a reasoning request (Stream mode)
-    鈫?鈶?Stream the model's output (normal text or Tool Calling instructions)
-    鈫?鈶?Check finish_reason
-   鈹溾攢 "tool_calls" 鈫?execute the tool, append result to messages, continue looping
-   鈹斺攢 "stop"       鈫?return the final answer, done
+① Send a reasoning request (Stream mode)
+    ↓
+② Stream the model's output (normal text or Tool Calling instructions)
+    ↓
+③ Check finish_reason
+   ├─ "tool_calls" → execute the tool, append result to messages, continue looping
+   └─ "stop"       → return the final answer, done
 ```
 
 Let's focus on **streaming Tool Calling**:
@@ -257,7 +259,7 @@ for chunk in stream:
         tool_call_deltas[idx]["function"]["arguments"] += tc.function.arguments
 ```
 
-This is **streaming Function Calling** 鈥?the model "thinks" about parameters while you receive fragments, eventually assembling the complete JSON.
+This is **streaming Function Calling** — the model "thinks" about parameters while you receive fragments, eventually assembling the complete JSON.
 
 ### Determining the Loop Direction
 
@@ -339,7 +341,7 @@ import sys
 import atexit
 import subprocess
 
-# 鈹€鈹€ Custom input function (avoids backspace issues entirely) 鈹€鈹€
+# ── Custom input function (avoids backspace issues entirely) ──
 def my_input(prompt: str = "") -> str:
     import termios
     import tty
@@ -603,13 +605,13 @@ When tool execution fails, let the model try to fix parameters and retry.
 
 The core idea of this article is just one sentence:
 
-> **The essence of an Agent Loop: model reasons 鈫?decides whether to call a tool 鈫?calls the tool 鈫?feeds the result back to the model 鈫?loops until the model says it's done.**
+> **The essence of an Agent Loop: model reasons → decides whether to call a tool → calls the tool → feeds the result back to the model → loops until the model says it's done.**
 
 The entire implementation has only three key code segments:
 
-1. `TOOLS` definition 鈥?tells the model what it can do
-2. `finish_reason` check in `agent_loop()` 鈥?decides whether to loop or stop
-3. `run_bash()` 鈥?actually executes the tool and returns results
+1. `TOOLS` definition — tells the model what it can do
+2. `finish_reason` check in `agent_loop()` — decides whether to loop or stop
+3. `run_bash()` — actually executes the tool and returns results
 
 **200 lines of code, and a complete Agent comes to life.**
 
