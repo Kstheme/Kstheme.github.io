@@ -81,10 +81,10 @@ _平面几何问题求解的三个本质困难：跨模态信息缺口、计算�
 
 | 方法路线          | 代表性工作              | 核心优势                                         | 关键局限                                         |
 | ----------------- | ----------------------- | ------------------------------------------------ | ------------------------------------------------ |
-| **早期规则方法**  | Seo et al. (2014, 2015) | 手工建立了解题框架                               | 数据集规模很小，规则刚性，无法应对题型变化       |
-| **神经网络方法**  | NGS, UniGeo             | 通过视觉问答+专用程序自动解题                    | 几何图形理解粒度粗，未显式解析元素               |
-| **符号方法**      | Inter-GPS, FormalGeo    | 形式化语言表示 + 强符号推理能力                  | 数据有限、规则需预定义、无法生成自然语言解题描述 |
-| **MLLM+数据增强** | G-LLaVA + Geo170K       | 首次将数据集扩展到 170K 规模，可生成自然语言解释 | 仅将 PGP 当通用 QA 处理，缺乏显式几何元素理解    |
+| **早期规则方法**  | Seo et al. (2014, 2015)[^1] | 手工建立了解题框架                               | 数据集规模很小，规则刚性，无法应对题型变化       |
+| **神经网络方法**  | NGS, UniGeo[^2][^3]        | 通过视觉问答+专用程序自动解题                    | 几何图形理解粒度粗，未显式解析元素               |
+| **符号方法**      | Inter-GPS, FormalGeo[^4][^5] | 形式化语言表示 + 强符号推理能力                  | 数据有限、规则需预定义、无法生成自然语言解题描述 |
+| **MLLM+数据增强** | G-LLaVA + Geo170K[^6]     | 首次将数据集扩展到 170K 规模，可生成自然语言解释 | 仅将 PGP 当通用 QA 处理，缺乏显式几何元素理解    |
 
 这些方法的一个核心问题是：**它们要么依赖手工预定义的规则，要么完全依赖神经网络隐式学习，但没有一种方案同时具备神经网络在理解上的灵活性和符号系统在推理上的精确性。**
 
@@ -125,7 +125,7 @@ GNS 是一个四模块流水线框架。给定一个平面几何问题 $P = [Q, 
 
 **第一，知识预测和符号解析是并行的**——两个模块各自接收原始输入，独立输出，避免了顺序依赖导致的误差传递。
 
-**第二，符号计算不是「可选的锦上添花」，而是 GNS 框架的核心组件**。没有这个模块，模型即使理解了几何关系，依然会在数值计算上翻车（实验证实准确率下降 3.4-4.8%）。
+**第二，符号计算不是「可选的锦上添花」，而是 GNS 框架的核心组件**。没有这个模块，模型即使理解了几何关系，依然会在数值计算上翻车（实验证实准确率下降 3.4-4.8%）[^7]。
 
 ![](/images/gns/framework.png)
 
@@ -277,5 +277,15 @@ _GNS 的核心范式转变：将「隐式编码 → 自然语言推理」单通�
 ---
 
 _本文基于 Ning et al. (AAAI-25) 论文 "GNS: Solving Plane Geometry Problems by Neural-Symbolic Reasoning with Multi-Modal LLMs" 撰写。代码和数据：[https://github.com/ning-mz/GNS](https://github.com/ning-mz/GNS)_
+
+## 参考文献
+
+[^1]: Seo M, Hajishirzi H, Farhadi A, et al. Solving geometry problems: Combining text and diagram interpretation[C]//Proceedings of the 2015 conference on empirical methods in natural language processing. 2015: 1466-1476.
+[^2]: Chen J, Tang J, Qin J, et al. Geoqa: A geometric question answering benchmark towards multimodal numerical reasoning[C]//Findings of the Association for Computational Linguistics: ACL-IJCNLP 2021. 2021: 513-523.
+[^3]: Chen J, Li T, Qin J, et al. Unigeo: Unifying geometry logical reasoning via reformulating mathematical expression[C]//Proceedings of the 2022 conference on empirical methods in natural language processing. 2022: 3313-3323.
+[^4]: Lu P, Gong R, Jiang S, et al. Inter-gps: Interpretable geometry problem solving with formal language and symbolic reasoning[C]//Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers). 2021: 6774-6786.
+[^5]: Zhang X, Zhu N, He Y, et al. Formalgeo: The first step toward human-like imo-level geometric automated reasoning[J]. arXiv preprint arXiv:2310.18021, 2023.
+[^6]: Gao J, Pi R, Zhang J, et al. G-llava: Solving geometric problem with multi-modal large language model[C]//International Conference on Learning Representations. 2025, 2025: 3490-3511.
+[^7]: Gao L, Madaan A, Zhou S, et al. Pal: Program-aided language models[C]//International conference on machine learning. PMLR, 2023: 10764-10799.
 
 Copyright Ownership: Kstheme, Contributors: Kstheme

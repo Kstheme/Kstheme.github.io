@@ -71,10 +71,10 @@ _Three essential difficulties of plane geometry problem solving: cross-modal inf
 
 | Approach                     | Representative Work     | Key Limitation                                                   |
 | ---------------------------- | ----------------------- | ---------------------------------------------------------------- |
-| **Early Rule-Based**         | Seo et al. (2014, 2015) | Small datasets, rigid rules                                      |
-| **Neural Methods**           | NGS, UniGeo             | Coarse geometry understanding                                    |
-| **Symbolic Methods**         | Inter-GPS, FormalGeo    | Limited data, predefined rules                                   |
-| **MLLM + Data Augmentation** | G-LLaVA + Geo170K       | Treats PGP as generic QA, lacks explicit geometric understanding |
+| **Early Rule-Based**         | Seo et al. (2014, 2015)[^1] | Small datasets, rigid rules                                      |
+| **Neural Methods**           | NGS, UniGeo[^2][^3]        | Coarse geometry understanding                                    |
+| **Symbolic Methods**         | Inter-GPS, FormalGeo[^4][^5] | Limited data, predefined rules                                   |
+| **MLLM + Data Augmentation** | G-LLaVA + Geo170K[^6]     | Treats PGP as generic QA, lacks explicit geometric understanding |
 
 The core problem: **none of these approaches simultaneously combine the flexibility of neural networks for understanding with the precision of symbolic systems for reasoning.**
 
@@ -112,7 +112,7 @@ Text Question(Q) + Diagram(I)
 Two key design choices:
 
 1. Knowledge Prediction and Symbolic Parsing run **in parallel**, avoiding sequential error propagation.
-2. Symbolic Computation is **not optional** — without it, accuracy drops 3.4-4.8% even when geometry relations are correctly understood.
+2. Symbolic Computation is **not optional** — without it, accuracy drops 3.4-4.8% even when geometry relations are correctly understood[^7].
 
 ![](/images/gns/framework.png)
 
@@ -258,5 +258,15 @@ _GNS's core paradigm shift: from "implicit encoding → NL reasoning" single cha
 ---
 
 _Based on Ning et al. (AAAI-25) "GNS: Solving Plane Geometry Problems by Neural-Symbolic Reasoning with Multi-Modal LLMs." Code and data: [https://github.com/ning-mz/GNS](https://github.com/ning-mz/GNS)_
+
+## References
+
+[^1]: Seo M, Hajishirzi H, Farhadi A, et al. Solving geometry problems: Combining text and diagram interpretation[C]//Proceedings of the 2015 conference on empirical methods in natural language processing. 2015: 1466-1476.
+[^2]: Chen J, Tang J, Qin J, et al. Geoqa: A geometric question answering benchmark towards multimodal numerical reasoning[C]//Findings of the Association for Computational Linguistics: ACL-IJCNLP 2021. 2021: 513-523.
+[^3]: Chen J, Li T, Qin J, et al. Unigeo: Unifying geometry logical reasoning via reformulating mathematical expression[C]//Proceedings of the 2022 conference on empirical methods in natural language processing. 2022: 3313-3323.
+[^4]: Lu P, Gong R, Jiang S, et al. Inter-gps: Interpretable geometry problem solving with formal language and symbolic reasoning[C]//Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers). 2021: 6774-6786.
+[^5]: Zhang X, Zhu N, He Y, et al. Formalgeo: The first step toward human-like imo-level geometric automated reasoning[J]. arXiv preprint arXiv:2310.18021, 2023.
+[^6]: Gao J, Pi R, Zhang J, et al. G-llava: Solving geometric problem with multi-modal large language model[C]//International Conference on Learning Representations. 2025, 2025: 3490-3511.
+[^7]: Gao L, Madaan A, Zhou S, et al. Pal: Program-aided language models[C]//International conference on machine learning. PMLR, 2023: 10764-10799.
 
 Copyright Ownership: Kstheme, Contributors: Kstheme
