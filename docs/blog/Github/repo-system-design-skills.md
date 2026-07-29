@@ -1,4 +1,4 @@
----
+﻿---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -9,7 +9,7 @@ tags:
   - agent
 title: "Turn Any GitHub Repository Into a System Design Course: This Open Source Project Makes It Happen"
 createTime: 2026/06/21 23:26:20
-permalink: /article/repo-system-design-skills/
+permalink: /blog/repo-system-design-skills/
 ---
 
 > Have you ever done this: When taking over a project, you just get it running first. When you encounter a bug, you add some logs. When you see a new PR, you merge it. But a year later, if someone asks you how the project architecture is designed, you can't answer?
@@ -30,9 +30,9 @@ And the result?
 
 When the interviewer asks, "What message queue does your current project use, and why was it chosen?" all you can say is, "Someone else made that choice."
 
-**The real problem isn't that you lack system design knowledge — it's that you've never used source code evidence to understand the architecture of a real system.**
+**The real problem isn't that you lack system design knowledge 鈥?it's that you've never used source code evidence to understand the architecture of a real system.**
 
-The code you write, the bugs you fix, the features you add — these are all system design material. What you're missing is a method to tie them all together.
+The code you write, the bugs you fix, the features you add 鈥?these are all system design material. What you're missing is a method to tie them all together.
 
 ---
 
@@ -76,7 +76,7 @@ It all sounds correct, but **it doesn't cite any source code**. You don't know w
 | Optimization suggestions         | May propose full rewrite | Validates first, experiments safely with branches          |
 | Learning effectiveness           | Forget after hearing     | Tests you, corrects mistakes, creates review cards         |
 
-**The core innovation of this project isn't "helping you read code" — it's establishing a complete methodology for an Agent to teach you system design.**
+**The core innovation of this project isn't "helping you read code" 鈥?it's establishing a complete methodology for an Agent to teach you system design.**
 
 ---
 
@@ -85,32 +85,15 @@ It all sounds correct, but **it doesn't cite any source code**. You don't know w
 The project contains 5 Skills, corresponding to 5 levels of system design learning.
 
 ```
-                   ┌──────────────────┐
-                   │  repo-system-    │
-                   │  design-lab      │  ← Master: plan the learning path
-                   └────────┬─────────┘
-                            │
-                   ┌────────▼─────────┐
-                   │  repo-           │
-                   │  architecture-   │  ← Architecture map: module boundaries,
-                   │  mapper          │    dependencies, data flow
-                   └────────┬─────────┘
-                            │
-                   ┌────────▼─────────┐
-                   │  repo-flow-      │
-                   │  tracer          │  ← Flow tracing: from UI to DB,
-                   └────────┬─────────┘    trace the complete path
-                            │
-                   ┌────────▼─────────┐
-                   │  repo-design-    │
-                   │  optimizer       │  ← Optimization review: find bottlenecks,
-                   └────────┬─────────┘    design experiments
-                            │
-                   ┌────────▼─────────┐
-                   │  repo-design-    │
-                   │  coach           │  ← Coach mode: quiz you, interview training
-                   └──────────────────┘
-```
+                   鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                   鈹? repo-system-    鈹?                   鈹? design-lab      鈹? 鈫?Master: plan the learning path
+                   鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                            鈹?                   鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈻尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                   鈹? repo-           鈹?                   鈹? architecture-   鈹? 鈫?Architecture map: module boundaries,
+                   鈹? mapper          鈹?   dependencies, data flow
+                   鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                            鈹?                   鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈻尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                   鈹? repo-flow-      鈹?                   鈹? tracer          鈹? 鈫?Flow tracing: from UI to DB,
+                   鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?   trace the complete path
+                            鈹?                   鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈻尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                   鈹? repo-design-    鈹?                   鈹? optimizer       鈹? 鈫?Optimization review: find bottlenecks,
+                   鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?   design experiments
+                            鈹?                   鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈻尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?                   鈹? repo-design-    鈹?                   鈹? coach           鈹? 鈫?Coach mode: quiz you, interview training
+                   鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?```
 
 ### Skill 1: repo-system-design-lab (Master Lab)
 
@@ -133,21 +116,21 @@ This Skill "draws" your project.
 - Dependency diagram
 - Fake / Real mode switching diagram
 
-**Every diagram has source code evidence.** It doesn't just draw boxes — it tells you "this module's code is in `src/services/`, entry point at `main.go:42`."
+**Every diagram has source code evidence.** It doesn't just draw boxes 鈥?it tells you "this module's code is in `src/services/`, entry point at `main.go:42`."
 
 ### Skill 3: repo-flow-tracer (Flow Tracing)
 
 This one is the most practical in my opinion.
 
-Say you want to understand the "user login → authentication → token issuance" flow:
+Say you want to understand the "user login 鈫?authentication 鈫?token issuance" flow:
 
 ```
 Streamlit page (app.py:120)
-  → Call LoginUseCase (application/auth.py:45)
-    → UserRepository queries user (domain/models.py:200)
-      → Postgres or InMemory adapter (infrastructure/repositories.py:88)
-        → JWT Token generation (infrastructure/auth.py:30)
-          → Return result to page
+  鈫?Call LoginUseCase (application/auth.py:45)
+    鈫?UserRepository queries user (domain/models.py:200)
+      鈫?Postgres or InMemory adapter (infrastructure/repositories.py:88)
+        鈫?JWT Token generation (infrastructure/auth.py:30)
+          鈫?Return result to page
 ```
 
 **Every step tells you the file location and line number.** You can follow along in your editor.
@@ -165,7 +148,7 @@ Having a validation plan before actually changing code is a habit that will save
 
 ### Skill 5: repo-design-coach (Learning Coach)
 
-This is the most unique one — it tests you instead of teaching you.
+This is the most unique one 鈥?it tests you instead of teaching you.
 
 - Asks one question at a time;
 - After you answer, it **corrects you with source code evidence**;
@@ -212,11 +195,11 @@ Adopts a three-layer approach: "Master + Specialized Execution + Reverse Teachin
 
 **Highlight 3: Citation-Driven Evidence Chain**
 
-Every architectural conclusion must cite source files. This is the most valuable design of this Skill set — it forces the Agent to read code rather than fabricate conclusions.
+Every architectural conclusion must cite source files. This is the most valuable design of this Skill set 鈥?it forces the Agent to read code rather than fabricate conclusions.
 
 **Highlight 4: Distinguishing Evidence / Inference / Open Question**
 
-This is the design detail most worth mentioning in an interview. Not all conclusions can be determined from source code alone — distinguishing these three states is a sign of mature system design thinking.
+This is the design detail most worth mentioning in an interview. Not all conclusions can be determined from source code alone 鈥?distinguishing these three states is a sign of mature system design thinking.
 
 ---
 
@@ -226,7 +209,7 @@ This is the design detail most worth mentioning in an interview. Not all conclus
 
 An Agent's nature is to generate text that looks reasonable, not to reason rigorously.
 
-This project's solution: **Mandate that every architecture conclusion cites source code files and line numbers.** If the Agent can't cite source code, it doesn't count as Evidence — only Inference.
+This project's solution: **Mandate that every architecture conclusion cites source code files and line numbers.** If the Agent can't cite source code, it doesn't count as Evidence 鈥?only Inference.
 
 ### Challenge 2: Agents Struggle with "Read-Only" Boundaries
 
@@ -238,7 +221,7 @@ This project's solution: **Explicitly declare "Non-Negotiables" in the Skill doc
 
 The traditional "have the Agent lecture you" approach leads to forgetting right after learning.
 
-This project's solution: **Use the coach Skill for reverse teaching** — have the Agent quiz you.
+This project's solution: **Use the coach Skill for reverse teaching** 鈥?have the Agent quiz you.
 
 ---
 
@@ -248,7 +231,7 @@ The project includes a complete example tutorial using the real open-source proj
 
 ![](/images/repo-system-design/study-planner.png)
 
-> Study-Planner is an AI study plan generation tool, featuring Streamlit UI, Application Use Cases, Domain Models, Agent Workflows, RAG, persistence, and Real/Fake infrastructure adapters — a medium-complexity project perfect for practice.
+> Study-Planner is an AI study plan generation tool, featuring Streamlit UI, Application Use Cases, Domain Models, Agent Workflows, RAG, persistence, and Real/Fake infrastructure adapters 鈥?a medium-complexity project perfect for practice.
 
 The tutorial includes **10 rounds**, each using a different Skill to solve one level of problem. Let's walk through it.
 
@@ -260,7 +243,7 @@ The tutorial includes **10 rounds**, each using a different Skill to solve one l
 
 ```
 Use $repo-system-design-lab to gradually teach me the system design of Kstheme/Study-Planner.
-This round is read-only analysis — no optimization, no code changes.
+This round is read-only analysis 鈥?no optimization, no code changes.
 Please verify if the README and docs/system-design.md are consistent with the source code, and output:
 1. One-sentence project overview
 2. Main modules and their responsibilities
@@ -274,14 +257,14 @@ All conclusions must cite source code files.
 
 The Agent starts reading the README, scans the directory structure, finds the entry file `study_planner/interfaces/streamlit/app.py`, and explores layer by layer:
 
-- **Application layer** (`study_planner/application/`) — use case orchestration
-- **Domain layer** (`study_planner/domain/models.py`) — data models
-- **Agent layer** (`study_planner/agents/planner_workflow.py`) — Agent workflow
-- **Infrastructure layer** (`study_planner/infrastructure/`) — LLM, RAG, database adapters
+- **Application layer** (`study_planner/application/`) 鈥?use case orchestration
+- **Domain layer** (`study_planner/domain/models.py`) 鈥?data models
+- **Agent layer** (`study_planner/agents/planner_workflow.py`) 鈥?Agent workflow
+- **Infrastructure layer** (`study_planner/infrastructure/`) 鈥?LLM, RAG, database adapters
 
 The output explicitly marks which conclusions come from source code (Evidence), which are inferences (Inference), and which are still uncertain (Open Question).
 
-**✅ What you learn:** A macro-level understanding of what the project does, what tech stack it uses, and where to look for core code.
+**鉁?What you learn:** A macro-level understanding of what the project does, what tech stack it uses, and where to look for core code.
 
 ---
 
@@ -306,27 +289,19 @@ The Agent scans the entire project and outputs multiple architecture diagrams (i
 **Layered Architecture Diagram:**
 
 ```
-┌──────────────────────────────────┐
-│  interfaces/streamlit/app.py     │  ← Page rendering and user interaction
-├──────────────────────────────────┤
-│  application/                    │  ← Use case orchestration (GeneratePlanUseCase, etc.)
-├──────────────────────────────────┤
-│  domain/models.py                │  ← Data models, minimal external dependencies
-├──────────────────────────────────┤
-│  agents/planner_workflow.py      │  ← Agent workflow (profile→resource→planner→critic)
-├──────────────────────────────────┤
-│  infrastructure/                 │  ← LLM, RAG, DB, Fake/Real switching
-│   ├─ llm/   ├─ rag/   ├─ db/    │
-│   └─ settings/                   │
-└──────────────────────────────────┘
-```
+鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? interfaces/streamlit/app.py     鈹? 鈫?Page rendering and user interaction
+鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? application/                    鈹? 鈫?Use case orchestration (GeneratePlanUseCase, etc.)
+鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? domain/models.py                鈹? 鈫?Data models, minimal external dependencies
+鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? agents/planner_workflow.py      鈹? 鈫?Agent workflow (profile鈫抮esource鈫抪lanner鈫抍ritic)
+鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? infrastructure/                 鈹? 鈫?LLM, RAG, DB, Fake/Real switching
+鈹?  鈹溾攢 llm/   鈹溾攢 rag/   鈹溾攢 db/    鈹?鈹?  鈹斺攢 settings/                   鈹?鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?```
 
 The Agent also annotates source code locations for each layer, such as:
 
 - `PostgresStudyPlanRepository` in `infrastructure/db/postgres/repositories.py` implements the domain-defined interface
 - `FakeLLM` in `infrastructure/llm/fake.py` lets you test without calling a real API
 
-**✅ What you learn:** The project's skeleton and module boundaries — knowing where each layer's code lives and why it's organized that way.
+**鉁?What you learn:** The project's skeleton and module boundaries 鈥?knowing where each layer's code lives and why it's organized that way.
 
 ---
 
@@ -335,7 +310,7 @@ The Agent also annotates source code locations for each layer, such as:
 **Your Prompt:**
 
 ```
-Use $repo-flow-tracer to trace "configure study goals → generate study plan → save plan".
+Use $repo-flow-tracer to trace "configure study goals 鈫?generate study plan 鈫?save plan".
 Start from the Streamlit page, trace all the way through GenerateStudyPlanUseCase, PlannerWorkflow,
 Domain Model, validation logic, and persistence.
 Output a call chain, sequence diagram, reliability notes, and design trade-offs with source evidence.
@@ -346,29 +321,29 @@ Output a call chain, sequence diagram, reliability notes, and design trade-offs 
 The Agent starts tracing from the Streamlit button event in `app.py`:
 
 ```
-Streamlit page (app.py:85) — user clicks "Generate Plan"
-  → GenerateStudyPlanUseCase (application/use_cases.py:42)
-    → PlannerWorkflow.run() (agents/planner_workflow.py:30)
-      → Profile node collects study goals
-      → Planner node generates draft plan
-      → Critic node validates and fixes
-      → Output node formats the result
-    → Validate StudyPlan domain model integrity (domain/models.py:120)
-  → StorageService saves (infrastructure/storage.py:55)
-    → PostgresStudyPlanRepository persists
+Streamlit page (app.py:85) 鈥?user clicks "Generate Plan"
+  鈫?GenerateStudyPlanUseCase (application/use_cases.py:42)
+    鈫?PlannerWorkflow.run() (agents/planner_workflow.py:30)
+      鈫?Profile node collects study goals
+      鈫?Planner node generates draft plan
+      鈫?Critic node validates and fixes
+      鈫?Output node formats the result
+    鈫?Validate StudyPlan domain model integrity (domain/models.py:120)
+  鈫?StorageService saves (infrastructure/storage.py:55)
+    鈫?PostgresStudyPlanRepository persists
 ```
 
 **Every step includes file and line number references.**
 
-You can not only understand the flow but also see design trade-offs — for example, PlannerWorkflow has an internal **repair loop**: if the Critic node finds issues with the plan, it triggers a retry, up to 3 times. This is a classic Agent reliability design.
+You can not only understand the flow but also see design trade-offs 鈥?for example, PlannerWorkflow has an internal **repair loop**: if the Critic node finds issues with the plan, it triggers a retry, up to 3 times. This is a classic Agent reliability design.
 
-**✅ What you learn:** A complete functional flow from UI to database, and the engineering decisions along the way.
+**鉁?What you learn:** A complete functional flow from UI to database, and the engineering decisions along the way.
 
 ---
 
 ### Round 4: Agent Workflow Deep Dive (repo-flow-tracer)
 
-This complements the previous round — instead of looking at flow breadth, it dives deep into one module.
+This complements the previous round 鈥?instead of looking at flow breadth, it dives deep into one module.
 
 **Your Prompt:**
 
@@ -394,13 +369,13 @@ The Agent dives into `agents/planner_workflow.py`, breaking down each node's inp
 
 You'll also learn:
 
-- **How the Repair Loop works**: Critic finds missing prerequisite annotations → notifies Planner to fix → re-validate, loop up to 3 times. If still不合格 after 3 tries, return the last result with a warning.
+- **How the Repair Loop works**: Critic finds missing prerequisite annotations 鈫?notifies Planner to fix 鈫?re-validate, loop up to 3 times. If still涓嶅悎鏍?after 3 tries, return the last result with a warning.
 - **Fake/Real switching**: Through a config toggle, you can test the entire Workflow without calling a real LLM.
 - **Error handling**: Each node has timeout control; a single node failure won't crash the entire Workflow.
 
 Finally, the Agent asks you 5 questions to verify your understanding.
 
-**✅ What you learn:** A production-grade Agent Workflow engineering implementation, including fault tolerance, retry, and observability design.
+**鉁?What you learn:** A production-grade Agent Workflow engineering implementation, including fault tolerance, retry, and observability design.
 
 ---
 
@@ -409,7 +384,7 @@ Finally, the Agent asks you 5 questions to verify your understanding.
 **Your Prompt:**
 
 ```
-Use $repo-flow-tracer to trace "upload document → parse → chunk → embedding/index → retrieve → LLM answer → citation".
+Use $repo-flow-tracer to trace "upload document 鈫?parse 鈫?chunk 鈫?embedding/index 鈫?retrieve 鈫?LLM answer 鈫?citation".
 Explain the boundaries between local services and real services,
 and the roles of Milvus, PostgreSQL, and LLM.
 ```
@@ -420,12 +395,12 @@ The Agent walks through the complete RAG pipeline:
 
 ```
 User uploads PDF/document
-  → File parsing (infrastructure/parsers/)
-    → Text chunking (infrastructure/rag/chunking.py:30)
-      → Embedding vectorization (infrastructure/llm/embeddings.py:45)
-        → Vector write to Milvus (infrastructure/rag/vector_store.py:60)
-          → Vector retrieval on user query (infrastructure/rag/retriever.py:80)
-            → LLM generates answer + citation (agents/rag_workflow.py:100)
+  鈫?File parsing (infrastructure/parsers/)
+    鈫?Text chunking (infrastructure/rag/chunking.py:30)
+      鈫?Embedding vectorization (infrastructure/llm/embeddings.py:45)
+        鈫?Vector write to Milvus (infrastructure/rag/vector_store.py:60)
+          鈫?Vector retrieval on user query (infrastructure/rag/retriever.py:80)
+            鈫?LLM generates answer + citation (agents/rag_workflow.py:100)
 ```
 
 **Three storage systems, each with distinct roles:**
@@ -434,9 +409,9 @@ User uploads PDF/document
 - **PostgreSQL**: Relational database, stores user info, study plans, task status
 - **LLM** (local or cloud): Generates answers and citations
 
-You also see the **Fake mode replacements** — during local testing, simple vector similarity replaces Milvus, and MockLLM replaces real model calls.
+You also see the **Fake mode replacements** 鈥?during local testing, simple vector similarity replaces Milvus, and MockLLM replaces real model calls.
 
-**✅ What you learn:** A complete RAG system data flow and component responsibility breakdown.
+**鉁?What you learn:** A complete RAG system data flow and component responsibility breakdown.
 
 ---
 
@@ -458,20 +433,20 @@ This is the round with the most "system design" flavor. The Agent analyzes:
 - **InMemory repositories**: For testing, data disappears on restart
 - **Postgres repositories**: Production source of truth
 
-The Agent flags a **notable design issue**: a brief inconsistency window between session_state data and the database — the user sees a plan cached in session_state, but the database may have been updated by another operation.
+The Agent flags a **notable design issue**: a brief inconsistency window between session_state data and the database 鈥?the user sees a plan cached in session_state, but the database may have been updated by another operation.
 
-**This is a classic system design interview topic — cache consistency issues.**
+**This is a classic system design interview topic 鈥?cache consistency issues.**
 
 The Agent also suggests optimization directions: introducing a version number mechanism or WebSocket real-time sync.
 
-**✅ What you learn:** State management and consistency trade-offs in real projects — must-know interview content.
+**鉁?What you learn:** State management and consistency trade-offs in real projects 鈥?must-know interview content.
 
 ---
 
 ### Round 7: Review and Rescheduling (repo-flow-tracer)
 
 ```
-Use $repo-flow-tracer to trace "task completion → generate review → determine if rescheduling is needed → generate adjusted plan → save".
+Use $repo-flow-tracer to trace "task completion 鈫?generate review 鈫?determine if rescheduling is needed 鈫?generate adjusted plan 鈫?save".
 Focus on explaining how completed tasks are protected, how adjusted plans are validated, and which failure scenarios need handling.
 ```
 
@@ -481,7 +456,7 @@ The Agent analyzes Study-Planner's plan update mechanism, focusing on:
 - **Plan adjustment validation**: New plans go through Critic validation to ensure prerequisite knowledge isn't missed
 - **Failure scenario handling**: When some tasks fail, mark them as "blocked" rather than "complete," preserving context
 
-**✅ What you learn:** Incremental update design — not every modification requires full recalculation.
+**鉁?What you learn:** Incremental update design 鈥?not every modification requires full recalculation.
 
 ---
 
@@ -507,9 +482,9 @@ The Agent scans across 6 dimensions and outputs a complete review table (each is
 | Observability | Missing structured logging         | `infrastructure/llm/real.py:22`      | Hard to debug production issues     | Medium   |
 | Security      | API Key hardcoding risk            | `infrastructure/settings.py:10`      | Credential leakage                  | High     |
 
-Every issue includes a concrete verification plan — for example, "Add LRU Cache for RAG, verify with hit rate benchmark."
+Every issue includes a concrete verification plan 鈥?for example, "Add LRU Cache for RAG, verify with hit rate benchmark."
 
-**✅ What you learn:** How to systematically review a project's architecture quality — not just finding bugs, but scanning across engineering dimensions.
+**鉁?What you learn:** How to systematically review a project's architecture quality 鈥?not just finding bugs, but scanning across engineering dimensions.
 
 ---
 
@@ -522,19 +497,19 @@ Use $repo-design-optimizer to design a safe experiment for the top 1 optimizatio
 First check git status.
 Then suggest a branch or worktree strategy, and output the involved files, minimum viable change, test commands,
 benchmark/verification method, and rollback approach.
-Don't implement yet — wait for my confirmation.
+Don't implement yet 鈥?wait for my confirmation.
 ```
 
 The Agent will:
 
 1. First check your git status to ensure a clean working directory
-2. Design a safe experiment plan — e.g., use a new branch to fix the repair loop infinite retry issue
+2. Design a safe experiment plan 鈥?e.g., use a new branch to fix the repair loop infinite retry issue
 3. List involved files, minimum change scope, test methods, verification metrics, and rollback steps
 4. **Wait for your confirmation before modifying any code**
 
 This is the most important habit: **plan your validation first, then change code.**
 
-**✅ What you learn:** A methodology for safely conducting architecture optimization experiments — not hasty changes, but with planning, validation, and rollback.
+**鉁?What you learn:** A methodology for safely conducting architecture optimization experiments 鈥?not hasty changes, but with planning, validation, and rollback.
 
 ---
 
@@ -565,7 +540,7 @@ The questions progressively deepen up to Level 5:
 
 > **Level 5 Question:** If Study-Planner needs to support 1000 concurrent users, what do you think is the biggest bottleneck in the current architecture? You need to cite at least 3 source code locations to support your judgment.
 
-**✅ What you learn:** Discovering your knowledge gaps through being tested — one of the most effective learning methods.
+**鉁?What you learn:** Discovering your knowledge gaps through being tested 鈥?one of the most effective learning methods.
 
 ---
 
@@ -601,7 +576,7 @@ Many people fall into the same trap when learning system design:
 
 **You read books, memorize questions, look at others' architecture diagrams, but you've never systematically analyzed the code you wrote yourself.**
 
-The value of Repo System Design Skills isn't about how intelligent it is — it's about establishing a reusable, methodology-backed **learning framework**.
+The value of Repo System Design Skills isn't about how intelligent it is 鈥?it's about establishing a reusable, methodology-backed **learning framework**.
 
 - It transforms Agents from "helping you write code" to "teaching you to understand code";
 - It transforms learning from "hear and forget" to "traceable evidence with practice and testing";
@@ -609,7 +584,7 @@ The value of Repo System Design Skills isn't about how intelligent it is — it'
 
 **Next time you take over a new project, don't rush to write code.**
 
-Spend 30 minutes understanding its architecture with this Skill set first. What you learn won't just be this project — it will be the ability to understand any project.
+Spend 30 minutes understanding its architecture with this Skill set first. What you learn won't just be this project 鈥?it will be the ability to understand any project.
 
 ---
 

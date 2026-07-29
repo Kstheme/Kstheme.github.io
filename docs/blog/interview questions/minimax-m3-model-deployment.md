@@ -1,4 +1,4 @@
----
+﻿---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -9,7 +9,7 @@ tags:
   - model-deployment
 title: "An Interview Question from a Small Company: MiniMax M3 Model Deployment and Concurrency Estimation"
 createTime: 2026/06/19 14:40:20
-permalink: /article/minimax-m3-deployment/
+permalink: /blog/minimax-m3-deployment/
 ---
 
 The full problem is as follows:
@@ -18,7 +18,7 @@ MiniMax M3 is an MoE large language model with 428B total parameters, 23B activa
 
 Hardware conditions:
 
-1. GPU: 8 × NVIDIA A6000 Pro, 96GB VRAM per card, deployed with TP8 tensor parallelism;
+1. GPU: 8 脳 NVIDIA A6000 Pro, 96GB VRAM per card, deployed with TP8 tensor parallelism;
 2. Network: Single node 400Gbps high-speed interconnect; VRAM is the performance bottleneck for this calculation, bandwidth does not participate in concurrency estimation.
 
 Please answer the following questions:
@@ -38,7 +38,7 @@ Please answer the following questions:
 
 1. Model: MiniMax M3, MoE mixture-of-experts architecture, 428B total parameters, 23B activated parameters per token, 60 Transformer layers, native MSA sparse attention, KV Cache stored in BF16 precision
 2. Quantization: All weights quantized to INT8, 1 byte per parameter
-3. Hardware: 8 × NVIDIA A6000 Pro, 96GB VRAM per card, TP8 tensor parallelism
+3. Hardware: 8 脳 NVIDIA A6000 Pro, 96GB VRAM per card, TP8 tensor parallelism
 4. System overhead: 10% of total VRAM reserved for system operations, operator activation, and framework scheduling
 5. Context baseline: 128K default, targeting 1M expansion
 
@@ -49,15 +49,15 @@ Please answer the following questions:
 | Hidden dimension (hidden_size)  | 6144  | Transformer layer feature dimension             |
 | Number of attention query heads | 64    | Total Query attention heads                     |
 | Number of KV heads (GQA)        | 4     | Grouped query attention, only 4 Key/Value heads |
-| Attention head dimension        | 96    | Derived from 6144 ÷ 64                          |
+| Attention head dimension        | 96    | Derived from 6144 梅 64                          |
 | BF16 bytes per element          | 2     | Default KV Cache storage precision              |
 | INT8 bytes per element          | 1     | Single parameter size after quantization        |
 
 ### Core Formulas
 
-1. Model weight VRAM = Total parameters × Bytes per parameter
-2. KV Cache VRAM per request = 2 (K matrix + V matrix) × Number of layers × Number of KV heads × Head dimension × Sequence length × Bytes per element
-3. Theoretical max concurrency = Available KV VRAM ÷ KV VRAM per request
+1. Model weight VRAM = Total parameters 脳 Bytes per parameter
+2. KV Cache VRAM per request = 2 (K matrix + V matrix) 脳 Number of layers 脳 Number of KV heads 脳 Head dimension 脳 Sequence length 脳 Bytes per element
+3. Theoretical max concurrency = Available KV VRAM 梅 KV VRAM per request
 
 ---
 
@@ -76,7 +76,7 @@ $$
 \end{align*}
 $$
 
-(Note: Industry standard decimal estimation, 1GB = 10⁹ bytes, consistent with hardware VRAM specifications; the error is within acceptable engineering tolerance.)
+(Note: Industry standard decimal estimation, 1GB = 10鈦?bytes, consistent with hardware VRAM specifications; the error is within acceptable engineering tolerance.)
 
 2. **Total available VRAM across 8 cards**
 
@@ -142,8 +142,8 @@ $$
 
 ### Conclusion
 
-- Standard dense MHA: ~**184GB** KV per request at 128K context — extreme VRAM pressure, a single card cannot serve a single long-context request
-- M3 native GQA + MSA: ~**11.5GB** KV per request at 128K context — only 1/16 of the traditional architecture, the core foundation for long-context viability
+- Standard dense MHA: ~**184GB** KV per request at 128K context 鈥?extreme VRAM pressure, a single card cannot serve a single long-context request
+- M3 native GQA + MSA: ~**11.5GB** KV per request at 128K context 鈥?only 1/16 of the traditional architecture, the core foundation for long-context viability
 
 ---
 
@@ -155,7 +155,7 @@ After deducting model weight VRAM from total effective VRAM, the remaining space
 
 ### Calculation
 
-1. Available VRAM for KV Cache = Effective total VRAM − Weight VRAM = $691.2 - 428 = 263.2 \text{ GB}$
+1. Available VRAM for KV Cache = Effective total VRAM 鈭?Weight VRAM = $691.2 - 428 = 263.2 \text{ GB}$
 2. KV VRAM per request (M3 native, 128K) = 11.5 GB
 3. Theoretical max concurrency:
 
@@ -194,5 +194,5 @@ $$
 
 ### Conclusion
 
-- Per-request KV Cache VRAM increases by 8×, theoretical max concurrency drops to 1/8 of the original, approximately **2~3 concurrent requests**.
-- In production, the Prefill phase at 1M context takes significantly longer, making computation bottlenecks more prominent — actual usable concurrency will be lower than the theoretical value. MSA sparse attention can improve decoding speed by 15× or more, ensuring long-context inference viability, but does not change the VRAM-level concurrency ceiling.
+- Per-request KV Cache VRAM increases by 8脳, theoretical max concurrency drops to 1/8 of the original, approximately **2~3 concurrent requests**.
+- In production, the Prefill phase at 1M context takes significantly longer, making computation bottlenecks more prominent 鈥?actual usable concurrency will be lower than the theoretical value. MSA sparse attention can improve decoding speed by 15脳 or more, ensuring long-context inference viability, but does not change the VRAM-level concurrency ceiling.

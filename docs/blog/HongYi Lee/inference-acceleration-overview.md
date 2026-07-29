@@ -1,4 +1,4 @@
----
+﻿---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -10,7 +10,7 @@ tags:
   - hung-yi-lee
 title: "From Flash Attention to Speculative Decoding: The Most Comprehensive Guide to LLM Inference Acceleration"
 createTime: 2026/07/01 18:16:40
-permalink: /article/inference-acceleration/
+permalink: /blog/inference-acceleration/
 ---
 
 > Anyone who has used ChatGPT knows that the model takes seconds or even tens of seconds to generate a response. Where is the bottleneck? Is there a way to make large language models "speak faster"? This article starts from the underlying principles and breaks down 6 major categories of acceleration techniques to help you build a complete inference acceleration knowledge framework.
@@ -28,7 +28,7 @@ The process of text generation in an LLM is essentially a **word-by-word complet
 
 ![](/images/inference-acceleration/prefill-decode.png)
 
-So how does each step actually compute? This brings us to the core module of the Transformer — **Self-Attention**.
+So how does each step actually compute? This brings us to the core module of the Transformer 鈥?**Self-Attention**.
 
 In simple terms, each token generates three vectors: **Query, Key, Value**. When generating the next token, its Query computes a "similarity score" (dot product) with the Keys of all previous tokens, then uses this score to weight and aggregate all Values.
 
@@ -50,35 +50,35 @@ Paper: https://arxiv.org/abs/2205.14135
 
 ### In One Sentence
 
-Flash Attention doesn't change the attention computation formula — it **changes the order of computation** to reduce data movement, thereby achieving significant speedup.
+Flash Attention doesn't change the attention computation formula 鈥?it **changes the order of computation** to reduce data movement, thereby achieving significant speedup.
 
 ### Understanding GPU Architecture
 
 To understand why Flash Attention is fast, you first need to know how GPUs work:
 
 - GPUs have many **Execution Units** that perform arithmetic
-- Each execution unit has a small "workbench" — **SRAM**, extremely fast but very small
-- Bulk data is stored in a "warehouse" — **HBM (High Bandwidth Memory)**, large capacity but slow to read/write
+- Each execution unit has a small "workbench" 鈥?**SRAM**, extremely fast but very small
+- Bulk data is stored in a "warehouse" 鈥?**HBM (High Bandwidth Memory)**, large capacity but slow to read/write
 
 ![](/images/inference-acceleration/gpu-sram-hbm.png)
 
 So for each operation, the execution unit must first move data from HBM to SRAM, compute, then move it back.
 
-> **The bottleneck of Attention computation isn't slow computation — it's slow data movement.**
+> **The bottleneck of Attention computation isn't slow computation 鈥?it's slow data movement.**
 
 Traditional Attention computation takes several steps, each requiring HBM read/write:
 
-1. Move Q, K → compute dot product → move result back to HBM
-2. Find maximum → move back to HBM
-3. Compute denominator (Softmax sum) → move back to HBM
-4. Compute final attention weight → move back to HBM
-5. Move V in for weighted sum → move result back to HBM
+1. Move Q, K 鈫?compute dot product 鈫?move result back to HBM
+2. Find maximum 鈫?move back to HBM
+3. Compute denominator (Softmax sum) 鈫?move back to HBM
+4. Compute final attention weight 鈫?move back to HBM
+5. Move V in for weighted sum 鈫?move result back to HBM
 
 Throughout the process, HBM is repeatedly read and written.
 
 ### The Core Idea of Flash Attention
 
-Flash Attention merges all these steps — **it doesn't need to compute the full attention weight before doing weighted sum**. It computes and merges on SRAM in one go.
+Flash Attention merges all these steps 鈥?**it doesn't need to compute the full attention weight before doing weighted sum**. It computes and merges on SRAM in one go.
 
 Specifically, it splits K and V into multiple chunks and processes one chunk at a time. The key trick is:
 
@@ -94,14 +94,14 @@ $$
 o_2 = o_1 \frac{s_1}{s_2}(e^{d_1 - d_2}) + \sum^{2N}_{i=N+1}{\frac{e^{a_i - d_2}}{s_2}v_i}
 $$
 
-This formula looks complex, but the core idea is simple: **Multiply the previously computed part by a "correction factor" — no need to recompute**.
+This formula looks complex, but the core idea is simple: **Multiply the previously computed part by a "correction factor" 鈥?no need to recompute**.
 
 ### Effectiveness and Limitations
 
-- ✅ **No change in results**: Mathematically equivalent to standard Attention
-- ✅ **Plug and play**: Can be directly used on any model with Attention
-- ✅ **Significant speedup**: The longer the sequence, the more obvious the effect
-- ⚠️ If the sequence is too short, the speedup is less noticeable
+- 鉁?**No change in results**: Mathematically equivalent to standard Attention
+- 鉁?**Plug and play**: Can be directly used on any model with Attention
+- 鉁?**Significant speedup**: The longer the sequence, the more obvious the effect
+- 鈿狅笍 If the sequence is too short, the speedup is less noticeable
 
 ---
 
@@ -119,9 +119,9 @@ This idea is simple and direct, and it doesn't change the Attention computation 
 
 ### The Cost: Memory Explosion
 
-The problem with KV Cache is obvious — **it consumes too much memory**.
+The problem with KV Cache is obvious 鈥?**it consumes too much memory**.
 
-Every time a new token is added, a new set of K and V must be stored. And it's not just one set — Transformers have **multiple layers × multiple heads of K and V**.
+Every time a new token is added, a new set of K and V must be stored. And it's not just one set 鈥?Transformers have **multiple layers 脳 multiple heads of K and V**.
 
 Let's calculate with Gemma 2:
 
@@ -179,7 +179,7 @@ $$
 a = q \cdot k = q^T k = q^T W_k c = (W_k^T q)^T c = (W_k^T q) \cdot c
 $$
 
-See, **you don't need to decompress $c$ into $k$** — just transform $q$ and do dot product in the compressed space.
+See, **you don't need to decompress $c$ into $k$** 鈥?just transform $q$ and do dot product in the compressed space.
 
 ![](/images/inference-acceleration/mla-dot-product.png)
 
@@ -207,7 +207,7 @@ Key insight: **Do weighted sum on the compressed $c$ first, then decompress only
 
 ### Sliding Window Attention
 
-The core idea is simple: **When computing Attention, don't look at the entire sequence — only look at the nearest N tokens.**
+The core idea is simple: **When computing Attention, don't look at the entire sequence 鈥?only look at the nearest N tokens.**
 
 ![](/images/inference-acceleration/sliding-window-attention.png)
 
@@ -223,7 +223,7 @@ Another approach: **Some layers use Sliding Window, others use global Attention.
 
 ![](/images/inference-acceleration/hybrid-attention.png)
 
-This saves KV Cache while maintaining global视野 in key layers.
+This saves KV Cache while maintaining global瑙嗛噹 in key layers.
 
 ### Streaming LLM
 
@@ -233,7 +233,7 @@ There's an interesting finding: **Using only Sliding Window degrades performance
 
 ![](/images/inference-acceleration/streaming-llm-attention.png)
 
-And this approach **doesn't require retraining** — just modify the inference code.
+And this approach **doesn't require retraining** 鈥?just modify the inference code.
 
 ![](/images/inference-acceleration/streaming-llm-results.png)
 
@@ -245,7 +245,7 @@ Experimental results show that Streaming LLM significantly outperforms pure Wind
 
 Here's a more direct approach: **If some K and V are never used, why not just discard them?**
 
-Research has found that Attention is actually **very sparse** — most tokens have very small attention weights, almost unused.
+Research has found that Attention is actually **very sparse** 鈥?most tokens have very small attention weights, almost unused.
 
 ![](/images/inference-acceleration/attention-sparsity.png)
 
@@ -260,15 +260,15 @@ The core idea is the same: **If a K/V hasn't been used by Attention for a long t
 
 ![](/images/inference-acceleration/kv-pruning.png)
 
-Scissorhands experiments show that **with 5× compression, model performance is essentially the same as without compression**.
+Scissorhands experiments show that **with 5脳 compression, model performance is essentially the same as without compression**.
 
-But ⚠️ subsequent research also found: **when models are given very difficult tasks, arbitrarily discarding K/V can cause significant performance degradation.** This method is suitable for routine tasks but should be used cautiously in critical scenarios.
+But 鈿狅笍 subsequent research also found: **when models are given very difficult tasks, arbitrarily discarding K/V can cause significant performance degradation.** This method is suitable for routine tasks but should be used cautiously in critical scenarios.
 
 ---
 
 ## 07 Cross-Conversation Cache: A Game Changer for Agent Scenarios
 
-The KV Cache approaches discussed so far are all optimizations **within the same conversation**. But KV Cache has an even more advanced application — **sharing across conversations**.
+The KV Cache approaches discussed so far are all optimizations **within the same conversation**. But KV Cache has an even more advanced application 鈥?**sharing across conversations**.
 
 If the same text segment appears in different conversations, their K and V can theoretically be reused.
 
@@ -308,15 +308,15 @@ The conclusion: **With good Prompt writing combined with Cached Input, Agent cos
 
 | Method                          | Description                                     | Changes Attention? | Needs Training? | Main Cost                         |
 | ------------------------------- | ----------------------------------------------- | :----------------: | :-------------: | --------------------------------- |
-| **Flash Attention**             | Reduce HBM reads/writes, optimize compute order |         ✗          |        ✗        | Some extra computation            |
-| **KV Cache**                    | Store computed K and V, avoid recomputation     |         ✗          |        ✗        | Large VRAM usage                  |
-| **Multi-Query Attention**       | Multiple Query heads share one K/V set          |         ✓          |        ✓        | May hurt model capability         |
-| **Grouped-Query Attention**     | Query groups share K/V                          |         ✓          |        ✓        | Efficiency-quality balance        |
-| **Multi-head Latent Attention** | Compress K/V before storing                     |         ✓          |        ✓        | Needs retraining                  |
-| **Sliding Window Attention**    | Attend to nearby tokens only                    |         ✓          |        ?        | May lose long-distance info       |
-| **Streaming LLM**               | Sliding Window + keep initial tokens            |         ✗          |        ✗        | —                                 |
-| **Pruning KV Cache**            | Discard infrequently used K and V               |         ✓          |        ✗        | May degrade on hard tasks         |
-| **Speculative Decoding**        | Small model drafts, large model verifies        | ✗ (theoretically)  |        ✗        | Extra computation for small model |
+| **Flash Attention**             | Reduce HBM reads/writes, optimize compute order |         鉁?         |        鉁?       | Some extra computation            |
+| **KV Cache**                    | Store computed K and V, avoid recomputation     |         鉁?         |        鉁?       | Large VRAM usage                  |
+| **Multi-Query Attention**       | Multiple Query heads share one K/V set          |         鉁?         |        鉁?       | May hurt model capability         |
+| **Grouped-Query Attention**     | Query groups share K/V                          |         鉁?         |        鉁?       | Efficiency-quality balance        |
+| **Multi-head Latent Attention** | Compress K/V before storing                     |         鉁?         |        鉁?       | Needs retraining                  |
+| **Sliding Window Attention**    | Attend to nearby tokens only                    |         鉁?         |        ?        | May lose long-distance info       |
+| **Streaming LLM**               | Sliding Window + keep initial tokens            |         鉁?         |        鉁?       | 鈥?                                |
+| **Pruning KV Cache**            | Discard infrequently used K and V               |         鉁?         |        鉁?       | May degrade on hard tasks         |
+| **Speculative Decoding**        | Small model drafts, large model verifies        | 鉁?(theoretically)  |        鉁?       | Extra computation for small model |
 
 ---
 

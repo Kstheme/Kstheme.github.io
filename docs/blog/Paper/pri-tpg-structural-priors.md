@@ -1,4 +1,4 @@
----
+﻿---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -10,14 +10,14 @@ tags:
   - paper
 title: "LLMs Don't Lack More Knowledge, But Reasoning Structures: A Close Reading of Pri-TPG"
 createTime: 2026/07/17 21:58:42
-permalink: /article/pri-tpg-structural-priors/
+permalink: /blog/pri-tpg-structural-priors/
 ---
 
-> From content retrieval to structure retrieval — a training-free long-range reasoning approach.
+> From content retrieval to structure retrieval 鈥?a training-free long-range reasoning approach.
 
 Large language models exhibit a paradoxical behavior when solving mathematical proofs:
 
-**As problems grow longer, model performance doesn't just gradually decline — it rapidly collapses.**
+**As problems grow longer, model performance doesn't just gradually decline 鈥?it rapidly collapses.**
 
 On the FormalGeo7K geometry reasoning benchmark, Vanilla ICL achieves 52.19% accuracy on shallow L1 problems, but drops to just 7.89% on L3. On longer L5 and L6 reasoning tasks, accuracy falls directly to 0.
 
@@ -47,14 +47,14 @@ This is the problem that the paper **Non-Parametric Structural Priors for Geomet
 | Core Method        | Pri-TPG                                                                    |
 | Research Task      | Multi-step geometry theorem prediction                                     |
 | Technical Approach | RAG + Theorem Precedence Graph + Symbolic Execution                        |
-| Key Feature        | Training-free — no gradient training required for theorem prediction       |
+| Key Feature        | Training-free 鈥?no gradient training required for theorem prediction       |
 | Main Datasets      | FormalGeo7K, Geometry3K, GeoQA                                             |
 | Main Result        | 89.29% on FormalGeo7K                                                      |
 | Keywords           | Structural Drift, Structural Prior, LLM Planner, Neural-Symbolic Reasoning |
 
 One-sentence summary:
 
-> Pri-TPG doesn't directly retrieve answers — it retrieves proof structures from similar problems, then uses these structures to constrain the LLM's next action.
+> Pri-TPG doesn't directly retrieve answers 鈥?it retrieves proof structures from similar problems, then uses these structures to constrain the LLM's next action.
 
 ## 01. Why Is Geometry Theorem Proving Essentially a Search Problem?
 
@@ -64,14 +64,10 @@ For example, a complete proof might require:
 
 ```text
 Prove two sides are equal
-↓
-Determine triangle congruence
-↓
-Derive corresponding angle equality
-↓
-Construct similar triangles
-↓
-Derive the target ratio
+鈫?Determine triangle congruence
+鈫?Derive corresponding angle equality
+鈫?Construct similar triangles
+鈫?Derive the target ratio
 ```
 
 The key isn't just "selecting the correct theorem."
@@ -80,20 +76,13 @@ More importantly:
 
 **The currently selected theorem must be grounded in facts already established.**
 
-If a theorem's prerequisites haven't been satisfied, it cannot be executed — even if it's semantically relevant to the target.
+If a theorem's prerequisites haven't been satisfied, it cannot be executed 鈥?even if it's semantically relevant to the target.
 
 Formally, a geometry problem can be described as:
 
 ```text
-Initial state S₀
-↓ Apply theorem a₁
-State S₁
-↓ Apply theorem a₂
-State S₂
-↓
-……
-↓
-Final state Sₜ satisfies goal g
+Initial state S鈧€
+鈫?Apply theorem a鈧?State S鈧?鈫?Apply theorem a鈧?State S鈧?鈫?鈥︹€?鈫?Final state S鈧?satisfies goal g
 ```
 
 A symbolic executor can check whether each step is valid, but it cannot automatically tell the model:
@@ -103,12 +92,11 @@ A symbolic executor can check whether each step is valid, but it cannot automati
 Assume a theorem library of 300 theorems and a proof requiring H steps. In the most naive case, the search space approaches:
 
 ```text
-300ᴴ
-```
+300岽?```
 
 The longer the reasoning chain, the more erroneous branches exist.
 
-Therefore, the difficulty of geometry proving is not just insufficient knowledge — it's:
+Therefore, the difficulty of geometry proving is not just insufficient knowledge 鈥?it's:
 
 > **How to continuously find valid next steps among an exponentially growing set of candidate paths.**
 
@@ -151,12 +139,9 @@ What does traditional RAG typically do?
 
 ```text
 Input a question
-↓
-Retrieve relevant text or knowledge
-↓
-Include in the prompt
-↓
-Let the LLM generate an answer
+鈫?Retrieve relevant text or knowledge
+鈫?Include in the prompt
+鈫?Let the LLM generate an answer
 ```
 
 It addresses:
@@ -176,14 +161,10 @@ Thus, Pri-TPG is closer to:
 
 ```text
 Input a question
-↓
-Retrieve similar proofs
-↓
-Extract theorem usage order
-↓
-Build a theorem precedence graph
-↓
-Constrain the next reasoning step
+鈫?Retrieve similar proofs
+鈫?Extract theorem usage order
+鈫?Build a theorem precedence graph
+鈫?Constrain the next reasoning step
 ```
 
 The difference can be summarized as:
@@ -196,7 +177,7 @@ The difference can be summarized as:
 | Primarily augments content           | Primarily constrains action space           |
 | Content-Augmented                    | Structure-Augmented                         |
 
-Therefore, Pri-TPG's key insight isn't simply adding more retrieval — it's:
+Therefore, Pri-TPG's key insight isn't simply adding more retrieval 鈥?it's:
 
 > **Transforming retrieval results from "content context" into "reasoning structure."**
 
@@ -218,13 +199,10 @@ It's a directed graph.
 For example, a local path might be:
 
 ```text
-Isosceles triangle判定
-↓
-Isosceles triangle properties
-↓
-Angle equality
-↓
-Similar triangle判定
+Isosceles triangle鍒ゅ畾
+鈫?Isosceles triangle properties
+鈫?Angle equality
+鈫?Similar triangle鍒ゅ畾
 ```
 
 Instead of choosing from 300 theorems arbitrarily, TPG tells the model:
@@ -242,7 +220,7 @@ It's more like a local navigation map:
 | Sensitive to variation        | Allows the LLM to choose within a local graph |
 | Lacks flexibility             | Preserves some planning freedom               |
 
-The paper notes that in FormalGeo7K experiments, after candidate filtering, the number of theorems per step is reduced from roughly 300 to about 30 — approximately a 90% reduction in single-step search space.
+The paper notes that in FormalGeo7K experiments, after candidate filtering, the number of theorems per step is reduced from roughly 300 to about 30 鈥?approximately a 90% reduction in single-step search space.
 
 ## 05. Pri-TPG Doesn't Use Just a Single Static Graph
 
@@ -250,7 +228,7 @@ If we simply count theorem order across all historical proofs and build one glob
 
 > Different problems require different theorem structures.
 
-Circles, triangles, parallelograms, length calculations, angle proofs — each has very different proof paths.
+Circles, triangles, parallelograms, length calculations, angle proofs 鈥?each has very different proof paths.
 
 Therefore, Pri-TPG refines structural priors layer by layer.
 
@@ -276,7 +254,7 @@ It answers:
 
 This layer provides domain-level structure.
 
-But it's too broad — the global graph contains many theorems irrelevant to the current problem.
+But it's too broad 鈥?the global graph contains many theorems irrelevant to the current problem.
 
 ### Layer 2: Query-Adaptive Prior
 
@@ -287,7 +265,7 @@ Retrieval conditions include:
 | Input Modality           | Role                                        |
 | ------------------------ | ------------------------------------------- |
 | Problem text             | Captures semantics and goal type            |
-| Geometry image           | Captures图形 structure                      |
+| Geometry image           | Captures鍥惧舰 structure                      |
 | Initial formalized state | Captures already established symbolic facts |
 
 The system uses multimodal encoders to map this information into a unified vector space, then retrieves Top-K similar problems from the training set.
@@ -315,7 +293,7 @@ Results for different retrieval sizes:
 | 100   | 80.29 | 95.32 | 64.30  | 30.33 |
 | 200   | 84.42 | 96.14 | 73.05  | 40.98 |
 
-As K increases, overall performance steadily improves, especially on medium and hard problems. Long-chain proofs require recalling more specialized theorems — if a critical theorem is missed, subsequent planning cannot succeed.
+As K increases, overall performance steadily improves, especially on medium and hard problems. Long-chain proofs require recalling more specialized theorems 鈥?if a critical theorem is missed, subsequent planning cannot succeed.
 
 ### Layer 3: State-Aware Prior
 
@@ -333,12 +311,9 @@ The system progressively narrows from:
 
 ```text
 Global theorem library
-↓
-Problem-relevant theorem set
-↓
-Currently executable theorems
-↓
-Structurally reasonable theorems
+鈫?Problem-relevant theorem set
+鈫?Currently executable theorems
+鈫?Structurally reasonable theorems
 ```
 
 ![](/images/pri-tpg/three-layer-prior.png)
@@ -361,14 +336,10 @@ The loop is:
 
 ```text
 LLM selects a theorem
-↓
-Symbolic executor verifies and executes
-↓
-Update current state
-↓
-Re-filter graph and candidates based on new state
-↓
-LLM selects again
+鈫?Symbolic executor verifies and executes
+鈫?Update current state
+鈫?Re-filter graph and candidates based on new state
+鈫?LLM selects again
 ```
 
 This closely resembles the typical Agent paradigm:
@@ -395,7 +366,7 @@ It ranks candidates based on three types of information:
 | --------------- | ------------------------------------------------- | ------------------------------------------------ |
 | (s\_{goal})     | Candidate's relevance to the final goal           | Theorems closer to the goal ranked higher        |
 | (s\_{graph})    | Structural relationship to current graph position | Successors of the previous theorem ranked higher |
-| (s\_{hist})     | Historical repetition and failure penalty         | Avoid loops and repeated无效 attempts            |
+| (s\_{hist})     | Historical repetition and failure penalty         | Avoid loops and repeated鏃犳晥 attempts            |
 
 The overall form is:
 
@@ -403,7 +374,7 @@ The overall form is:
 Candidate score = Goal relevance + Graph structural relevance - Historical repetition penalty
 ```
 
-This scoring doesn't replace the LLM's final decision — it surfaces more promising candidates first, then lets the LLM reason based on the problem, state, and historical trajectory.
+This scoring doesn't replace the LLM's final decision 鈥?it surfaces more promising candidates first, then lets the LLM reason based on the problem, state, and historical trajectory.
 
 ## 08. Why Must It Be a Closed Loop Instead of Generating the Full Proof at Once?
 
@@ -428,19 +399,16 @@ This shows that one-shot planning cannot handle errors that occur mid-proof in l
 | Generates the full sequence at once | Selects one step at a time                         |
 | Unified verification at the end     | Immediate verification after each step             |
 | Cannot correct mid-proof            | Can re-plan based on feedback                      |
-| Errors accumulate along the chain   | Errors are截断 in time                             |
-| Long tasks容易 collapse             | Medium-to-long tasks are significantly more stable |
+| Errors accumulate along the chain   | Errors are鎴柇 in time                             |
+| Long tasks瀹规槗 collapse             | Medium-to-long tasks are significantly more stable |
 
 Formal reasoning must be a closed loop:
 
 ```text
 Plan
-↓
-Execute
-↓
-Feedback
-↓
-Correct
+鈫?Execute
+鈫?Feedback
+鈫?Correct
 ```
 
 ![](/images/pri-tpg/singlepass-vs-iterative.png)
@@ -481,9 +449,9 @@ From the table:
 
 | Setting     | Iterative | RAG | TPG | Total | Hard  |
 | ----------- | --------- | --- | --- | ----- | ----- |
-| Vanilla ICL | ✓         | ✗   | ✗   | 26.29 | 0.00  |
-| w/o TPG     | ✓         | ✓   | ✗   | 72.64 | 22.95 |
-| Pri-TPG     | ✓         | ✓   | ✓   | 84.42 | 40.98 |
+| Vanilla ICL | 鉁?        | 鉁?  | 鉁?  | 26.29 | 0.00  |
+| w/o TPG     | 鉁?        | 鉁?  | 鉁?  | 72.64 | 22.95 |
+| Pri-TPG     | 鉁?        | 鉁?  | 鉁?  | 84.42 | 40.98 |
 
 This set of experiments shows:
 
@@ -499,7 +467,7 @@ TPG further improves from 72.64% to 84.42%, showing:
 
 > Finding relevant theorems doesn't mean knowing how to organize them.
 
-### Evidence Chain 2: More Precise Structural Priors → Better Results
+### Evidence Chain 2: More Precise Structural Priors 鈫?Better Results
 
 | Setting              | Total | Easy  | Medium | Hard  |
 | -------------------- | ----- | ----- | ------ | ----- |
@@ -515,7 +483,7 @@ The real improvements come from:
 1. Making the structure relevant to the current problem;
 2. Making the structure relevant to the current state.
 
-Thus, bigger structural priors aren't better — what matters is:
+Thus, bigger structural priors aren't better 鈥?what matters is:
 
 > **The closer they are to the current problem and current reasoning state, the better.**
 
@@ -577,7 +545,7 @@ Therefore:
 
 "Non-parametric" mainly means:
 
-> The theorem prediction strategy isn't re-trained into model weights — it's provided as external retrieval graphs and structural priors at inference time.
+> The theorem prediction strategy isn't re-trained into model weights 鈥?it's provided as external retrieval graphs and structural priors at inference time.
 
 ## 11. What Limitations Does the Paper Explicitly Acknowledge?
 
@@ -586,7 +554,7 @@ Therefore:
 | Lower inference efficiency            | Multi-step planning requires repeated LLM calls                |
 | Very long chains remain difficult     | Significant accuracy drop on L6                                |
 | TPG is local                          | Primarily encodes local precedence, not full global depth      |
-| Single-step errors have high impact   | One failed step can破坏 the entire subsequent proof chain      |
+| Single-step errors have high impact   | One failed step can鐮村潖 the entire subsequent proof chain      |
 | Still relies on base model capability | Stronger backbones generally yield higher absolute performance |
 
 These limitations show:
@@ -595,13 +563,13 @@ These limitations show:
 
 ## 12. My Further Analysis
 
-The following questions aren't all explicitly raised by the paper, but are延伸 judgments based on its method design and experimental results.
+The following questions aren't all explicitly raised by the paper, but are寤朵几 judgments based on its method design and experimental results.
 
 ### 1. Is TPG a Logical Dependency Graph or an Empirical Order Graph?
 
 The paper describes edges (u \rightarrow v) as prerequisite dependencies between theorems.
 
-But the graph is primarily constructed from historical解题 trajectories.
+But the graph is primarily constructed from historical瑙ｉ trajectories.
 
 | Strict Logical Dependency           | Historical Empirical Order            |
 | ----------------------------------- | ------------------------------------- |
@@ -623,14 +591,14 @@ Thus, a question worth further investigation is:
 
 > Does TPG learn causal dependencies or high-frequency path templates?
 
-### 2. Local Structural Consistency ≠ Global Proof Consistency
+### 2. Local Structural Consistency 鈮?Global Proof Consistency
 
 Pri-TPG primarily performs structural localization based on successors of the previous theorem.
 
 | Local Advantage                       | Potential Problem                            |
 | ------------------------------------- | -------------------------------------------- |
 | Maintains step-by-step coherence      | May restrict cross-branch switches           |
-| Reduces无效 successors                | May miss alternative proof routes            |
+| Reduces鏃犳晥 successors                | May miss alternative proof routes            |
 | Reduces short-range search difficulty | Doesn't guarantee eventual goal reachability |
 | Leverages historical local patterns   | May struggle with backtracking               |
 
@@ -642,13 +610,13 @@ This is also a key reason why very long chains like L6 remain difficult.
 
 Pri-TPG applies history penalty to repeated and failed theorems.
 
-But this mechanism mainly adjusts candidate ranking within the current推理.
+But this mechanism mainly adjusts candidate ranking within the current鎺ㄧ悊.
 
 | Current Mechanism                 | Further Structure Learning               |
 | --------------------------------- | ---------------------------------------- |
 | Down-weights failed theorems      | Locates the node or edge causing failure |
 | Avoids repeated attempts          | Updates the graph structure itself       |
-| Effective within the current task | Can accumulate经验 across tasks          |
+| Effective within the current task | Can accumulate缁忛獙 across tasks          |
 | Local ranking adjustment          | Global credit assignment                 |
 
 It hasn't yet truly achieved:
@@ -707,18 +675,12 @@ A possible process:
 
 ```text
 LLM reasons along the current TPG
-↓
-Symbolic executor detects path failure or goal unreachable
-↓
-Locate the node or edge that first made subsequent completion impossible
-↓
-Perform backward credit assignment on the relevant local structure
-↓
-Lower erroneous edge weights, raise alternative path weights
-↓
-Update the TPG
-↓
-Re-plan
+鈫?Symbolic executor detects path failure or goal unreachable
+鈫?Locate the node or edge that first made subsequent completion impossible
+鈫?Perform backward credit assignment on the relevant local structure
+鈫?Lower erroneous edge weights, raise alternative path weights
+鈫?Update the TPG
+鈫?Re-plan
 ```
 
 The corresponding research question can be formulated as:
@@ -786,4 +748,4 @@ Future long-horizon Agents may need not only stronger models, larger contexts, a
 
 > **Extracting structure from history, validating structure during execution, and updating structure from failure.**
 
-And that may be the most值得 pursuing question that Pri-TPG leaves for Agent research.
+And that may be the most鍊煎緱 pursuing question that Pri-TPG leaves for Agent research.

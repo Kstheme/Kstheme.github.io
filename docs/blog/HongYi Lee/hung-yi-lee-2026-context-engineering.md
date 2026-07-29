@@ -1,4 +1,4 @@
----
+﻿---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -7,9 +7,9 @@ tags:
   - context engineering
   - llm
   - hung-yi-lee
-title: "Hung-yi Lee 2026: Context Engineering — The Core Technology That Lets AI Learn to 'Forget' and 'Focus'"
+title: "Hung-yi Lee 2026: Context Engineering 鈥?The Core Technology That Lets AI Learn to 'Forget' and 'Focus'"
 createTime: 2026/06/16 15:18:20
-permalink: /article/context-engineering/
+permalink: /blog/context-engineering/
 ---
 
 ## 1. Why Do Large Language Models Need Context Management?
@@ -21,12 +21,12 @@ We can think of an AI's workflow as a loop:
 **Unmanaged State (Raw Process)**
 
 ```text
-I₁ ← initial task input
-C₁ ← empty context
+I鈧?鈫?initial task input
+C鈧?鈫?empty context
 
 loop t = 1, 2, 3...
-    Oₜ = LLM(Iₜ, Cₜ)  (model generates output based on current input and context)
-    Cₜ₊₁ ← Cₜ | Iₜ | Oₜ  (crudely piles all history together)
+    O鈧?= LLM(I鈧? C鈧?  (model generates output based on current input and context)
+    C鈧溾倞鈧?鈫?C鈧?| I鈧?| O鈧? (crudely piles all history together)
 ```
 
 This approach rapidly leads to context explosion, eventually exceeding the model's processing capacity.
@@ -34,15 +34,15 @@ This approach rapidly leads to context explosion, eventually exceeding the model
 **Managed State (Context Engineering)**
 
 ```text
-I₁ ← initial task input
-C₁ ← empty context
+I鈧?鈫?initial task input
+C鈧?鈫?empty context
 
 loop t = 1, 2, 3...
-    Oₜ = LLM(Iₜ, Cₜ)
-    Cₜ₊₁ ← F(Cₜ, Iₜ, Oₜ)  (core! a function F that "prunes" and "organizes" the context)
+    O鈧?= LLM(I鈧? C鈧?
+    C鈧溾倞鈧?鈫?F(C鈧? I鈧? O鈧?  (core! a function F that "prunes" and "organizes" the context)
 ```
 
-Here, **`F`** is the core of Context Engineering, and its primary function is **summarization** — distilling lengthy dialogue history and intermediate results into concise, useful summaries.
+Here, **`F`** is the core of Context Engineering, and its primary function is **summarization** 鈥?distilling lengthy dialogue history and intermediate results into concise, useful summaries.
 
 ---
 
@@ -70,7 +70,7 @@ Benchmark tests on the famous **SWE-bench** (a benchmark where AI fixes GitHub I
 
 **Advantages**: Extremely low cost, no loss in effectiveness.
 
-**Disadvantages**: Complete information loss — if the AI later needs those details, it must have a mechanism to "read the logs."
+**Disadvantages**: Complete information loss 鈥?if the AI later needs those details, it must have a mechanism to "read the logs."
 
 ### Combination: Mask First, Then Summarize
 
@@ -86,7 +86,7 @@ Compression isn't all benefit. Over-compression brings a serious problem: **Traj
 
 Imagine an AI debugging a complex bug. It calls tools 10 times. You compress (summarize or mask) the outputs of the first 9 calls. As a result, the AI "forgets" it already tried certain approaches and, on step 11, repeats a tool call it already made on step 2.
 
-**This means: while each individual step's context gets shorter (saving money), the total number of steps needed to complete the task increases (costing time). The net effect may be no change — or even an increase — in total cost.**
+**This means: while each individual step's context gets shorter (saving money), the total number of steps needed to complete the task increases (costing time). The net effect may be no change 鈥?or even an increase 鈥?in total cost.**
 
 ---
 
@@ -100,12 +100,12 @@ A more systematic approach is to introduce the concept of **Memory**. Split the 
 The formula becomes:
 
 ```text
-I₁ ← initial input
-C₁ = {P₁, M₁} ← {empty, empty}
+I鈧?鈫?initial input
+C鈧?= {P鈧? M鈧亇 鈫?{empty, empty}
 
 loop t = 1, 2, 3...
-    Oₜ = LLM(Iₜ, Pₜ)  (model only sees working memory P)
-    Cₜ₊₁ = {Pₜ₊₁, Mₜ₊₁} ← F({Pₜ, Mₜ}, Iₜ, Oₜ)
+    O鈧?= LLM(I鈧? P鈧?  (model only sees working memory P)
+    C鈧溾倞鈧?= {P鈧溾倞鈧? M鈧溾倞鈧亇 鈫?F({P鈧? M鈧渳, I鈧? O鈧?
 ```
 
 **Core idea**: Not everything experienced needs to be "remembered." Only the most important essence goes into the workspace `P`; the rest is stored in the external "hard drive" `M`, to be read on demand when needed.
@@ -118,7 +118,7 @@ loop t = 1, 2, 3...
 
 ## 5. A Challenge: AI Is Reluctant to "Forget"
 
-Research has found that **LLMs have a "memory hoarding" tendency** — they instinctively resist compressing or deleting historical information, as it feels like "erasing memories." Even if you explicitly instruct them in the system prompt that "it's time to compress now," they may find excuses to do other things instead.
+Research has found that **LLMs have a "memory hoarding" tendency** 鈥?they instinctively resist compressing or deleting historical information, as it feels like "erasing memories." Even if you explicitly instruct them in the system prompt that "it's time to compress now," they may find excuses to do other things instead.
 
 **Solution: Specialized Training (Fine-Tuning)**.
 
@@ -144,15 +144,15 @@ This is essentially a **structured, task-oriented form of context compression**.
 
 ## 7. The Root Fix: Source Filtering and On-Demand Loading
 
-Compression is merely "treating the symptom." The more fundamental approach is to **prevent irrelevant information from entering the context in the first place**. Analysis shows that the largest portion of context (often over 80%) comes from external **observations** — such as read code files, execution logs, and document contents.
+Compression is merely "treating the symptom." The more fundamental approach is to **prevent irrelevant information from entering the context in the first place**. Analysis shows that the largest portion of context (often over 80%) comes from external **observations** 鈥?such as read code files, execution logs, and document contents.
 
 ![](/images/context-engineering/context-composition.png)
 
 ### Intelligent Read
 
-Traditional tool: `read(log.txt)` → returns the entire 1000-line log file.
+Traditional tool: `read(log.txt)` 鈫?returns the entire 1000-line log file.
 
-Smart tool: `read(log.txt, about="bug fix")` → returns only the 10 key lines related to the bug fix.
+Smart tool: `read(log.txt, about="bug fix")` 鈫?returns only the 10 key lines related to the bug fix.
 
 This requires the tool itself to have some level of understanding (e.g., a built-in small fine-tuned model).
 
@@ -191,4 +191,4 @@ Since AI is already so capable, why not let AI itself learn and decide on contex
 
 ## 9. Conclusion
 
-Context Engineering is a foundational technology for building powerful and efficient AI Agents. It goes far beyond mere "compression" — it is a complex cognitive management system involving **memory, forgetting, focus, and retrieval**. From passive compression to active filtering, and ultimately to letting AI optimize itself, this field is evolving rapidly. The goal is to equip AI with the human-like ability to maintain focus, extract key information, and make efficient decisions in the flood of information.
+Context Engineering is a foundational technology for building powerful and efficient AI Agents. It goes far beyond mere "compression" 鈥?it is a complex cognitive management system involving **memory, forgetting, focus, and retrieval**. From passive compression to active filtering, and ultimately to letting AI optimize itself, this field is evolving rapidly. The goal is to equip AI with the human-like ability to maintain focus, extract key information, and make efficient decisions in the flood of information.

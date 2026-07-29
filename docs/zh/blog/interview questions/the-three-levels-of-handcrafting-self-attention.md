@@ -8,7 +8,7 @@ tags:
   - llm
 title: 自注意力手工实现的三个境界
 createTime: 2026/06/16 15:18:20
-permalink: /zh/article/ozftpyls/
+permalink: /zh/blog/ozftpyls/
 ---
 
 ## 引言

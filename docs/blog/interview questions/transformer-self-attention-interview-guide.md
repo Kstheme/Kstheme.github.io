@@ -1,4 +1,4 @@
----
+﻿---
 author: Kstheme
 date: 2025-11-10T00:00:00.000Z
 category:
@@ -9,7 +9,7 @@ tags:
   - interview
 title: "Transformer Interview Essential: Detailed Breakdown of Self-Attention + Why It's Better Than RNN for Long Sequences"
 createTime: 2026/06/16 15:18:20
-permalink: /article/transformer-self-attention/
+permalink: /blog/transformer-self-attention/
 ---
 
 > Interviewer: "Please explain in detail how the self-attention mechanism in the Transformer model works. Why is it better suited for handling long sequences than RNN?"
@@ -25,8 +25,8 @@ Consider the input sentence:
 **"The cat sat on the mat because it was tired."**
 We want the model to understand that "it" refers to "cat."
 
-- **RNN**: Must read word by word from the first to the last, compressing information into a single hidden state — the farther away, the more information is lost.
-- **Self-Attention**: Lets "it" directly attend to all other words in the sentence and automatically assign attention weights — high weight to "cat," low weight to "mat."
+- **RNN**: Must read word by word from the first to the last, compressing information into a single hidden state 鈥?the farther away, the more information is lost.
+- **Self-Attention**: Lets "it" directly attend to all other words in the sentence and automatically assign attention weights 鈥?high weight to "cat," low weight to "mat."
 
 This is the core idea of self-attention: **each word computes relevance with every other word in the sequence, then aggregates information.**
 
@@ -63,7 +63,7 @@ $$
 \text{Scores} = QK^T
 $$
 
-- $Q$ shape $(n, d_k)$, $K^T$ shape $(d_k, n)$ → resulting shape $(n, n)$
+- $Q$ shape $(n, d_k)$, $K^T$ shape $(d_k, n)$ 鈫?resulting shape $(n, n)$
 - Each element $\text{score}_{ij}$ represents the raw attention that position $i$ pays to position $j$.
 
 #### Step 3: Scale
@@ -92,7 +92,7 @@ $$
 \text{Attention}(Q, K, V) = A \cdot V
 $$
 
-- $A$ shape $(n, n)$, $V$ shape $(n, d_v)$ → resulting shape $(n, d_v)$
+- $A$ shape $(n, n)$, $V$ shape $(n, d_v)$ 鈫?resulting shape $(n, d_v)$
 
 **The output at each position dynamically fuses contextual information from the entire sequence.**
 
@@ -132,7 +132,7 @@ A single head can only capture one type of relationship. Transformer uses **mult
 
 ### 1.4 Compensating for Missing Position Information: Positional Encoding
 
-Self-attention is **permutation equivariant** — shuffling the input order merely shuffles the output correspondingly.
+Self-attention is **permutation equivariant** 鈥?shuffling the input order merely shuffles the output correspondingly.
 To inject sequence order, Transformer adds **positional encoding** $P$ to the input word embeddings. $P$ also has shape $(n, d_{model})$ and is obtained through sine/cosine functions or learned embeddings.
 
 The input becomes $X + P$, allowing the model to distinguish positional relationships like "A comes before B."
@@ -148,18 +148,18 @@ The input becomes $X + P$, allowing the model to distinguish positional relation
 | **Gradient Stability** | BPTT involves chain multiplication, prone to vanishing/exploding | Gradients only pass through Softmax and linear layers; path is very short |
 | **Memory Bottleneck** | Compressed into a fixed-size hidden state; information gets diluted | Each output can directly access the full Value matrix |
 | **Interpretability** | Difficult | Attention weight matrix $n \times n$ can be directly visualized |
-| **Complexity** | O(n·d²) but sequential | Standard O(n²·d), but highly parallelized, actually faster than RNN |
+| **Complexity** | O(n路d虏) but sequential | Standard O(n虏路d), but highly parallelized, actually faster than RNN |
 
 ### Detailed Explanation
 
 1. **Information flow path length is O(1)**
-   RNN requires $n$ recursive steps to pass information from the first word to the $n$th word, causing severe decay in long-range dependencies. Self-attention establishes direct connections between any two positions in a single matrix multiplication — the path is always 1.
+   RNN requires $n$ recursive steps to pass information from the first word to the $n$th word, causing severe decay in long-range dependencies. Self-attention establishes direct connections between any two positions in a single matrix multiplication 鈥?the path is always 1.
 
 2. **Fully parallelized, dramatic training efficiency**
-   RNN must compute step by step along the time dimension and cannot parallelize across the sequence. Self-attention is fundamentally matrix multiplication — the entire sequence is processed in one shot, achieving extremely high GPU utilization and dozens of times faster training.
+   RNN must compute step by step along the time dimension and cannot parallelize across the sequence. Self-attention is fundamentally matrix multiplication 鈥?the entire sequence is processed in one shot, achieving extremely high GPU utilization and dozens of times faster training.
 
 3. **More stable gradient propagation**
-   RNN's BPTT involves chain multiplication, making it prone to vanishing or exploding gradients. Self-attention's gradients only pass through Softmax and linear mappings — the path is extremely short, gradients are stable, and long-distance dependency signals are much easier to learn.
+   RNN's BPTT involves chain multiplication, making it prone to vanishing or exploding gradients. Self-attention's gradients only pass through Softmax and linear mappings 鈥?the path is extremely short, gradients are stable, and long-distance dependency signals are much easier to learn.
 
 4. **No fixed-size memory bottleneck**
    RNN compresses all history into a fixed-dimensional hidden state; information in long sequences gets diluted. In self-attention, each output can directly access the full Value matrix, and memory capacity scales naturally with sequence length.
@@ -168,7 +168,7 @@ The input becomes $X + P$, allowing the model to distinguish positional relation
    The attention weight matrix $A$ ($n \times n$) can be directly visualized, clearly showing word-to-word dependency relationships, making debugging and analysis easier.
 
 6. **Complexity comparison and advanced approaches**
-   Standard self-attention has $O(n^2)$ time complexity, but matrix multiplication is highly parallelized — for sequences up to several thousand tokens, it is practically faster than RNN's sequential computation. For extremely long sequences, variants such as sparse attention, linear attention, and state space models reduce complexity to $O(n)$ or $O(n\log n)$ while preserving global receptive fields, still outperforming RNN.
+   Standard self-attention has $O(n^2)$ time complexity, but matrix multiplication is highly parallelized 鈥?for sequences up to several thousand tokens, it is practically faster than RNN's sequential computation. For extremely long sequences, variants such as sparse attention, linear attention, and state space models reduce complexity to $O(n)$ or $O(n\log n)$ while preserving global receptive fields, still outperforming RNN.
 
 ---
 
@@ -178,7 +178,7 @@ When asked this in an interview, here's how to answer concisely:
 
 ### How does self-attention work?
 
-> Imagine every word is at a roundtable discussion, able to talk directly to any other word — not like RNN where messages have to be passed along one by one.
+> Imagine every word is at a roundtable discussion, able to talk directly to any other word 鈥?not like RNN where messages have to be passed along one by one.
 >
 > The computation is straightforward:
 > Input sequence X, shape `[n, d_model]`.
@@ -186,10 +186,10 @@ When asked this in an interview, here's how to answer concisely:
 > In standard multi-head attention, `d_k = d_v = d_model / h`.
 >
 > Then:
-> 1. **Compute scores**: `S = QKᵀ` → shape `[n, n]`.
-> 2. **Scale**: `S / √d_k`.
+> 1. **Compute scores**: `S = QK岬€` 鈫?shape `[n, n]`.
+> 2. **Scale**: `S / 鈭歞_k`.
 > 3. **Softmax**: apply per row to get weight matrix A (`[n, n]`, each row sums to 1).
-> 4. **Weighted sum**: `A V` → output `[n, d_v]`, each word fuses global context.
+> 4. **Weighted sum**: `A V` 鈫?output `[n, d_v]`, each word fuses global context.
 >
 > Multi-head attention runs the above process $h$ times in parallel, each head learning different relationships. Finally, all head outputs are concatenated into `[n, d_model]` and linearly projected.
 > Since self-attention is order-agnostic, we add **positional encoding** to the input to inform the model about word positions.
@@ -198,9 +198,9 @@ When asked this in an interview, here's how to answer concisely:
 
 > Four core reasons:
 > 1. **Extremely short path**: Any two words connect directly (O(1)), so long-range dependencies never get lost.
-> 2. **Fully parallel**: It's all matrix multiplication — throw the entire sentence into the GPU at once, training is dozens of times faster.
-> 3. **Stable gradients**: Gradients only pass through Softmax and linear layers — no chain multiplication, much more stable optimization.
-> 4. **No memory bottleneck**: Can directly access V from any position — lossless information, no need to "forget."
+> 2. **Fully parallel**: It's all matrix multiplication 鈥?throw the entire sentence into the GPU at once, training is dozens of times faster.
+> 3. **Stable gradients**: Gradients only pass through Softmax and linear layers 鈥?no chain multiplication, much more stable optimization.
+> 4. **No memory bottleneck**: Can directly access V from any position 鈥?lossless information, no need to "forget."
 >
 > In a nutshell: self-attention replaces RNN's **step-by-step recursive compression** with **global direct interaction**, fundamentally solving the core pain point of long-sequence modeling.
 
@@ -208,7 +208,7 @@ When asked this in an interview, here's how to answer concisely:
 
 ## 4. Summary
 
-- **Self-Attention**: Q, K, V scaled dot-product + Softmax + weighted sum → each word aggregates global information.
+- **Self-Attention**: Q, K, V scaled dot-product + Softmax + weighted sum 鈫?each word aggregates global information.
 - **Multi-Head Attention**: Multiple subspaces learn in parallel, concatenated then linearly transformed.
 - **Compared to RNN**: O(1) path length, fully parallel, stable gradients, no memory bottleneck, strong interpretability.
 

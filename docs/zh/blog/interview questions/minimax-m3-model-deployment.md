@@ -9,7 +9,7 @@ tags:
   - 模型部署
 title: "面试某小厂遇到的一个面试题：MiniMax M3 模型部署与并发估算"
 createTime: 2026/06/19 14:40:20
-permalink: /zh/article/minimax-m3-deployment/
+permalink: /zh/blog/minimax-m3-deployment/
 ---
 
 完整题目如下：

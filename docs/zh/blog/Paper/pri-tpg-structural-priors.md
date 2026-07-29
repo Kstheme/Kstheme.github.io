@@ -10,7 +10,7 @@ tags:
   - paper
 title: "LLM 缺的不是更多知识，而是推理结构：精读 Pri-TPG"
 createTime: 2026/07/17 21:58:42
-permalink: /zh/article/pri-tpg-structural-priors/
+permalink: /zh/blog/pri-tpg-structural-priors/
 ---
 
 > 从内容检索到结构检索，一种 Training-free 的长程推理方案

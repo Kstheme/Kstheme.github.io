@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "description": "",
-  "author": "Alan Zero <342200758@qq.com>",
+  "author": "Kstheme <342200758@qq.com>",
   "license": "MIT",
   "scripts": {
     "docs:build": "vuepress build docs --clean-cache --clean-temp",
