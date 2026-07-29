@@ -11,7 +11,7 @@ tags:
   - aaai
 title: "Why Can a 13B Small Model Solve Geometry Problems That GPT Gets Wrong? — A Close Reading of AAAI-25 GNS"
 createTime: 2026/07/29 17:27:20
-permalink: /article/gns-neural-symbolic-geometry/
+permalink: /blog/gns-neural-symbolic-geometry/
 copyright: Kstheme
 ---
 

@@ -10,7 +10,7 @@ tags:
   - hung-yi-lee
 title: "The Most Complete Breakdown of LLM Positional Encoding: Absolute, Relative, Rotary, and No Positional Encoding at All"
 createTime: 2026/07/22 17:53:20
-permalink: /article/positional-encoding-guide/
+permalink: /blog/positional-encoding-guide/
 copyright: Kstheme
 ---
 

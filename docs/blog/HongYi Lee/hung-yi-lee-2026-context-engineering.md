@@ -9,7 +9,7 @@ tags:
   - hung-yi-lee
 title: "Hung-yi Lee 2026: Context Engineering — The Core Technology That Lets AI Learn to 'Forget' and 'Focus'"
 createTime: 2026/06/16 15:18:20
-permalink: /article/context-engineering/
+permalink: /blog/context-engineering/
 ---
 
 ## 1. Why Do Large Language Models Need Context Management?

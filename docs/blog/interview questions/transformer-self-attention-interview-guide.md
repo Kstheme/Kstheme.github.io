@@ -9,7 +9,7 @@ tags:
   - interview
 title: "Transformer Interview Essential: Detailed Breakdown of Self-Attention + Why It's Better Than RNN for Long Sequences"
 createTime: 2026/06/16 15:18:20
-permalink: /article/transformer-self-attention/
+permalink: /blog/transformer-self-attention/
 ---
 
 > Interviewer: "Please explain in detail how the self-attention mechanism in the Transformer model works. Why is it better suited for handling long sequences than RNN?"

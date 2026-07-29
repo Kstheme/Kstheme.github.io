@@ -9,7 +9,7 @@ tags:
   - agent
 title: "Turn Any GitHub Repository Into a System Design Course: This Open Source Project Makes It Happen"
 createTime: 2026/06/21 23:26:20
-permalink: /article/repo-system-design-skills/
+permalink: /blog/repo-system-design-skills/
 ---
 
 > Have you ever done this: When taking over a project, you just get it running first. When you encounter a bug, you add some logs. When you see a new PR, you merge it. But a year later, if someone asks you how the project architecture is designed, you can't answer?

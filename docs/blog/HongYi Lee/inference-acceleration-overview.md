@@ -10,7 +10,7 @@ tags:
   - hung-yi-lee
 title: "From Flash Attention to Speculative Decoding: The Most Comprehensive Guide to LLM Inference Acceleration"
 createTime: 2026/07/01 18:16:40
-permalink: /article/inference-acceleration/
+permalink: /blog/inference-acceleration/
 ---
 
 > Anyone who has used ChatGPT knows that the model takes seconds or even tens of seconds to generate a response. Where is the bottleneck? Is there a way to make large language models "speak faster"? This article starts from the underlying principles and breaks down 6 major categories of acceleration techniques to help you build a complete inference acceleration knowledge framework.

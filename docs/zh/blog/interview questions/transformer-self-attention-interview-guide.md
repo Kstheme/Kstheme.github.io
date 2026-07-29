@@ -9,7 +9,7 @@ tags:
   - interview
 title: 'Transformer 面试必考：自注意力机制详细拆解 + 为什么它比 RNN 更适合长序列？'
 createTime: 2026/06/16 15:18:20
-permalink: /zh/article/transformer-self-attention/
+permalink: /zh/blog/transformer-self-attention/
 ---
 
 > 面试官："请详细解释 Transformer 模型中的自注意力机制是如何工作的？它为什么比 RNN 更适合处理长序列？"

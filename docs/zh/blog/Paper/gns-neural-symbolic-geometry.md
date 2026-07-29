@@ -11,7 +11,7 @@ tags:
   - aaai
 title: "GPT 算不对的平面几何题，13B 小模型为什么能解？——AAAI-25 GNS 论文精读"
 createTime: 2026/07/29 17:27:20
-permalink: /zh/article/gns-neural-symbolic-geometry/
+permalink: /zh/blog/gns-neural-symbolic-geometry/
 copyright: Kstheme
 ---
 

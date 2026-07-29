@@ -9,7 +9,7 @@ tags:
   - model-deployment
 title: "An Interview Question from a Small Company: MiniMax M3 Model Deployment and Concurrency Estimation"
 createTime: 2026/06/19 14:40:20
-permalink: /article/minimax-m3-deployment/
+permalink: /blog/minimax-m3-deployment/
 ---
 
 The full problem is as follows:

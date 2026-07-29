@@ -37,7 +37,7 @@ const enBlog = defineCollection({
   title: "Blog",
   // 文章列表页的链接，如果 `linkPrefix` 未定义，它也将作为 相关的文章的 permalink 的前缀
   link: "/blog/",
-  linkPrefix: "/article/", // 相关文章的链接前缀
+  linkPrefix: "/blog/", // 相关文章的链接前缀
   postList: true, // 是否启用文章列表页
   tags: true, // 是否启用标签页
   archives: true, // 是否启用归档页
@@ -81,7 +81,7 @@ const zhBlog = defineCollection({
   title: "Blog",
   // 文章列表页的链接，如果 `linkPrefix` 未定义，它也将作为 相关的文章的 permalink 的前缀
   link: "/blog/",
-  linkPrefix: "/article/", // 相关文章的链接前缀
+  linkPrefix: "/blog/", // 相关文章的链接前缀
   postList: true, // 是否启用文章列表页
   tags: true, // 是否启用标签页
   archives: true, // 是否启用归档页

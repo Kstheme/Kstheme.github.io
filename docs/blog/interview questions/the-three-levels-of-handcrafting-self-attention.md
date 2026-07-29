@@ -8,7 +8,7 @@ tag:
   - llm
 title: the-three-levels-of-handcrafting-self-attention
 createTime: 2026/06/16 15:18:20
-permalink: /article/ozftpyls/
+permalink: /blog/ozftpyls/
 ---
 
 ## Introduction

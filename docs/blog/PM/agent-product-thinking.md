@@ -10,7 +10,7 @@ tags:
   - requirements
 title: "You Know the Tech, but Don't Know What Agent Product to Build? I Found a Framework from 3 Case Studies"
 createTime: 2026/07/04 15:18:20
-permalink: /article/agent-product-thinking/
+permalink: /blog/agent-product-thinking/
 ---
 
 I used to have a very real dilemma.

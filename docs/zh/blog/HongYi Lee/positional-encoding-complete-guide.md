@@ -10,7 +10,7 @@ tags:
   - 李宏毅
 title: "大模型位置编码最全拆解：绝对位置、相对位置、旋转位置，以及不用位置编码"
 createTime: 2026/07/22 17:53:20
-permalink: /zh/article/positional-encoding-guide/
+permalink: /zh/blog/positional-encoding-guide/
 copyright: Kstheme
 ---
 

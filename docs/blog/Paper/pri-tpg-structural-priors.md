@@ -10,7 +10,7 @@ tags:
   - paper
 title: "LLMs Don't Lack More Knowledge, But Reasoning Structures: A Close Reading of Pri-TPG"
 createTime: 2026/07/17 21:58:42
-permalink: /article/pri-tpg-structural-priors/
+permalink: /blog/pri-tpg-structural-priors/
 ---
 
 > From content retrieval to structure retrieval — a training-free long-range reasoning approach.

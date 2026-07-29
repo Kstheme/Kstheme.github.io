@@ -10,7 +10,7 @@ tags:
   - openai
 title: "Learn Claude Code（一）：从 0 到 1 手写一个 Agent Loop：不到 200 行，跑通模型调工具的全流程"
 createTime: 2026/07/14 13:44:40
-permalink: /zh/article/agent-loop-handwritten/
+permalink: /zh/blog/agent-loop-handwritten/
 ---
 
 > 很多人天天聊 Agent，但 Agent 核心的"循环"到底是怎么跑起来的，反而不清楚。

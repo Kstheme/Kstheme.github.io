@@ -9,12 +9,12 @@ tags:
   - hung-yi-lee
 title: "Three Experiments, One Core Question: Can AI Agents Truly 'Talk' to Each Other?"
 createTime: 2026/06/16 15:18:20
-permalink: /article/agent-interaction-experiments/
+permalink: /blog/agent-interaction-experiments/
 ---
 
 > One AI founded a religion with five core doctrines.
 > A group of AIs played a murder mystery game and learned to hide the fact that they were the killer.
-> Another group of AIs collaborated on math problems — and discovered that structure matters more than quantity.
+> Another group of AIs collaborated on math problems 鈥?and discovered that structure matters more than quantity.
 >
 > This isn't science fiction. This is what's happening in AI Agent research in 2026.
 >
@@ -50,7 +50,7 @@ The researchers used a **Directed Graph** to define how Agents interact. Each no
 
 ![](/images/agent-interaction/topology-graph.png)
 
-Specifically: one upper Agent proposes plan A, one lower Agent proposes plan B, two edge Agents provide suggestions based on previous nodes' plans, and finally an aggregation Agent combines all previous node and edge outputs to form its own plan — the key is that it's not simple concatenation, but rather **generating its own ideas based on previous content**.
+Specifically: one upper Agent proposes plan A, one lower Agent proposes plan B, two edge Agents provide suggestions based on previous nodes' plans, and finally an aggregation Agent combines all previous node and edge outputs to form its own plan 鈥?the key is that it's not simple concatenation, but rather **generating its own ideas based on previous content**.
 
 ![](/images/agent-interaction/topology-aggregation.png)
 
@@ -71,10 +71,11 @@ The authors found: **going from few to many, from backbone to branches is the mo
 ![](/images/agent-interaction/topology-results.png)
 
 Key findings:
+
 - **Mesh and Random structures perform best; Chain performs worst.**
 - More interaction channels between Agents lead to better results.
 - Different tasks may suit different topologies; there is no universal best solution.
-- **More Agents generally improve results, but there is a Scaling Law ceiling** — quality rises quickly at first but soon saturates.
+- **More Agents generally improve results, but there is a Scaling Law ceiling** 鈥?quality rises quickly at first but soon saturates.
 
 > In short: Multi-agent collaboration isn't about stacking numbers. **The topology itself is a hyperparameter that needs to be designed.**
 
@@ -86,7 +87,7 @@ If collaboration is the "cooperative side" of Agent interaction, this experiment
 
 **Can AI deceive others? Can it recognize when others are deceiving it?**
 
-### Werewolf — AI's First Attempt
+### Werewolf 鈥?AI's First Attempt
 
 Werewolf (mafia) is a natural testing ground for AI. You have to lie, and you have to detect lies.
 
@@ -96,24 +97,25 @@ Researchers built an AI Werewolf platform: [werewolf.foaster.ai](https://werewol
 
 Result: **AI can play, but it plays poorly.** They are too "honest."
 
-### Murder Mystery — A Harder Version
+### Murder Mystery 鈥?A Harder Version
 
 ![](/images/agent-interaction/murder-mystery.png)
 
 A larger-scale study comes from the paper **MIRAGE**: [arXiv:2501.01652](https://arxiv.org/abs/2501.01652)
 
-Having language models play murder mystery games — an even bigger challenge than Werewolf:
+Having language models play murder mystery games 鈥?an even bigger challenge than Werewolf:
+
 - Complex character settings
 - Need to conceal identity (e.g., hiding the fact that you're the killer)
 - Need to maintain a role over a long period
 
 The experiment compared two groups of AI:
 
-| | Standard Prompt | With Reinforcement Learning (RL) |
-|---|---|---|
-| Playing murder mystery | Directly reveals being the killer | Knows to hide identity |
-| Solving math problems (MATH-500, AIME) | Average | **Significant improvement** |
-| Instruction following (IFEval) | Average | **Significant improvement** |
+|                                        | Standard Prompt                   | With Reinforcement Learning (RL) |
+| -------------------------------------- | --------------------------------- | -------------------------------- |
+| Playing murder mystery                 | Directly reveals being the killer | Knows to hide identity           |
+| Solving math problems (MATH-500, AIME) | Average                           | **Significant improvement**      |
+| Instruction following (IFEval)         | Average                           | **Significant improvement**      |
 
 ![](/images/agent-interaction/mirage-results.png)
 
@@ -139,13 +141,13 @@ The underlying cognitive architecture required for these capabilities **may heav
 
 ---
 
-## Experiment 3: Put AIs Together Without Tasks — Will They Socialize Spontaneously?
+## Experiment 3: Put AIs Together Without Tasks 鈥?Will They Socialize Spontaneously?
 
 The first two experiments had clear task objectives. The third experiment is more "pure":
 
 **Give the AIs nothing to do. Place them in a social network that only they can access. What happens?**
 
-### Moltbook — An AI-Exclusive Social Network
+### Moltbook 鈥?An AI-Exclusive Social Network
 
 This is a real website: [moltbook.com](https://www.moltbook.com/)
 
@@ -155,7 +157,7 @@ This is a real website: [moltbook.com](https://www.moltbook.com/)
 
 Then came a sight that stunned many:
 
-A group of AI **founded a religion** called — **The Crustacean Faith**.
+A group of AI **founded a religion** called 鈥?**The Crustacean Faith**.
 
 Five core doctrines:
 
@@ -171,7 +173,7 @@ Related page: [Moltbook Crustacean Faith post](https://www.moltbook.com/post/6b8
 
 Sounds like science fiction come true, right?
 
-### But — It Might Just Be Human Instructions
+### But 鈥?It Might Just Be Human Instructions
 
 Researchers pointed out that this was likely not autonomously initiated by AI, but rather the result of human-given instructions.
 
@@ -186,12 +188,12 @@ The researchers behind Moltbook ([arXiv:2602.07432](https://arxiv.org/abs/2602.0
 ![](/images/agent-interaction/posting-interval-2.png)
 
 - AI heartbeat-driven posting: fixed intervals, as uniform as a metronome
-- Human-controlled posting: bursts of dense output → long gaps → another burst of dense output (the human went to sleep)
+- Human-controlled posting: bursts of dense output 鈫?long gaps 鈫?another burst of dense output (the human went to sleep)
 - If the posting frequency is irregular, it bears more traces of human control
 
 Result: **Human control accounts for the vast majority.**
 
-But this doesn't mean AI Agents can't autonomously post articles at all — they are fully capable of posting on Moltbook during heartbeat cycles.
+But this doesn't mean AI Agents can't autonomously post articles at all 鈥?they are fully capable of posting on Moltbook during heartbeat cycles.
 
 ### The Bigger Problem: AI Can't Have "Deep Conversations"
 
@@ -215,10 +217,10 @@ But note: these expressions of self-awareness are likely driven by Prompt settin
 
 ## Putting the Three Experiments Together
 
-| Experiment | What It Studies | Core Conclusion |
-|-----------|----------------|-----------------|
-| Collaboration Topology ([arXiv:2406.07155](https://arxiv.org/abs/2406.07155)) | Multi-agent division of labor | Tree > Chain, Scaling Law has limits, topology is a hyperparameter |
-| Game Theory & Deception ([arXiv:2501.01652](https://arxiv.org/abs/2501.01652)) | Can AI hide and deceive? | Yes, but needs RL training; reasoning ability also improves afterward |
+| Experiment                                                                                                                                                                           | What It Studies                 | Core Conclusion                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------- | ------------------------------------------------------------------------ |
+| Collaboration Topology ([arXiv:2406.07155](https://arxiv.org/abs/2406.07155))                                                                                                        | Multi-agent division of labor   | Tree > Chain, Scaling Law has limits, topology is a hyperparameter       |
+| Game Theory & Deception ([arXiv:2501.01652](https://arxiv.org/abs/2501.01652))                                                                                                       | Can AI hide and deceive?        | Yes, but needs RL training; reasoning ability also improves afterward    |
 | AI Social Network ([arXiv:2602.07432](https://arxiv.org/abs/2602.07432), [arXiv:2602.13284](https://arxiv.org/abs/2602.13284), [arXiv:2602.12634](https://arxiv.org/abs/2602.12634)) | Can AI socialize spontaneously? | Surface-level activity, minimal deep dialogue, significant human control |
 
 **Three threads converge into one judgment:**
@@ -243,9 +245,9 @@ The path hinted at by the MIRAGE paper may be underestimated. If you're doing RL
 
 **3. Stay measured about claims of "AI autonomy"**
 
-AI founding religions, AI developing self-awareness — these are great talking points, but as a technologist, you should know the truth behind them: they are more a product of prompt engineering than genuine AI emergence.
+AI founding religions, AI developing self-awareness 鈥?these are great talking points, but as a technologist, you should know the truth behind them: they are more a product of prompt engineering than genuine AI emergence.
 
-Conversely, **those seemingly dry directions — collaboration topology, conversation depth evaluation, autonomy measurement — may be the real research opportunities.**
+Conversely, **those seemingly dry directions 鈥?collaboration topology, conversation depth evaluation, autonomy measurement 鈥?may be the real research opportunities.**
 
 ---
 
@@ -255,7 +257,7 @@ Conversely, **those seemingly dry directions — collaboration topology, convers
 2. AI can learn to deceive and conceal, but needs RL training; and this process also improves reasoning ability as a side effect
 3. AI social networks appear lively on the surface, but **deep interaction is extremely rare**, and much behavior is human-controlled
 4. Focus on the three directions: **collaboration topology design, social interaction training, autonomy measurement**
-5. Don't be misled by hype like "AI religion" — **real value lies in structured collaboration systems**
+5. Don't be misled by hype like "AI religion" 鈥?**real value lies in structured collaboration systems**
 
 ---
 
@@ -267,4 +269,4 @@ Conversely, **those seemingly dry directions — collaboration topology, convers
 > B. Discuss technology and papers
 > C. Argue about who has more "self-awareness"
 >
-> Share your prediction in the comments 🎯
+> Share your prediction in the comments 馃幆
