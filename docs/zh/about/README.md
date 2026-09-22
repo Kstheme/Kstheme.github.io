@@ -10,7 +10,7 @@ title: 关于
 
 交付的不是 Demo，是每天处理成千上万页、在真实业务中稳定运行的线上系统。
 
-现在我在西交利物浦大学读**模式识别与智能系统**硕士，把工程直觉往上游推一步——关注 AI4Math、LLM Reasoning 与高效推理。
+现在我在**读研**，把工程直觉往上游推一步——从「让模型用起来」转向「搞清模型为什么这样工作」。
 
 ---
 
@@ -24,26 +24,27 @@ title: 关于
 - **大模型后训练与对齐** — LoRA/SFT 微调、指令样本构造、结构化输出对齐、大规模 Prompt 工程
 - **RAG 与知识图谱** — GraphRAG 架构、混合检索（BM25 + 向量 + 图谱）、Neo4j 建模、多跳推理
 - **Agent 系统** — LangGraph 多智能体工作流、任务规划、工具调用、记忆机制、生产级编排
-- **大模型推理与 AI4Math** — Chain-of-Thought、Self-Consistency、Test-Time Scaling、Verifier / Reward Model
 - **生产工程** — ONNX/TensorRT 加速、vLLM 推理部署、FastAPI 服务、Paddle-Lite 端侧部署
 
 ---
 
-## 教育背景
+## 研究方向
 
-**西交利物浦大学** | 模式识别与智能系统，人工智能与先进技术学院 | 硕士研究生 —— 2026.09 - 至今
+目前**硕士在读**，把重心从工程落地转向推理能力的机制与提效，具体关注这几个方向：
 
-主修课程：模式识别、强化学习、自然语言处理、语音语言处理
+- **AI4Math 与数学推理** — 几何问题求解（Geometry Problem Solving）、形式化方法与神经符号（Neural-Symbolic）的结合、长链推理中的结构性先验
+- **LLM Reasoning** — Chain-of-Thought、Self-Consistency、Test-Time Scaling，以及 Verifier / Reward Model 等推理验证方法
+- **高效推理与小模型** — Small Language Models 的能力边界、推理加速与成本控制
+- **多模态推理** — MLLM Reasoning、文档与图表的结构化理解
+- **Agent 基础设施** — Agent Memory、MCP、Skills 等 Agent 底座方向
 
-**宁波工程学院** | 计算机科学与技术，网络空间安全学院 | 工学学士 —— 2018.09 - 2022.06（GPA 3.9/4）
-
-主修课程：微积分、C/C++、Java、Python、数据结构、计算机组成原理、操作系统、计算机网络、机器学习、自然语言处理、数字图像处理
+我把这条线理解成「把三年踩过的坑，变成可复用的方法」：工程上见过的失败模式，往往正是研究里值得追问的问题。
 
 ---
 
 ## 工作经历
 
-**北京南昊科技股份有限公司** | 技术经理 | AI 算法研发 —— 2022.07 - 2025.10
+**某 K12 教育科技公司** | 技术经理 | AI 算法研发 —— 2022.07 - 2025.10
 
 主导文档智能与 OCR + LLM 系统的算法研发与落地，覆盖扫描文档、手写文本、复杂版面等真实场景。
 
@@ -70,9 +71,9 @@ title: 关于
 
 </VPCard>
 
-<VPCard title="智学作文智能判评平台" icon="material-symbols:edit-document">
+<VPCard title="作文智能判评平台" icon="material-symbols:edit-document">
 
-FAST-AND-SLOW 双引擎架构：Slow 模块用微调后的 Qwen2.5-32B 深度推理生成结构化评估报告，Fast 模块在 LLM 表征后接全连接层做快速分数预测，并按置信度阈值决定是否触发重评估。基于 Swift 对 Qwen2.5-32B 做 LoRA 微调（2000 条多难度标注样本）。已上线 APP、公众号、Web 端。**OCR 准确率 98.5%，与人工评分误差 ≤5 分的比例约 90%。**
+FAST-AND-SLOW 双引擎架构：Slow 模块用微调后的 Qwen2.5-32B 深度推理生成结构化评估报告，Fast 模块在 LLM 表征后接全连接层做快速分数预测，并按置信度阈值决定是否触发重评估。基于 Swift 对 Qwen2.5-32B 做 LoRA 微调（2000 条多难度标注样本）。已在移动端与 Web 端上线。**OCR 准确率 98.5%，与人工评分误差 ≤5 分的比例约 90%。**
 
 <Badge type="tip" text="Qwen2.5-32B" />
 <Badge type="tip" text="Swift/LoRA" />
@@ -157,6 +158,8 @@ FAST-AND-SLOW 双引擎架构：Slow 模块用微调后的 Qwen2.5-32B 深度推
 ## 一起做点什么
 
 如果你有文档与智能结合的难题——合同分析、表单处理、知识库自动化、或者某个我还未曾想到的方向——我很乐意聊聊。
+
+如果你正在做 **AI4Math、数学推理、几何问题求解** 这类方向，想找人讨论或合作，同样欢迎来找我。
 
 `killkstheme@outlook.com` · [GitHub](https://github.com/Kstheme) · [知乎](https://www.zhihu.com/people/kstheme)
 

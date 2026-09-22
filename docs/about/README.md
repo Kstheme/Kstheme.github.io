@@ -10,7 +10,7 @@ For the past three years I've been building production systems that sit at the i
 
 The result is systems that don't just recognise text — they understand what it means, evaluate its quality, and answer questions about it. Thousands of pages processed daily, at production latency.
 
-I'm now studying for a Master's in **Pattern Recognition and Intelligent Systems** at Xi'an Jiaotong-Liverpool University, pushing the engineering intuition one step upstream — with a focus on AI4Math, LLM Reasoning, and efficient inference.
+I'm now **back at university for a Master's**, pushing the engineering intuition one step upstream — from "getting models to work" toward "understanding why they work the way they do."
 
 ---
 
@@ -26,26 +26,27 @@ My work spans the full pipeline — from image preprocessing and layout analysis
 - **LLM Post-Training & Alignment** — LoRA/SFT fine-tuning, instruction construction, structured output alignment, prompt engineering at scale
 - **RAG & Knowledge Graphs** — GraphRAG architecture, hybrid retrieval (BM25 + vector + graph), Neo4j modelling, multi-hop reasoning
 - **Agent Systems** — Multi-agent workflows with LangGraph, task planning, tool calling, memory, production orchestration
-- **LLM Reasoning & AI4Math** — Chain-of-Thought, Self-Consistency, Test-Time Scaling, Verifier / Reward Models
 - **Production Engineering** — ONNX/TensorRT acceleration, vLLM serving, FastAPI, edge deployment with Paddle-Lite
 
 ---
 
-## Education
+## Research focus
 
-**Xi'an Jiaotong-Liverpool University** | Pattern Recognition and Intelligent Systems, School of AI and Advanced Computing | Master's Degree — 2026.09 – Present
+I'm currently **pursuing a Master's degree**, shifting my centre of gravity from shipping systems to understanding the mechanisms and efficiency of reasoning. Specifically:
 
-Coursework: Pattern Recognition, Reinforcement Learning, Natural Language Processing, Speech and Language Processing
+- **AI4Math & Mathematical Reasoning** — Geometry Problem Solving, combining formal methods with neural-symbolic approaches, and structural priors in long-horizon reasoning
+- **LLM Reasoning** — Chain-of-Thought, Self-Consistency, Test-Time Scaling, and verification methods such as Verifier / Reward Models
+- **Efficient inference & small models** — the capability boundaries of Small Language Models, inference acceleration, and cost control
+- **Multimodal reasoning** — MLLM Reasoning, structured understanding of documents and charts
+- **Agent infrastructure** — Agent Memory, MCP, and Skills as agent substrate
 
-**Ningbo University of Technology** | Computer Science and Technology, School of Cyberspace Security | B.Eng. — 2018.09 – 2022.06 (GPA 3.9/4)
-
-Coursework: Calculus, C/C++, Java, Python, Data Structures, Computer Organisation, Operating Systems, Computer Networks, Machine Learning, Natural Language Processing, Digital Image Processing
+I see this as "turning three years of hard-won lessons into reusable method": the failure modes I hit in engineering are often exactly the questions worth asking in research.
 
 ---
 
 ## Experience
 
-**Beijing Nanhao Technology Co., Ltd.** | Technical Manager | AI Algorithm R&D — 2022.07 – 2025.10
+**A K12 education technology company** | Technical Manager | AI Algorithm R&D — 2022.07 – 2025.10
 
 Led algorithm R&D and delivery for document intelligence and OCR + LLM systems, covering scanned documents, handwritten text, and complex layouts in real-world conditions.
 
@@ -74,7 +75,7 @@ An end-to-end recognition and auto-grading system for scanned documents, connect
 
 <VPCard title="Essay Evaluation Platform" icon="material-symbols:edit-document">
 
-A FAST-AND-SLOW dual-engine architecture: the Slow module uses a fine-tuned Qwen2.5-32B for deep reasoning and structured evaluation reports, while the Fast module attaches a fully-connected head to the LLM representation for instant score prediction, using a confidence threshold to decide when to trigger re-evaluation. Qwen2.5-32B was LoRA-tuned with Swift on 2000 annotated samples of varying difficulty. Live on mobile app, official account, and web. **98.5% OCR accuracy, ~90% of scores within 5 points of human raters.**
+A FAST-AND-SLOW dual-engine architecture: the Slow module uses a fine-tuned Qwen2.5-32B for deep reasoning and structured evaluation reports, while the Fast module attaches a fully-connected head to the LLM representation for instant score prediction, using a confidence threshold to decide when to trigger re-evaluation. Qwen2.5-32B was LoRA-tuned with Swift on 2000 annotated samples of varying difficulty. Live on mobile and web. **98.5% OCR accuracy, ~90% of scores within 5 points of human raters.**
 
 <Badge type="tip" text="Qwen2.5-32B" />
 <Badge type="tip" text="Swift/LoRA" />
@@ -159,6 +160,8 @@ I also believe that AI-assisted development is the new normal. I practice what I
 ## Let's build something
 
 I'm always interested in tackling hard problems where documents meet intelligence — whether it's contract analysis, form processing, knowledge base automation, or something I haven't imagined yet.
+
+I'm equally keen to hear from anyone working on **AI4Math, mathematical reasoning, or geometry problem solving** — research discussions and collaborations are very welcome.
 
 `killkstheme@outlook.com` · [GitHub](https://github.com/Kstheme) · [知乎](https://www.zhihu.com/people/kstheme)
 
