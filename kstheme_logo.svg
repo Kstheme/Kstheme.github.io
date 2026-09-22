@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">kstheme KS logo</title>
+  <desc id="desc">A minimalist KS monogram logo with dark rounded square background, white K, cyan S, and AI node lines.</desc>
+  <defs>
+    <linearGradient id="bg" x1="70" y1="50" x2="442" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1b1d20"/>
+      <stop offset="0.55" stop-color="#101215"/>
+      <stop offset="1" stop-color="#0b0d10"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="270" y1="150" x2="420" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16d2e2"/>
+      <stop offset="0.5" stop-color="#08a9c9"/>
+      <stop offset="1" stop-color="#057da5"/>
+    </linearGradient>
+    <filter id="softShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity="0.30"/>
+    </filter>
+    <filter id="letterShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- app icon background -->
+  <rect x="36" y="36" width="440" height="440" rx="82" fill="url(#bg)" filter="url(#softShadow)"/>
+
+  <!-- subtle corner highlight -->
+  <path d="M96 58H222" stroke="#ffffff" stroke-opacity="0.05" stroke-width="2"/>
+  <path d="M58 96V222" stroke="#ffffff" stroke-opacity="0.05" stroke-width="2"/>
+
+  <!-- AI connection lines behind monogram -->
+  <g stroke="#10b7d1" stroke-width="5" stroke-linecap="round" stroke-opacity="0.78" fill="none">
+    <path d="M140 278L214 236L277 323L370 378"/>
+    <path d="M214 236L346 140"/>
+    <path d="M214 236L258 343"/>
+  </g>
+
+  <!-- K monogram -->
+  <g filter="url(#letterShadow)">
+    <text x="122" y="338" font-family="Avenir Next, Inter, Helvetica Neue, Arial, sans-serif" font-size="250" font-weight="300" fill="#f4f7f9" letter-spacing="-22">K</text>
+  </g>
+
+  <!-- S monogram as text for clean scalability -->
+  <g filter="url(#letterShadow)">
+    <text x="241" y="342" font-family="Avenir Next, Inter, Helvetica Neue, Arial, sans-serif" font-size="252" font-weight="300" fill="url(#cyan)" letter-spacing="-18">S</text>
+  </g>
+
+  <!-- small cut/underline accents approximating the original logo -->
+  <path d="M250 349H337" stroke="#0b0d10" stroke-width="13" stroke-linecap="round" opacity="0.55"/>
+  <path d="M226 371H318" stroke="url(#cyan)" stroke-width="15" stroke-linecap="square" opacity="0.95"/>
+
+  <!-- nodes placed on top -->
+  <g fill="#11b9d4" stroke="#0a1115" stroke-width="5">
+    <circle cx="140" cy="278" r="12"/>
+    <circle cx="214" cy="236" r="10"/>
+    <circle cx="258" cy="343" r="10"/>
+    <circle cx="346" cy="140" r="11"/>
+    <circle cx="370" cy="378" r="12"/>
+  </g>
+</svg>

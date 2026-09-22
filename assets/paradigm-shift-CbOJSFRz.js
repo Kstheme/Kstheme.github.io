@@ -1,0 +1,1 @@
+var e=`/images/gns/main-results.png`,t=`/images/gns/difficulties.png`,n=`/images/gns/evolution.png`,r=`/images/gns/framework.png`,i=`/images/gns/dataset.png`,a=`/images/gns/benchmark-results.png`,o=`/images/gns/ablation.png`,s=`/images/gns/paradigm-shift.png`;export{r as a,e as c,i,o as n,n as o,a as r,t as s,s as t};

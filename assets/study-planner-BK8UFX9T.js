@@ -1,0 +1,1 @@
+var e=`/images/repo-system-design/skill-overview.png`,t=`/images/repo-system-design/study-planner.png`;export{e as n,t};

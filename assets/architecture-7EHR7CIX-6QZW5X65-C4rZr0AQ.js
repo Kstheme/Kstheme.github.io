@@ -1,0 +1,1 @@
+import{Vr as e}from"./common-Dj5H8TAk.js";export{e as createArchitectureServices};
