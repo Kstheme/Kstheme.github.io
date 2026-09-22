@@ -8,9 +8,12 @@ A collection of open-source projects I've built and maintained.
 
 <VPCard title="Study-Planner" icon="material-symbols:calendar-clock-outline">
 
-An AI-powered learning operating system that turns goals into structured study plans. Features RAG-based Q&A over your materials, daily task tracking, automated review reports, and intelligent replanning.
+An AI-powered learning operating system that turns goals into structured study plans. A six-stage LangGraph agent workflow (Profile → Knowledge → Resource → Planner → Critic → Output) uses a Planner-Critic repair loop to keep improving plan completeness and executability. A full RAG pipeline parses PDF/TXT/Markdown, stores vectors in Milvus, and traces citations — supporting material Q&A, summarisation, knowledge-point extraction, and flashcard generation. Includes a PostgreSQL persistence layer plus dashboards for task distribution, daily load, and review progress. Six-layer architecture with a framework-free domain model, and a Fake/Real dual mode toggled by one line of config. **30+ pytest cases.**
 
 <Badge type="tip" text="Python" />
+<Badge type="tip" text="LangGraph" />
+<Badge type="tip" text="RAG" />
+<Badge type="tip" text="Milvus" />
 <Badge type="info" text="⭐ 6" />
 
 **[GitHub →](https://github.com/Kstheme/Study-Planner)**
@@ -40,7 +43,7 @@ A collection of reusable AI-agent skills for scientific research, targeting Natu
 
 <VPCard title="Kstheme.github.io" icon="material-symbols:globe-outline">
 
-Personal blog and portfolio built with VuePress & vuepress-theme-plume. Sharing insights on AI, LLMs, and software engineering.
+Personal blog and portfolio built with VuePress & vuepress-theme-plume, publishing regularly on LLMs, Agents, RAG, AI4Math, computer vision, and AI engineering practice. Also runs the WeChat official account **Kstheme for AI** (250+ followers).
 
 <Badge type="tip" text="TypeScript" />
 

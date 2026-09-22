@@ -48,7 +48,7 @@ export default defineThemeConfig({
     { icon: "zhihu", link: "https://www.zhihu.com/people/kstheme" },
     {
       icon: "material-symbols:mail-outline",
-      link: "mailto:killkstheme@gmail.com",
+      link: "mailto:killkstheme@outlook.com",
     },
     { icon: "juejin", link: "https://juejin.cn/user/3732214924982244" },
     { icon: "simple-icons:csdn", link: "https://blog.csdn.net/Kstheme" },
